@@ -15,8 +15,8 @@
     --brown-deep: #CBAE8F;
     --gray: #E4E4E2;
     --gray-deep: #B9B7B4;
-    --ink: #4A3B35;
-    --muted: #B3A79B;
+    --ink: #4B4B49;
+    --muted: #A8A6A2;
     --white: #FFFDFA;
     --radius: 18px;
     --gap: 14px;
@@ -117,6 +117,37 @@
     display:flex; justify-content:flex-end; align-items:center; gap:4px;
   }
 
+  /* ---------- 메인 영역: 화면 전환 ---------- */
+  .main-view{ display:none; flex-direction:column; gap:20px; flex:1; min-height:0; }
+  .main-view.active{ display:flex; }
+
+  .view-header{
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .view-header h2{
+    font-size:20px; font-weight:700; letter-spacing:0.3px;
+  }
+
+  .calendar-layout{
+    display:grid; grid-template-columns: 1fr 260px; gap:16px; flex:1; min-height:0;
+  }
+  .calendar-box, .todo-box{
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(74,59,53,0.05);
+    padding: 20px;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--muted); font-size:14px; font-weight:500;
+    min-height: 360px;
+  }
+  .habit-bar{
+    background: var(--gray);
+    border-radius: 14px;
+    padding: 14px 20px;
+    text-align:center;
+    color: var(--ink); font-size:14px; font-weight:500;
+  }
+
   /* 데스크톱 전용: 퀵버튼 세로 나열 (아이콘 + 라벨 가로 정렬) */
   .desktop-view .quick-buttons{
     display:flex;
@@ -146,6 +177,44 @@
   .mobile-view .profile .avatar svg{ width:22px; height:22px; }
   .mobile-view .quick-buttons{ margin-bottom:20px; }
 
+  /* 모바일: 화면 전환 */
+  .main-view-m{ display:none; flex-direction:column; gap:14px; }
+  .main-view-m.active{ display:flex; }
+
+  .mobile-view .view-header{
+    display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;
+  }
+  .mobile-view .view-header h2{
+    font-size:18px; font-weight:700; letter-spacing:0.3px;
+  }
+  .mobile-calendar-box{
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(74,59,53,0.05);
+    padding: 20px;
+    min-height: 220px;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--muted); font-size:14px; font-weight:500;
+  }
+
+  /* 접었다 펼 수 있는 섹션 (투두 / 해빗트래커) */
+  .collapsible{
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 2px 10px rgba(74,59,53,0.05);
+    overflow:hidden;
+  }
+  .collapsible-header{
+    width:100%;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 14px 16px;
+    font-size:14px; font-weight:600; color: var(--ink);
+  }
+  .collapsible-header svg{ color: var(--muted); transition: transform .2s ease; }
+  .collapsible-header.open svg{ transform: rotate(180deg); }
+  .collapsible-content{ display:none; padding: 0 16px 16px; color: var(--muted); font-size:13px; }
+  .collapsible-content.open{ display:block; }
+
   @media (max-width: 768px){
     .desktop-view{ display:none; }
     .mobile-view{ display:block; }
@@ -169,19 +238,36 @@
       </div>
 
       <div class="quick-buttons">
-        <button>일정</button>
-        <button>시간</button>
-        <button>메모</button>
-        <button>?</button>
+        <button onclick="showMainView('view-calendar')">일정</button>
+        <button onclick="showMainView('view-default')">시간</button>
+        <button onclick="showMainView('view-default')">메모</button>
+        <button onclick="showMainView('view-default')">?</button>
       </div>
     </aside>
 
     <main class="main">
-      <div class="topbar">
-        <button class="icon-btn"><i data-lucide="plus"></i></button>
-        <button class="icon-btn"><i data-lucide="mail"></i></button>
-        <button class="icon-btn"><i data-lucide="bell"></i></button>
-        <button class="icon-btn"><i data-lucide="settings"></i></button>
+      <div id="view-default" class="main-view active">
+        <div class="topbar">
+          <button class="icon-btn"><i data-lucide="plus"></i></button>
+          <button class="icon-btn"><i data-lucide="mail"></i></button>
+          <button class="icon-btn"><i data-lucide="bell"></i></button>
+          <button class="icon-btn"><i data-lucide="settings"></i></button>
+        </div>
+      </div>
+
+      <div id="view-calendar" class="main-view">
+        <div class="view-header">
+          <h2>CALENDAR</h2>
+          <div class="topbar" style="justify-content:flex-end;">
+            <button class="icon-btn"><i data-lucide="plus"></i></button>
+            <button class="icon-btn"><i data-lucide="more-horizontal"></i></button>
+          </div>
+        </div>
+        <div class="calendar-layout">
+          <div class="calendar-box">달력</div>
+          <div class="todo-box">투두</div>
+        </div>
+        <div class="habit-bar">해빗트래커</div>
       </div>
     </main>
   </div>
@@ -210,14 +296,59 @@
     </div>
 
     <div class="quick-buttons">
-      <button>일정</button>
-      <button>시간</button>
-      <button>메모</button>
-      <button>?</button>
+      <button onclick="showMobileView('mobile-view-calendar')">일정</button>
+      <button onclick="showMobileView('mobile-view-default')">시간</button>
+      <button onclick="showMobileView('mobile-view-default')">메모</button>
+      <button onclick="showMobileView('mobile-view-default')">?</button>
+    </div>
+
+    <div id="mobile-view-default" class="main-view-m active"></div>
+
+    <div id="mobile-view-calendar" class="main-view-m">
+      <div class="view-header">
+        <h2>CALENDAR</h2>
+        <div class="icon-group">
+          <button class="icon-btn"><i data-lucide="plus"></i></button>
+          <button class="icon-btn"><i data-lucide="more-horizontal"></i></button>
+        </div>
+      </div>
+
+      <div class="mobile-calendar-box">달력</div>
+
+      <div class="collapsible">
+        <button class="collapsible-header open" onclick="toggleCollapse(this)">
+          투두 <i data-lucide="chevron-down"></i>
+        </button>
+        <div class="collapsible-content open">투두 리스트가 여기에 들어갑니다.</div>
+      </div>
+
+      <div class="collapsible">
+        <button class="collapsible-header open" onclick="toggleCollapse(this)">
+          해빗트래커 <i data-lucide="chevron-down"></i>
+        </button>
+        <div class="collapsible-content open">해빗트래커 내용이 여기에 들어갑니다.</div>
+      </div>
     </div>
 
   </div>
 
-<script>lucide.createIcons();</script>
+<script>
+  lucide.createIcons();
+  function showMainView(id){
+    document.querySelectorAll('.main-view').forEach(function(el){ el.classList.remove('active'); });
+    var target = document.getElementById(id);
+    if(target){ target.classList.add('active'); }
+  }
+  function showMobileView(id){
+    document.querySelectorAll('.main-view-m').forEach(function(el){ el.classList.remove('active'); });
+    var target = document.getElementById(id);
+    if(target){ target.classList.add('active'); }
+  }
+  function toggleCollapse(btn){
+    var content = btn.nextElementSibling;
+    var isOpen = content.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+  }
+</script>
 </body>
 </html>
