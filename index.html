@@ -13,6 +13,8 @@
     --pink-deep: #E8B7BB;
     --brown: #EFE6D8;
     --brown-deep: #CBAE8F;
+    --gray: #E4E4E2;
+    --gray-deep: #B9B7B4;
     --ink: #4A3B35;
     --muted: #B3A79B;
     --white: #FFFDFA;
@@ -22,7 +24,7 @@
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
     font-family:'Pretendard', -apple-system, sans-serif;
-    background: var(--pink);
+    background: var(--white);
     color: var(--ink);
     min-height:100vh;
   }
@@ -34,6 +36,7 @@
   .search-box{
     display:flex; align-items:center; gap:8px;
     background:var(--white);
+    border: 1px solid #EAE7E3;
     border-radius: 999px;
     padding: 10px 16px;
     box-shadow: 0 2px 10px rgba(74,59,53,0.06);
@@ -57,9 +60,11 @@
 
   .avatar{
     width:64px; height:64px; border-radius:50%;
-    background: linear-gradient(135deg, var(--pink-deep), var(--brown-deep));
+    background: var(--gray);
+    display:flex; align-items:center; justify-content:center;
     flex-shrink:0;
   }
+  .avatar svg{ color: var(--gray-deep); width:26px; height:26px; }
 
   .profile-name{
     font-size:16px; font-weight:600;
@@ -75,19 +80,19 @@
     display:grid; grid-template-columns:repeat(4,1fr); gap:var(--gap);
   }
   .quick-buttons button{
-    background: var(--brown-deep);
+    background: var(--gray-deep);
     border-radius: 14px;
     padding: 14px 6px;
     display:flex; flex-direction:column; align-items:center; gap:6px;
     box-shadow: 0 2px 10px rgba(74,59,53,0.06);
-    font-size:12px; font-weight:500; color: var(--pink);
+    font-size:12px; font-weight:500; color: var(--white);
     transition: transform .15s ease, box-shadow .15s ease;
   }
   .quick-buttons button:hover{
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(74,59,53,0.1);
   }
-  .quick-buttons button svg{ color: var(--pink); }
+  .quick-buttons button svg{ color: var(--white); }
 
   /* ---------- 데스크톱 (2.5 : 7.5) ---------- */
   .desktop-view{
@@ -96,8 +101,7 @@
     min-height:100vh;
   }
   .desktop-view .sidebar{
-    /* 선(border) 대신 배경색 대비 + 은은한 그림자로만 영역을 구분 */
-    background: rgba(255,255,255,0.18);
+    /* 선(border) 없이 은은한 그림자로만 영역을 구분 */
     box-shadow: 4px 0 24px rgba(74,59,53,0.05);
     padding: 32px 24px;
     display:flex; flex-direction:column; gap:28px;
@@ -139,6 +143,7 @@
     display:flex; align-items:center; gap:14px; margin-bottom:22px;
   }
   .mobile-view .profile .avatar{ width:56px; height:56px; }
+  .mobile-view .profile .avatar svg{ width:22px; height:22px; }
   .mobile-view .quick-buttons{ margin-bottom:20px; }
 
   @media (max-width: 768px){
@@ -158,16 +163,16 @@
       </div>
 
       <div class="profile">
-        <div class="avatar"></div>
+        <div class="avatar"><i data-lucide="image"></i></div>
         <div class="profile-name">이름<span class="uid">@아이디</span></div>
         <p class="intro">한 줄 소개가 여기에 들어갑니다.</p>
       </div>
 
       <div class="quick-buttons">
-        <button><i data-lucide="calendar"></i>일정</button>
-        <button><i data-lucide="clock"></i>시간</button>
-        <button><i data-lucide="notebook-pen"></i>메모</button>
-        <button><i data-lucide="help-circle"></i>?</button>
+        <button>일정</button>
+        <button>시간</button>
+        <button>메모</button>
+        <button>?</button>
       </div>
     </aside>
 
@@ -197,7 +202,7 @@
     </div>
 
     <div class="profile">
-      <div class="avatar"></div>
+      <div class="avatar"><i data-lucide="image"></i></div>
       <div>
         <div class="profile-name">이름<span class="uid">@아이디</span></div>
         <p class="intro">한 줄 소개가 여기에 들어갑니다.</p>
@@ -205,10 +210,10 @@
     </div>
 
     <div class="quick-buttons">
-      <button><i data-lucide="calendar"></i>일정</button>
-      <button><i data-lucide="clock"></i>시간</button>
-      <button><i data-lucide="notebook-pen"></i>메모</button>
-      <button><i data-lucide="help-circle"></i>?</button>
+      <button>일정</button>
+      <button>시간</button>
+      <button>메모</button>
+      <button>?</button>
     </div>
 
   </div>
