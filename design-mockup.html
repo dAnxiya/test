@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>커뮤니티 디자인 목업</title>
+<link rel="stylesheet" as="style" crossorigin
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root{
+    --pink: #F6DEE0;
+    --pink-deep: #E8B7BB;
+    --brown: #EFE6D8;
+    --brown-deep: #CBAE8F;
+    --ink: #4A3B35;
+    --muted: #B3A79B;
+    --white: #FFFDFA;
+    --radius: 18px;
+    --gap: 14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Pretendard', -apple-system, sans-serif;
+    background: linear-gradient(160deg, var(--pink) 0%, var(--brown) 100%);
+    color: var(--ink);
+    min-height:100vh;
+  }
+  button{font-family:inherit; border:none; background:none; cursor:pointer; color:inherit;}
+  input{font-family:inherit;}
+  svg{ width:18px; height:18px; stroke-width:1.8; }
+
+  /* ---------- 공통 컴포넌트 ---------- */
+  .search-box{
+    display:flex; align-items:center; gap:8px;
+    background:var(--white);
+    border-radius: 999px;
+    padding: 10px 16px;
+    box-shadow: 0 2px 10px rgba(74,59,53,0.06);
+  }
+  .search-box svg{ color: var(--muted); flex-shrink:0; }
+  .search-box input{
+    border:none; outline:none; background:transparent;
+    font-size:14px; color:var(--ink); width:100%;
+  }
+  .search-box input::placeholder{ color: var(--muted); }
+
+  .icon-btn{
+    width:34px; height:34px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    color: var(--ink);
+    transition: background .15s ease;
+  }
+  .icon-btn:hover{ background: rgba(255,255,255,0.6); }
+  .icon-btn svg{ width:17px; height:17px; }
+
+  .avatar{
+    width:64px; height:64px; border-radius:50%;
+    background: linear-gradient(135deg, var(--pink-deep), var(--brown-deep));
+    flex-shrink:0;
+  }
+
+  .profile-name{
+    font-size:16px; font-weight:600;
+  }
+  .profile-name .uid{
+    font-weight:400; font-size:13px; color: var(--muted); margin-left:4px;
+  }
+  .intro{
+    font-size:13px; color: var(--muted); margin-top:4px; line-height:1.5;
+  }
+
+  .quick-buttons{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:var(--gap);
+  }
+  .quick-buttons button{
+    background: var(--white);
+    border-radius: 14px;
+    padding: 14px 6px;
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    box-shadow: 0 2px 10px rgba(74,59,53,0.06);
+    font-size:12px; font-weight:500; color: var(--ink);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .quick-buttons button:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(74,59,53,0.1);
+  }
+  .quick-buttons button svg{ color: var(--brown-deep); }
+
+  .content-placeholder{
+    background: var(--white);
+    border-radius: var(--radius);
+    min-height: 400px;
+    display:flex; align-items:center; justify-content:center;
+    color: var(--muted); font-size:14px;
+    box-shadow: 0 2px 10px rgba(74,59,53,0.05);
+  }
+
+  /* ---------- 데스크톱 (2.5 : 7.5) ---------- */
+  .desktop-view{
+    display:grid;
+    grid-template-columns: 2.5fr 7.5fr;
+    min-height:100vh;
+  }
+  .desktop-view .sidebar{
+    padding: 32px 24px;
+    display:flex; flex-direction:column; gap:28px;
+  }
+  .desktop-view .profile{
+    display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+  }
+  .desktop-view .main{
+    padding: 24px 32px;
+    display:flex; flex-direction:column; gap:20px;
+  }
+  .desktop-view .topbar{
+    display:flex; justify-content:flex-end; align-items:center; gap:4px;
+  }
+
+  /* ---------- 모바일 ---------- */
+  .mobile-view{ display:none; padding: 20px 16px; }
+  .mobile-view .topbar{
+    display:flex; align-items:center; gap:8px; margin-bottom:22px;
+  }
+  .mobile-view .topbar .search-box{ flex:1; }
+  .mobile-view .topbar .icon-group{ display:flex; align-items:center; }
+  .mobile-view .profile{
+    display:flex; align-items:center; gap:14px; margin-bottom:22px;
+  }
+  .mobile-view .profile .avatar{ width:56px; height:56px; }
+  .mobile-view .quick-buttons{ margin-bottom:20px; }
+
+  @media (max-width: 768px){
+    .desktop-view{ display:none; }
+    .mobile-view{ display:block; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- ================= 데스크톱 (아이패드 가로) ================= -->
+  <div class="desktop-view">
+    <aside class="sidebar">
+      <div class="search-box">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="검색">
+      </div>
+
+      <div class="profile">
+        <div class="avatar"></div>
+        <div class="profile-name">이름<span class="uid">@아이디</span></div>
+        <p class="intro">한 줄 소개가 여기에 들어갑니다.</p>
+      </div>
+
+      <div class="quick-buttons">
+        <button><i data-lucide="calendar"></i>일정</button>
+        <button><i data-lucide="clock"></i>시간</button>
+        <button><i data-lucide="notebook-pen"></i>메모</button>
+        <button><i data-lucide="help-circle"></i>?</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <button class="icon-btn"><i data-lucide="plus"></i></button>
+        <button class="icon-btn"><i data-lucide="mail"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i></button>
+        <button class="icon-btn"><i data-lucide="settings"></i></button>
+      </div>
+      <div class="content-placeholder">메인 콘텐츠 영역</div>
+    </main>
+  </div>
+
+  <!-- ================= 모바일 (아이패드 세로) ================= -->
+  <div class="mobile-view">
+    <div class="topbar">
+      <div class="search-box">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="검색">
+      </div>
+      <div class="icon-group">
+        <button class="icon-btn"><i data-lucide="plus"></i></button>
+        <button class="icon-btn"><i data-lucide="mail"></i></button>
+        <button class="icon-btn"><i data-lucide="bell"></i></button>
+        <button class="icon-btn"><i data-lucide="settings"></i></button>
+      </div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar"></div>
+      <div>
+        <div class="profile-name">이름<span class="uid">@아이디</span></div>
+        <p class="intro">한 줄 소개가 여기에 들어갑니다.</p>
+      </div>
+    </div>
+
+    <div class="quick-buttons">
+      <button><i data-lucide="calendar"></i>일정</button>
+      <button><i data-lucide="clock"></i>시간</button>
+      <button><i data-lucide="notebook-pen"></i>메모</button>
+      <button><i data-lucide="help-circle"></i>?</button>
+    </div>
+
+    <div class="content-placeholder">메인 콘텐츠 영역</div>
+  </div>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>
