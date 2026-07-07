@@ -105,6 +105,9 @@
     min-height:100vh;
   }
   .desktop-view .sidebar{
+    /* 선(border) 대신 배경색 대비 + 은은한 그림자로만 영역을 구분 */
+    background: rgba(255,255,255,0.35);
+    box-shadow: 4px 0 24px rgba(74,59,53,0.05);
     padding: 32px 24px;
     display:flex; flex-direction:column; gap:28px;
   }
@@ -117,6 +120,21 @@
   }
   .desktop-view .topbar{
     display:flex; justify-content:flex-end; align-items:center; gap:4px;
+  }
+
+  /* 데스크톱 전용: 퀵버튼 세로 나열 (아이콘 + 라벨 가로 정렬) */
+  .desktop-view .quick-buttons{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .desktop-view .quick-buttons button{
+    flex-direction:row;
+    justify-content:flex-start;
+    align-items:center;
+    gap:12px;
+    padding: 12px 14px;
+    font-size:13px;
   }
 
   /* ---------- 모바일 ---------- */
