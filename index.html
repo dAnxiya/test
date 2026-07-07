@@ -1,354 +1,498 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>커뮤니티 디자인 목업</title>
-<link rel="stylesheet" as="style" crossorigin
-  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
-<script src="https://unpkg.com/lucide@latest"></script>
-<style>
-  :root{
-    --pink: #F9C9D2;
-    --pink-deep: #E8B7BB;
-    --brown: #EFE6D8;
-    --brown-deep: #CBAE8F;
-    --gray: #E4E4E2;
-    --gray-deep: #B9B7B4;
-    --ink: #4B4B49;
-    --muted: #A8A6A2;
-    --white: #FFFDFA;
-    --radius: 18px;
-    --gap: 14px;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    font-family:'Pretendard', -apple-system, sans-serif;
-    background: var(--white);
-    color: var(--ink);
-    min-height:100vh;
-  }
-  button{font-family:inherit; border:none; background:none; cursor:pointer; color:inherit;}
-  input{font-family:inherit;}
-  svg{ width:18px; height:18px; stroke-width:1.8; }
+import React, { useState, useMemo, useEffect } from "react";
 
-  /* ---------- 공통 컴포넌트 ---------- */
-  .search-box{
-    display:flex; align-items:center; gap:8px;
-    background:var(--white);
-    border: 1px solid #EAE7E3;
-    border-radius: 999px;
-    padding: 10px 16px;
-    box-shadow: 0 2px 10px rgba(74,59,53,0.06);
-  }
-  .search-box svg{ color: var(--muted); flex-shrink:0; }
-  .search-box input{
-    border:none; outline:none; background:transparent;
-    font-size:14px; color:var(--ink); width:100%;
-  }
-  .search-box input::placeholder{ color: var(--muted); }
+/* ============================= shared constants ============================= */
 
-  .icon-btn{
-    width:34px; height:34px;
-    display:flex; align-items:center; justify-content:center;
-    border-radius:50%;
-    color: var(--ink);
-    transition: background .15s ease;
-  }
-  .icon-btn:hover{ background: rgba(255,255,255,0.6); }
-  .icon-btn svg{ width:17px; height:17px; }
+const CALENDARS = [
+  { id: "personal", name: "개인", color: "#FF3B30" },
+  { id: "work", name: "업무", color: "#007AFF" },
+  { id: "trpg", name: "TRPG", color: "#AF52DE" },
+];
 
-  .avatar{
-    width:64px; height:64px; border-radius:50%;
-    background: var(--gray);
-    display:flex; align-items:center; justify-content:center;
-    flex-shrink:0;
-  }
-  .avatar svg{ color: var(--gray-deep); width:26px; height:26px; }
+const WEEKDAYS_KR = ["일", "월", "화", "수", "목", "금", "토"];
+const MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
 
-  .profile-name{
-    font-size:16px; font-weight:600;
-  }
-  .profile-name .uid{
-    font-weight:400; font-size:13px; color: var(--muted); margin-left:4px;
-  }
-  .intro{
-    font-size:13px; color: var(--muted); margin-top:4px; line-height:1.5;
-  }
+function pad(n) { return String(n).padStart(2, "0"); }
+function dateKey(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+function isSameDay(a, b) {
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+function addMonths(date, n) { return new Date(date.getFullYear(), date.getMonth() + n, 1); }
+function addDays(date, n) { const d = new Date(date); d.setDate(d.getDate() + n); return d; }
+function startOfWeek(date) { const d = new Date(date); d.setDate(d.getDate() - d.getDay()); return d; }
+function buildMonthGrid(year, month) {
+  const gridStart = startOfWeek(new Date(year, month, 1));
+  return Array.from({ length: 42 }, (_, i) => addDays(gridStart, i));
+}
+function timeToMinutes(t) { if (!t) return 0; const [h, m] = t.split(":").map(Number); return h * 60 + m; }
 
-  .quick-buttons{
-    display:grid; grid-template-columns:repeat(4,1fr); gap:var(--gap);
-  }
-  .quick-buttons button{
-    background: var(--gray-deep);
-    border-radius: 14px;
-    padding: 14px 6px;
-    display:flex; flex-direction:column; align-items:center; gap:6px;
-    box-shadow: 0 2px 10px rgba(74,59,53,0.06);
-    font-size:12px; font-weight:500; color: var(--white);
-    transition: transform .15s ease, box-shadow .15s ease;
-  }
-  .quick-buttons button:hover{
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(74,59,53,0.1);
-  }
-  .quick-buttons button svg{ color: var(--white); }
+const SAMPLE_EVENTS = [
+  { id: "e1", title: "TRPG 세션 - 겨울 시나리오", calendarId: "trpg", date: dateKey(new Date()), start: "19:00", end: "23:00", allDay: false, location: "Discord", notes: "" },
+  { id: "e2", title: "일정표 앱 배포", calendarId: "work", date: dateKey(addDays(new Date(), 2)), start: "10:00", end: "11:00", allDay: false, location: "", notes: "" },
+  { id: "e3", title: "생일", calendarId: "personal", date: dateKey(addDays(new Date(), 5)), allDay: true, location: "", notes: "" },
+];
 
-  /* ---------- 데스크톱 (2.5 : 7.5) ---------- */
-  .desktop-view{
-    display:grid;
-    grid-template-columns: 2.5fr 7.5fr;
-    min-height:100vh;
-  }
-  .desktop-view .sidebar{
-    /* 선(border) 없이 은은한 그림자로만 영역을 구분 */
-    box-shadow: 4px 0 24px rgba(74,59,53,0.05);
-    padding: 32px 24px;
-    display:flex; flex-direction:column; gap:28px;
-  }
-  .desktop-view .profile{
-    display:flex; flex-direction:column; align-items:flex-start; gap:10px;
-  }
-  .desktop-view .main{
-    padding: 24px 32px;
-    display:flex; flex-direction:column; gap:20px;
-  }
-  .desktop-view .topbar{
-    display:flex; justify-content:flex-end; align-items:center; gap:4px;
-  }
+/* ============================= icon rail (matches wireframe) ============================= */
 
-  /* ---------- 메인 영역: 화면 전환 ---------- */
-  .main-view{ display:none; flex-direction:column; gap:20px; flex:1; min-height:0; }
-  .main-view.active{ display:flex; }
+function IconRail({ active, onNavigate }) {
+  const items = [
+    { id: "profile", label: "프로필", icon: <ProfileIcon /> },
+    { id: "calendar", label: "캘린더", icon: <CalendarIcon /> },
+    { id: "time", label: "시간", icon: <ClockIcon /> },
+    { id: "memo", label: "메모", icon: <PencilIcon /> },
+  ];
+  return (
+    <div style={{
+      width: 60, flexShrink: 0, background: "#fafafa", borderRight: "1px solid #e8e8ea",
+      display: "flex", flexDirection: "column", alignItems: "center", padding: "18px 0", gap: 6,
+    }}>
+      {items.map((it) => {
+        const isActive = active === it.id;
+        return (
+          <button
+            key={it.id}
+            onClick={() => onNavigate(it.id)}
+            title={it.label}
+            style={{
+              width: 38, height: 38, borderRadius: 11, border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              background: isActive ? "#1c1c1e" : "transparent",
+              color: isActive ? "#fff" : "#9a9a9e",
+              transition: "background 0.15s, color 0.15s",
+            }}
+          >
+            {it.icon}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
-  .view-header{
-    display:flex; align-items:center; justify-content:space-between;
+function ProfileIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+    </svg>
+  );
+}
+function CalendarIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <rect x="3.5" y="5" width="17" height="15" rx="2.2" />
+      <path d="M3.5 9.5h17" />
+      <path d="M8 3v3.4M16 3v3.4" />
+    </svg>
+  );
+}
+function ClockIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3.2 2" />
+    </svg>
+  );
+}
+function PencilIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 20l1-4.2L15.8 5 19 8.2 8.2 19 4 20z" />
+      <path d="M13.2 6.6l3.2 3.2" />
+    </svg>
+  );
+}
+
+/* ============================= to-do panel ============================= */
+
+function TodoPanel() {
+  const [items, setItems] = useState([
+    { id: "t1", text: "TRPG 시나리오 정리", done: false },
+    { id: "t2", text: "캘린더 앱 색상 다듬기", done: false },
+    { id: "t3", text: "장보기", done: true },
+  ]);
+  const [draft, setDraft] = useState("");
+
+  function add() {
+    const text = draft.trim();
+    if (!text) return;
+    setItems((prev) => [...prev, { id: "t" + Date.now(), text, done: false }]);
+    setDraft("");
   }
-  .view-header h2{
-    font-size:20px; font-weight:700; letter-spacing:0.3px;
+  function toggle(id) {
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, done: !i.done } : i)));
+  }
+  function remove(id) {
+    setItems((prev) => prev.filter((i) => i.id !== id));
   }
 
-  .calendar-layout{
-    display:grid; grid-template-columns: 1fr 260px; gap:16px; flex:1; min-height:0;
-  }
-  .calendar-box, .todo-box{
-    background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: 0 2px 10px rgba(74,59,53,0.05);
-    padding: 20px;
-    display:flex; align-items:center; justify-content:center;
-    color: var(--muted); font-size:14px; font-weight:500;
-    min-height: 360px;
-  }
-  .habit-bar{
-    background: var(--gray);
-    border-radius: 14px;
-    padding: 14px 20px;
-    text-align:center;
-    color: var(--ink); font-size:14px; font-weight:500;
-  }
-
-  /* 데스크톱 전용: 퀵버튼 세로 나열 (아이콘 + 라벨 가로 정렬) */
-  .desktop-view .quick-buttons{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-  }
-  .desktop-view .quick-buttons button{
-    flex-direction:row;
-    justify-content:flex-start;
-    align-items:center;
-    gap:12px;
-    padding: 12px 14px;
-    font-size:13px;
-  }
-
-  /* ---------- 모바일 ---------- */
-  .mobile-view{ display:none; padding: 20px 16px; }
-  .mobile-view .topbar{
-    display:flex; align-items:center; gap:8px; margin-bottom:22px;
-  }
-  .mobile-view .topbar .search-box{ flex:1; }
-  .mobile-view .topbar .icon-group{ display:flex; align-items:center; }
-  .mobile-view .profile{
-    display:flex; align-items:center; gap:14px; margin-bottom:22px;
-  }
-  .mobile-view .profile .avatar{ width:56px; height:56px; }
-  .mobile-view .profile .avatar svg{ width:22px; height:22px; }
-  .mobile-view .quick-buttons{ margin-bottom:20px; }
-
-  /* 모바일: 화면 전환 */
-  .main-view-m{ display:none; flex-direction:column; gap:14px; }
-  .main-view-m.active{ display:flex; }
-
-  .mobile-view .view-header{
-    display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;
-  }
-  .mobile-view .view-header h2{
-    font-size:18px; font-weight:700; letter-spacing:0.3px;
-  }
-  .mobile-calendar-box{
-    background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: 0 2px 10px rgba(74,59,53,0.05);
-    padding: 20px;
-    min-height: 220px;
-    display:flex; align-items:center; justify-content:center;
-    color: var(--muted); font-size:14px; font-weight:500;
-  }
-
-  /* 접었다 펼 수 있는 섹션 (투두 / 해빗트래커) */
-  .collapsible{
-    background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: 0 2px 10px rgba(74,59,53,0.05);
-    overflow:hidden;
-  }
-  .collapsible-header{
-    width:100%;
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 14px 16px;
-    font-size:14px; font-weight:600; color: var(--ink);
-  }
-  .collapsible-header svg{ color: var(--muted); transition: transform .2s ease; }
-  .collapsible-header.open svg{ transform: rotate(180deg); }
-  .collapsible-content{ display:none; padding: 0 16px 16px; color: var(--muted); font-size:13px; }
-  .collapsible-content.open{ display:block; }
-
-  @media (max-width: 768px){
-    .desktop-view{ display:none; }
-    .mobile-view{ display:block; }
-  }
-</style>
-</head>
-<body>
-
-  <!-- ================= 데스크톱 (아이패드 가로) ================= -->
-  <div class="desktop-view">
-    <aside class="sidebar">
-      <div class="search-box">
-        <i data-lucide="search"></i>
-        <input type="text" placeholder="검색">
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div style={{ padding: "16px 18px 10px", fontSize: 14, fontWeight: 700, color: "#1c1c1e" }}>
+        to do
       </div>
-
-      <div class="profile">
-        <div class="avatar"><i data-lucide="image"></i></div>
-        <div class="profile-name">이름<span class="uid">@아이디</span></div>
-        <p class="intro">한 줄 소개가 여기에 들어갑니다.</p>
+      <div style={{ flex: 1, overflowY: "auto", padding: "0 14px", display: "flex", flexDirection: "column", gap: 4 }}>
+        {items.map((it) => (
+          <div
+            key={it.id}
+            style={{
+              display: "flex", alignItems: "center", gap: 9, padding: "7px 8px",
+              borderRadius: 8, background: "#fff",
+            }}
+          >
+            <button
+              onClick={() => toggle(it.id)}
+              style={{
+                width: 17, height: 17, borderRadius: "50%", flexShrink: 0, cursor: "pointer",
+                border: it.done ? "none" : "1.5px solid #c7c7cc",
+                background: it.done ? "#34C759" : "transparent",
+              }}
+            />
+            <span
+              style={{
+                flex: 1, fontSize: 13, color: it.done ? "#b0b0b5" : "#1c1c1e",
+                textDecoration: it.done ? "line-through" : "none",
+              }}
+            >
+              {it.text}
+            </span>
+            <button
+              onClick={() => remove(it.id)}
+              style={{ border: "none", background: "none", color: "#c7c7cc", fontSize: 15, cursor: "pointer", padding: "0 2px" }}
+            >
+              ×
+            </button>
+          </div>
+        ))}
+        {items.length === 0 && (
+          <div style={{ fontSize: 12.5, color: "#c7c7cc", padding: "10px 4px" }}>
+            할 일이 없어요.
+          </div>
+        )}
       </div>
-
-      <div class="quick-buttons">
-        <button onclick="showMainView('view-calendar')">일정</button>
-        <button onclick="showMainView('view-default')">시간</button>
-        <button onclick="showMainView('view-default')">메모</button>
-        <button onclick="showMainView('view-default')">?</button>
+      <div style={{ padding: 14, borderTop: "1px solid #ececef", display: "flex", gap: 6 }}>
+        <input
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && add()}
+          placeholder="할 일 추가"
+          style={{
+            flex: 1, border: "1px solid #e5e5ea", borderRadius: 8, padding: "7px 10px",
+            fontSize: 12.5, outline: "none", fontFamily: "inherit",
+          }}
+        />
+        <button
+          onClick={add}
+          style={{
+            border: "none", background: "#1c1c1e", color: "#fff", borderRadius: 8,
+            width: 32, fontSize: 15, cursor: "pointer",
+          }}
+        >
+          +
+        </button>
       </div>
-    </aside>
+    </div>
+  );
+}
 
-    <main class="main">
-      <div id="view-default" class="main-view active">
-        <div class="topbar">
-          <button class="icon-btn"><i data-lucide="plus"></i></button>
-          <button class="icon-btn"><i data-lucide="mail"></i></button>
-          <button class="icon-btn"><i data-lucide="bell"></i></button>
-          <button class="icon-btn"><i data-lucide="settings"></i></button>
+/* ============================= calendar (compact, embedded) ============================= */
+
+function EventPill({ ev, calColor, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: "flex", alignItems: "center", gap: 4, width: "100%", textAlign: "left",
+        background: ev.allDay ? calColor : "transparent", border: "none", borderRadius: 4,
+        padding: "1px 4px", cursor: "pointer", overflow: "hidden",
+      }}
+      title={ev.title}
+    >
+      {!ev.allDay && <span style={{ width: 5, height: 5, borderRadius: "50%", background: calColor, flexShrink: 0 }} />}
+      <span style={{
+        fontSize: 10.5, fontWeight: ev.allDay ? 600 : 500, color: ev.allDay ? "#fff" : "#1c1c1e",
+        whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+      }}>
+        {!ev.allDay && ev.start && <span style={{ color: "#9a9a9e", fontWeight: 400, marginRight: 3 }}>{ev.start}</span>}
+        {ev.title}
+      </span>
+    </button>
+  );
+}
+
+const inputStyle = { border: "1px solid #e5e5ea", borderRadius: 8, padding: "9px 10px", fontSize: 14, color: "#1c1c1e", outline: "none", fontFamily: "inherit" };
+const rowStyle = { display: "flex", alignItems: "center", gap: 10, fontSize: 13.5 };
+const labelStyle = { color: "#6e6e73", width: 56, flexShrink: 0 };
+const selectStyle = { ...inputStyle, flex: 1, padding: "7px 8px" };
+
+function EventEditor({ initial, defaultDate, onSave, onDelete, onClose }) {
+  const [title, setTitle] = useState(initial?.title || "");
+  const [calendarId, setCalendarId] = useState(initial?.calendarId || CALENDARS[0].id);
+  const [date, setDate] = useState(initial?.date || dateKey(defaultDate));
+  const [allDay, setAllDay] = useState(initial?.allDay || false);
+  const [start, setStart] = useState(initial?.start || "09:00");
+  const [end, setEnd] = useState(initial?.end || "10:00");
+  const [location, setLocation] = useState(initial?.location || "");
+  const [notes, setNotes] = useState(initial?.notes || "");
+  const canSave = title.trim().length > 0;
+
+  return (
+    <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.28)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50 }} onClick={onClose}>
+      <div onClick={(e) => e.stopPropagation()} style={{ width: 360, maxWidth: "92vw", background: "#fff", borderRadius: 14, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", overflow: "hidden" }}>
+        <div style={{ padding: "14px 16px", borderBottom: "1px solid #eee", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <button onClick={onClose} style={{ border: "none", background: "none", color: "#007AFF", fontSize: 14, cursor: "pointer" }}>취소</button>
+          <span style={{ fontSize: 13, fontWeight: 600 }}>{initial ? "일정 편집" : "새 일정"}</span>
+          <button
+            disabled={!canSave}
+            onClick={() => onSave({ id: initial?.id, title: title.trim(), calendarId, date, allDay, start: allDay ? null : start, end: allDay ? null : end, location, notes })}
+            style={{ border: "none", background: "none", color: canSave ? "#007AFF" : "#c7c7cc", fontSize: 14, fontWeight: 600, cursor: canSave ? "pointer" : "default" }}
+          >
+            완료
+          </button>
+        </div>
+        <div style={{ padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+          <input autoFocus placeholder="제목" value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} />
+          <div style={rowStyle}>
+            <span style={labelStyle}>캘린더</span>
+            <select value={calendarId} onChange={(e) => setCalendarId(e.target.value)} style={selectStyle}>
+              {CALENDARS.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          <div style={rowStyle}>
+            <span style={labelStyle}>날짜</span>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={selectStyle} />
+          </div>
+          <div style={{ ...rowStyle, justifyContent: "space-between" }}>
+            <span style={labelStyle}>하루 종일</span>
+            <input type="checkbox" checked={allDay} onChange={(e) => setAllDay(e.target.checked)} />
+          </div>
+          {!allDay && (
+            <>
+              <div style={rowStyle}><span style={labelStyle}>시작</span><input type="time" value={start} onChange={(e) => setStart(e.target.value)} style={selectStyle} /></div>
+              <div style={rowStyle}><span style={labelStyle}>종료</span><input type="time" value={end} onChange={(e) => setEnd(e.target.value)} style={selectStyle} /></div>
+            </>
+          )}
+          <input placeholder="위치" value={location} onChange={(e) => setLocation(e.target.value)} style={inputStyle} />
+          <textarea placeholder="메모" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} style={{ ...inputStyle, resize: "none" }} />
+          {initial && (
+            <button onClick={() => onDelete(initial.id)} style={{ marginTop: 4, border: "none", background: "#fff1f0", color: "#FF3B30", fontSize: 13.5, fontWeight: 600, borderRadius: 8, padding: "9px 0", cursor: "pointer" }}>
+              일정 삭제
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MiniCalendar({ viewDate, selectedDate, onSelect }) {
+  const [cursor, setCursor] = useState(new Date(viewDate.getFullYear(), viewDate.getMonth(), 1));
+  useEffect(() => { setCursor(new Date(viewDate.getFullYear(), viewDate.getMonth(), 1)); }, [viewDate]);
+  const days = buildMonthGrid(cursor.getFullYear(), cursor.getMonth());
+  const today = new Date();
+  return (
+    <div style={{ padding: "0 12px 14px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+        <button onClick={() => setCursor(addMonths(cursor, -1))} style={{ border: "none", background: "transparent", color: "#8e8e93", fontSize: 14, cursor: "pointer", width: 18, height: 18 }}>‹</button>
+        <span style={{ fontSize: 12, fontWeight: 600, color: "#1c1c1e" }}>{cursor.getFullYear()}년 {MONTHS_KR[cursor.getMonth()]}</span>
+        <button onClick={() => setCursor(addMonths(cursor, 1))} style={{ border: "none", background: "transparent", color: "#8e8e93", fontSize: 14, cursor: "pointer", width: 18, height: 18 }}>›</button>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", fontSize: 9.5, color: "#a1a1a6", marginBottom: 3 }}>
+        {WEEKDAYS_KR.map((w) => <div key={w} style={{ textAlign: "center" }}>{w}</div>)}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", rowGap: 1 }}>
+        {days.map((d, i) => {
+          const inMonth = d.getMonth() === cursor.getMonth();
+          const isToday = isSameDay(d, today);
+          const isSelected = isSameDay(d, selectedDate);
+          return (
+            <button key={i} onClick={() => onSelect(d)} style={{
+              border: "none", background: isSelected ? "#FF3B30" : "transparent",
+              color: isSelected ? "#fff" : isToday ? "#FF3B30" : inMonth ? "#1c1c1e" : "#d4d4d8",
+              fontWeight: isToday || isSelected ? 700 : 400, fontSize: 10.5,
+              width: 19, height: 19, borderRadius: "50%", margin: "0 auto", cursor: "pointer",
+            }}>
+              {d.getDate()}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MonthView({ viewDate, today, selectedDate, eventsByDate, calColorMap, onSelectDate, onDayDoubleClick, onEventClick }) {
+  const days = buildMonthGrid(viewDate.getFullYear(), viewDate.getMonth());
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", borderBottom: "1px solid #e2e2e6" }}>
+        {WEEKDAYS_KR.map((w, i) => (
+          <div key={w} style={{ textAlign: "center", fontSize: 10, fontWeight: 600, color: i === 0 ? "#FF3B30" : i === 6 ? "#007AFF" : "#8e8e93", padding: "5px 0" }}>{w}</div>
+        ))}
+      </div>
+      <div style={{ flex: 1, display: "grid", gridTemplateColumns: "repeat(7,1fr)", gridTemplateRows: "repeat(6,1fr)" }}>
+        {days.map((d, i) => {
+          const inMonth = d.getMonth() === viewDate.getMonth();
+          const isToday = isSameDay(d, today);
+          const isSelected = isSameDay(d, selectedDate);
+          const key = dateKey(d);
+          const dayEvents = eventsByDate[key] || [];
+          const weekday = d.getDay();
+          return (
+            <div
+              key={i}
+              onClick={() => onSelectDate(d)}
+              onDoubleClick={() => onDayDoubleClick(d)}
+              style={{
+                borderRight: "1px solid #ececef", borderBottom: "1px solid #ececef",
+                background: isSelected ? "#eef5ff" : "#fff", padding: "3px 4px",
+                display: "flex", flexDirection: "column", gap: 1, cursor: "pointer", overflow: "hidden",
+              }}
+            >
+              <span style={{
+                alignSelf: "flex-start", fontSize: 11, fontWeight: isToday ? 700 : 500,
+                color: isToday ? "#fff" : !inMonth ? "#d4d4d8" : weekday === 0 ? "#FF3B30" : weekday === 6 ? "#007AFF" : "#1c1c1e",
+                background: isToday ? "#FF3B30" : "transparent", width: 18, height: 18, borderRadius: "50%",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                {d.getDate()}
+              </span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 1, overflow: "hidden" }}>
+                {dayEvents.slice(0, 2).map((ev) => (
+                  <EventPill key={ev.id} ev={ev} calColor={calColorMap[ev.calendarId]} onClick={(e) => { e.stopPropagation(); onEventClick(ev); }} />
+                ))}
+                {dayEvents.length > 2 && <span style={{ fontSize: 9.5, color: "#a1a1a6", paddingLeft: 4 }}>+{dayEvents.length - 2}</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CalendarApp() {
+  const [today] = useState(new Date());
+  const [viewDate, setViewDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [events, setEvents] = useState(SAMPLE_EVENTS);
+  const [editing, setEditing] = useState(null);
+  const [showEditor, setShowEditor] = useState(false);
+  const [activeCalendars, setActiveCalendars] = useState(() => new Set(CALENDARS.map((c) => c.id)));
+
+  const calColorMap = useMemo(() => {
+    const m = {}; CALENDARS.forEach((c) => (m[c.id] = c.color)); return m;
+  }, []);
+  const visibleEvents = useMemo(() => events.filter((e) => activeCalendars.has(e.calendarId)), [events, activeCalendars]);
+  const eventsByDate = useMemo(() => {
+    const map = {};
+    visibleEvents.forEach((e) => { (map[e.date] = map[e.date] || []).push(e); });
+    Object.values(map).forEach((list) => list.sort((a, b) => (a.allDay ? -1 : timeToMinutes(a.start) - timeToMinutes(b.start))));
+    return map;
+  }, [visibleEvents]);
+
+  function toggleCalendar(id) {
+    setActiveCalendars((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  }
+  function openNew(date) { setEditing(null); setSelectedDate(date); setShowEditor(true); }
+  function openEdit(ev) { setEditing(ev); setShowEditor(true); }
+  function saveEvent(data) {
+    if (data.id) setEvents((prev) => prev.map((e) => (e.id === data.id ? { ...e, ...data } : e)));
+    else setEvents((prev) => [...prev, { ...data, id: "e" + Date.now() }]);
+    setShowEditor(false);
+  }
+  function deleteEvent(id) { setEvents((prev) => prev.filter((e) => e.id !== id)); setShowEditor(false); }
+  function goToday() { setViewDate(new Date()); setSelectedDate(new Date()); }
+  function goPrev() { setViewDate((d) => addMonths(d, -1)); }
+  function goNext() { setViewDate((d) => addMonths(d, 1)); }
+
+  return (
+    <div style={{ display: "flex", height: "100%", minHeight: 0 }}>
+      <div style={{ width: 168, flexShrink: 0, borderRight: "1px solid #ececef", overflowY: "auto" }}>
+        <MiniCalendar viewDate={viewDate} selectedDate={selectedDate} onSelect={(d) => { setSelectedDate(d); setViewDate(d); }} />
+        <div style={{ borderTop: "1px solid #ececef", padding: "10px 12px" }}>
+          <div style={{ fontSize: 10.5, color: "#8e8e93", fontWeight: 600, marginBottom: 6 }}>내 캘린더</div>
+          {CALENDARS.map((c) => {
+            const active = activeCalendars.has(c.id);
+            return (
+              <label key={c.id} style={{ display: "flex", alignItems: "center", gap: 7, padding: "3px 0", cursor: "pointer", fontSize: 12 }}>
+                <input type="checkbox" checked={active} onChange={() => toggleCalendar(c.id)} style={{ accentColor: c.color, width: 12, height: 12 }} />
+                <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.color }} />
+                <span style={{ color: active ? "#1c1c1e" : "#d4d4d8" }}>{c.name}</span>
+              </label>
+            );
+          })}
         </div>
       </div>
 
-      <div id="view-calendar" class="main-view">
-        <div class="view-header">
-          <h2>CALENDAR</h2>
-          <div class="topbar" style="justify-content:flex-end;">
-            <button class="icon-btn"><i data-lucide="plus"></i></button>
-            <button class="icon-btn"><i data-lucide="more-horizontal"></i></button>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderBottom: "1px solid #ececef" }}>
+          <button onClick={goToday} style={{ border: "1px solid #e2e2e6", background: "#fff", fontSize: 11.5, fontWeight: 600, padding: "4px 10px", borderRadius: 6, cursor: "pointer" }}>오늘</button>
+          <button onClick={goPrev} style={{ border: "1px solid #e2e2e6", background: "#fff", fontSize: 13, width: 24, height: 24, borderRadius: 6, cursor: "pointer" }}>‹</button>
+          <button onClick={goNext} style={{ border: "1px solid #e2e2e6", background: "#fff", fontSize: 13, width: 24, height: 24, borderRadius: 6, cursor: "pointer" }}>›</button>
+          <div style={{ fontSize: 14.5, fontWeight: 700 }}>{viewDate.getFullYear()}년 {MONTHS_KR[viewDate.getMonth()]}</div>
+          <div style={{ flex: 1 }} />
+          <button onClick={() => openNew(selectedDate)} style={{ border: "none", background: "#007AFF", color: "#fff", fontSize: 12, fontWeight: 600, borderRadius: 7, padding: "6px 12px", cursor: "pointer" }}>
+            + 일정 추가
+          </button>
+        </div>
+        <div style={{ flex: 1, minHeight: 0 }}>
+          <MonthView
+            viewDate={viewDate} today={today} selectedDate={selectedDate} eventsByDate={eventsByDate}
+            calColorMap={calColorMap} onSelectDate={setSelectedDate} onDayDoubleClick={openNew} onEventClick={openEdit}
+          />
+        </div>
+      </div>
+
+      {showEditor && (
+        <EventEditor initial={editing} defaultDate={selectedDate} onSave={saveEvent} onDelete={deleteEvent} onClose={() => setShowEditor(false)} />
+      )}
+    </div>
+  );
+}
+
+/* ============================= page (wireframe layout) ============================= */
+
+export default function CalendarPage() {
+  const [nav, setNav] = useState("calendar");
+
+  return (
+    <div style={{
+      display: "flex", height: "100vh", width: "100%", background: "#fff",
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif',
+      color: "#1c1c1e",
+    }}>
+      <IconRail active={nav} onNavigate={setNav} />
+
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "22px 28px", minWidth: 0 }}>
+        <div style={{ marginBottom: 18 }}>
+          <span style={{
+            fontSize: 22, fontWeight: 800, letterSpacing: 0.5,
+            borderBottom: "2px dashed #FF3B30", paddingBottom: 5,
+          }}>
+            CALENDAR
+          </span>
+        </div>
+
+        <div style={{ flex: 1, display: "flex", gap: 18, minHeight: 0 }}>
+          {/* 달력 */}
+          <div style={{
+            flex: 2.4, background: "#f4f4f5", border: "1px solid #e5e5ea", borderRadius: 14,
+            overflow: "hidden", minWidth: 0,
+          }}>
+            <div style={{ background: "#fff", height: "100%" }}>
+              <CalendarApp />
+            </div>
+          </div>
+
+          {/* to do */}
+          <div style={{
+            flex: 1, background: "#f4f4f5", border: "1px solid #e5e5ea", borderRadius: 14,
+            overflow: "hidden", minWidth: 220,
+          }}>
+            <TodoPanel />
           </div>
         </div>
-        <div class="calendar-layout">
-          <div class="calendar-box">달력</div>
-          <div class="todo-box">투두</div>
-        </div>
-        <div class="habit-bar">해빗트래커</div>
-      </div>
-    </main>
-  </div>
-
-  <!-- ================= 모바일 (아이패드 세로) ================= -->
-  <div class="mobile-view">
-    <div class="topbar">
-      <div class="search-box">
-        <i data-lucide="search"></i>
-        <input type="text" placeholder="검색">
-      </div>
-      <div class="icon-group">
-        <button class="icon-btn"><i data-lucide="plus"></i></button>
-        <button class="icon-btn"><i data-lucide="mail"></i></button>
-        <button class="icon-btn"><i data-lucide="bell"></i></button>
-        <button class="icon-btn"><i data-lucide="settings"></i></button>
       </div>
     </div>
-
-    <div class="profile">
-      <div class="avatar"><i data-lucide="image"></i></div>
-      <div>
-        <div class="profile-name">이름<span class="uid">@아이디</span></div>
-        <p class="intro">한 줄 소개가 여기에 들어갑니다.</p>
-      </div>
-    </div>
-
-    <div class="quick-buttons">
-      <button onclick="showMobileView('mobile-view-calendar')">일정</button>
-      <button onclick="showMobileView('mobile-view-default')">시간</button>
-      <button onclick="showMobileView('mobile-view-default')">메모</button>
-      <button onclick="showMobileView('mobile-view-default')">?</button>
-    </div>
-
-    <div id="mobile-view-default" class="main-view-m active"></div>
-
-    <div id="mobile-view-calendar" class="main-view-m">
-      <div class="view-header">
-        <h2>CALENDAR</h2>
-        <div class="icon-group">
-          <button class="icon-btn"><i data-lucide="plus"></i></button>
-          <button class="icon-btn"><i data-lucide="more-horizontal"></i></button>
-        </div>
-      </div>
-
-      <div class="mobile-calendar-box">달력</div>
-
-      <div class="collapsible">
-        <button class="collapsible-header open" onclick="toggleCollapse(this)">
-          투두 <i data-lucide="chevron-down"></i>
-        </button>
-        <div class="collapsible-content open">투두 리스트가 여기에 들어갑니다.</div>
-      </div>
-
-      <div class="collapsible">
-        <button class="collapsible-header open" onclick="toggleCollapse(this)">
-          해빗트래커 <i data-lucide="chevron-down"></i>
-        </button>
-        <div class="collapsible-content open">해빗트래커 내용이 여기에 들어갑니다.</div>
-      </div>
-    </div>
-
-  </div>
-
-<script>
-  lucide.createIcons();
-  function showMainView(id){
-    document.querySelectorAll('.main-view').forEach(function(el){ el.classList.remove('active'); });
-    var target = document.getElementById(id);
-    if(target){ target.classList.add('active'); }
-  }
-  function showMobileView(id){
-    document.querySelectorAll('.main-view-m').forEach(function(el){ el.classList.remove('active'); });
-    var target = document.getElementById(id);
-    if(target){ target.classList.add('active'); }
-  }
-  function toggleCollapse(btn){
-    var content = btn.nextElementSibling;
-    var isOpen = content.classList.toggle('open');
-    btn.classList.toggle('open', isOpen);
-  }
-</script>
-</body>
-</html>
+  );
+}
