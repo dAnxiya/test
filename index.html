@@ -156,12 +156,17 @@
   .habit-add-btn:hover { background: var(--pink); border-color: var(--brown-light); }
   .habit-body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
   .habit-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--brown-light); font-size: 12.5px; font-weight: 600; text-align: center; padding: 10px; }
-  .habit-row { display: flex; align-items: flex-start; gap: 10px; }
+  .habit-row { display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+  .habit-row-head { display: flex; align-items: center; gap: 8px; }
   .habit-name {
-    width: 68px; flex-shrink: 0; font-size: 12px; font-weight: 700; color: var(--brown-dark);
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-top: 2px;
+    flex: 1; min-width: 0; font-size: 12px; font-weight: 700; color: var(--brown-dark);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: text;
   }
-  .habit-days { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; gap: 5px; }
+  .habit-name-input {
+    flex: 1; min-width: 0; font-size: 12px; font-weight: 700; color: var(--brown-dark);
+    border: 1px solid var(--brown); border-radius: 6px; padding: 2px 6px; outline: none; font-family: inherit;
+  }
+  .habit-days { width: 100%; min-width: 0; display: flex; flex-wrap: wrap; gap: 5px; }
   .habit-day {
     width: 20px; height: 20px; flex-shrink: 0; border-radius: 50%; border: 1.5px solid var(--brown-light);
     background: #fff; color: var(--brown-light); font-size: 8.5px; font-weight: 700; cursor: pointer;
@@ -912,14 +917,14 @@
             <div id="logList"></div>
             <button class="subject-add-row" id="subjectAddBtn">
               <span style="font-size:14px;font-weight:700;">+</span>
-              <span>공부 추가</span>
+              <span id="subjAddLabel">공부 추가</span>
             </button>
           </div>
         </div>
         <div class="panel-right">
           <div class="card stats-card">
             <div class="stats-header">
-              <span class="label">오늘 공부 시간</span>
+              <span class="label" id="todayStudyLabel">오늘 공부 시간</span>
               <span class="value" id="totalToday">0분</span>
             </div>
             <div class="timetable-scroll" id="timetableScroll">
@@ -999,10 +1004,19 @@
         </div>
         <button class="settings-reset-btn" id="settingsResetBtn">기본 색상으로 되돌리기</button>
         <div class="settings-card">
+          <div class="settings-card-head">
+            <span class="settings-card-title">활동 이름</span>
+            <span class="settings-card-desc">'공부'라고 표기되는 부분을 원하는 말로 바꿀 수 있어요. 예: 작업, 운동</span>
+          </div>
+          <div class="field-row" style="margin-top:10px;">
+            <input class="field-input" id="studyLabelInput" placeholder="공부" maxlength="10" style="flex:1;" />
+          </div>
+        </div>
+        <div class="settings-card">
           <div class="settings-toggle-row">
             <div class="settings-card-head">
-              <span class="settings-card-title">달력에 공부 시간 표시</span>
-              <span class="settings-card-desc">날짜 칸 아래에 그날 공부한 시간을 보여줘요. 꺼도 기록은 지워지지 않고, 다시 켜면 이전 기록도 그대로 보여요</span>
+              <span class="settings-card-title" id="calStudyToggleTitle">달력에 공부 시간 표시</span>
+              <span class="settings-card-desc" id="calStudyToggleDesc">날짜 칸 아래에 그날 공부한 시간을 보여줘요. 꺼도 기록은 지워지지 않고, 다시 켜면 이전 기록도 그대로 보여요</span>
             </div>
             <label class="switch">
               <input type="checkbox" id="showStudyTimeToggle" checked />
@@ -1576,6 +1590,49 @@ document.getElementById("showStudyTimeToggle").onchange = (e) => {
 };
 
 /* ============================================================
+   활동 이름(라벨) 커스터마이징: 사이트 곳곳의 "공부"라는 표현을
+   사용자가 원하는 말(예: 작업, 운동)로 한 번에 바꿔주는 기능.
+   ============================================================ */
+function hasBatchim(word) {
+  const lastChar = word[word.length - 1];
+  const code = lastChar.charCodeAt(0) - 0xac00;
+  if (code < 0 || code > 11171) return false; // 한글이 아니면 받침 없는 것으로 취급
+  return code % 28 !== 0;
+}
+function josa(word, withBatchim, withoutBatchim) {
+  return hasBatchim(word) ? withBatchim : withoutBatchim;
+}
+let studyLabel = localStorage.getItem("studyLabel") || "공부";
+
+function applyStudyLabel(label) {
+  const subjAddLabel = document.getElementById("subjAddLabel");
+  if (subjAddLabel) subjAddLabel.textContent = `${label} 추가`;
+  const todayStudyLabel = document.getElementById("todayStudyLabel");
+  if (todayStudyLabel) todayStudyLabel.textContent = `오늘 ${label} 시간`;
+  const calStudyToggleTitle = document.getElementById("calStudyToggleTitle");
+  if (calStudyToggleTitle) calStudyToggleTitle.textContent = `달력에 ${label} 시간 표시`;
+  const calStudyToggleDesc = document.getElementById("calStudyToggleDesc");
+  if (calStudyToggleDesc) calStudyToggleDesc.textContent = `날짜 칸 아래에 그날 ${label}한 시간을 보여줘요. 꺼도 기록은 지워지지 않고, 다시 켜면 이전 기록도 그대로 보여요`;
+  const subjFieldName = document.getElementById("subjFieldName");
+  if (subjFieldName) subjFieldName.placeholder = `${label} 이름`;
+  const subjDeleteBtn = document.getElementById("subjDeleteBtn");
+  if (subjDeleteBtn) subjDeleteBtn.textContent = `${label} 삭제`;
+  window.dispatchEvent(new CustomEvent("studylabel:update"));
+}
+
+const studyLabelInput = document.getElementById("studyLabelInput");
+studyLabelInput.value = studyLabel;
+studyLabelInput.placeholder = "공부";
+studyLabelInput.addEventListener("input", () => {
+  const val = studyLabelInput.value.trim();
+  studyLabel = val.length > 0 ? val : "공부";
+  localStorage.setItem("studyLabel", studyLabel);
+  applyStudyLabel(studyLabel);
+});
+
+applyStudyLabel(studyLabel);
+
+/* ============================================================
    HELP (문의하기): title + content -> mailto to oceanxae@icloud.com
    (a static page has no server to send from, so a mailto: link,
    pre-filled with the person's message, is used to hand it off to
@@ -1833,9 +1890,11 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
         return `<button class="habit-day${isToday ? " today" : ""}${done ? " done" : ""}" data-key="${k}">${day}</button>`;
       }).join("");
       row.innerHTML = `
-        <span class="habit-name" title="${h.name}">${h.name}</span>
-        <div class="habit-days">${daysHtml}</div>
-        <button class="habit-del" title="습관 삭제">×</button>`;
+        <div class="habit-row-head">
+          <span class="habit-name" title="${h.name}">${h.name}</span>
+          <button class="habit-del" title="습관 삭제">×</button>
+        </div>
+        <div class="habit-days">${daysHtml}</div>`;
       row.querySelectorAll(".habit-day").forEach((btn) => {
         btn.onclick = () => {
           const k = btn.dataset.key;
@@ -1843,12 +1902,32 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
           btn.classList.toggle("done");
         };
       });
+      row.querySelector(".habit-name").onclick = () => startEditHabitName(row, h);
       row.querySelector(".habit-del").onclick = () => {
         habitsByMonth[monthKeyOf(habitViewDate)] = habits.filter((x) => x.id !== h.id);
         renderHabits();
       };
       body.appendChild(row);
     });
+  }
+
+  function startEditHabitName(row, h) {
+    const nameEl = row.querySelector(".habit-name");
+    const input = document.createElement("input");
+    input.className = "habit-name-input";
+    input.value = h.name;
+    row.querySelector(".habit-row-head").replaceChild(input, nameEl);
+    input.focus();
+    input.select();
+    input.onblur = () => {
+      const val = input.value.trim();
+      if (val) h.name = val;
+      renderHabits();
+    };
+    input.onkeydown = (e) => {
+      if (e.key === "Enter") input.blur();
+      if (e.key === "Escape") { input.onblur = null; renderHabits(); }
+    };
   }
 
   document.getElementById("habitPrevBtn").onclick = () => {
@@ -2397,11 +2476,12 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
   }
   startBtn.onclick = startPause;
   stopBtn.onclick = stopTimer;
+  window.addEventListener("studylabel:update", () => renderLog());
 
   function renderLog() {
     const el = document.getElementById("logList");
     if (SUBJECTS.length === 0) {
-      el.innerHTML = `<div class="empty-note">공부가 없어요. 아래에서 추가해보세요.</div>`;
+      el.innerHTML = `<div class="empty-note">${studyLabel}${josa(studyLabel, "이", "가")} 없어요. 아래에서 추가해보세요.</div>`;
       return;
     }
     const totals = {};
@@ -2496,7 +2576,7 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
   function openSubjectModal(id) {
     editingSubjId = id;
     const subj = id ? subjectById(id) : null;
-    subjModalTitle.textContent = subj ? "공부 편집" : "공부 추가";
+    subjModalTitle.textContent = subj ? `${studyLabel} 편집` : `${studyLabel} 추가`;
     subjFieldName.value = subj ? subj.name : "";
     if (subj) {
       const [h, s, v] = hexToHsv(subj.color);
