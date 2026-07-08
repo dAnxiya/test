@@ -22,12 +22,12 @@
   .avatar-block { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 26px; }
   .avatar-circle {
     width: 92px; height: 92px; border-radius: 50%; background: #F3DEE1;
-    display: flex; align-items: center; justify-content: center; color: #a6a6ab;
+    display: flex; align-items: center; justify-content: center; color: #B3A098;
     position: relative; overflow: hidden; cursor: pointer; background-size: cover; background-position: center;
   }
   .avatar-circle::after {
     content: "변경"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    background: rgba(0,0,0,.45); color: #fff; font-size: 11px; font-weight: 700; opacity: 0; transition: opacity .15s;
+    background: rgba(179,160,152,.55); color: #fff; font-size: 11px; font-weight: 700; opacity: 0; transition: opacity .15s;
   }
   .avatar-circle:hover::after { opacity: 1; }
   .avatar-circle svg { width: 38px; height: 38px; }
@@ -89,12 +89,12 @@
   .photo-banner {
     flex: none; height: 42vh; max-height: 360px; background: #F3DEE1; border-radius: 16px;
     display: flex; align-items: center; justify-content: center;
-    color: #b0b0b5; font-size: 13px; font-weight: 600; gap: 8px; min-height: 160px;
+    color: #B3A098; font-size: 13px; font-weight: 600; gap: 8px; min-height: 160px;
     position: relative; overflow: hidden; cursor: pointer; background-size: cover; background-position: center;
   }
   .photo-banner::after {
     content: "사진 변경"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    background: rgba(0,0,0,.35); color: #fff; font-size: 13px; font-weight: 700; opacity: 0; transition: opacity .15s;
+    background: rgba(179,160,152,.45); color: #fff; font-size: 13px; font-weight: 700; opacity: 0; transition: opacity .15s;
   }
   .photo-banner:hover::after { opacity: 1; }
   .photo-banner svg { width: 22px; height: 22px; }
@@ -104,8 +104,9 @@
 
   .dday-card {
     flex: 1; background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 16px; padding: 16px 18px;
-    display: flex; flex-direction: column; justify-content: center; gap: 6px;
+    display: flex; flex-direction: column; justify-content: center; gap: 6px; cursor: pointer;
   }
+  .dday-card:hover { background: #EBD3D8; }
   .dday-label { font-size: 12px; font-weight: 600; color: #8e8e93; }
   .dday-value { font-size: 30px; font-weight: 800; color: #B3A098; letter-spacing: 0.3px; }
 
@@ -163,9 +164,9 @@
 
   .cal-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   .cal-toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #F3DEE1; }
-  .cal-toolbar .today-btn { border: 1px solid #F3DEE1; background: #fff; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
-  .cal-toolbar .nav-btn { border: 1px solid #F3DEE1; background: #fff; font-size: 13px; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; }
-  .cal-toolbar .month-label { font-size: 14.5px; font-weight: 700; }
+  .cal-toolbar .today-btn { border: 1px solid #F3DEE1; background: #fff; color: #1c1c1e; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+  .cal-toolbar .nav-btn { border: 1px solid #F3DEE1; background: #fff; color: #1c1c1e; font-size: 13px; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; }
+  .cal-toolbar .month-label { font-size: 14.5px; font-weight: 700; color: #1c1c1e; }
   .cal-toolbar .spacer { flex: 1; }
   .add-btn { border: none; background: #B3A098; color: #fff; font-size: 12px; font-weight: 600; border-radius: 7px; padding: 6px 12px; cursor: pointer; }
 
@@ -495,9 +496,9 @@
             </span>
           </div>
           <div class="bottom-row">
-            <div class="dday-card">
-              <div class="dday-label" id="ddayLabel">디데이 이름</div>
-              <div class="dday-value" id="ddayValue">D-0</div>
+            <div class="dday-card" id="ddayCard" title="클릭해서 디데이 설정">
+              <div class="dday-label" id="ddayLabel">디데이 설정</div>
+              <div class="dday-value" id="ddayValue">+</div>
             </div>
             <div class="notes-card">
               <div class="notes-head">
@@ -746,6 +747,26 @@
   </div>
 </div>
 
+<!-- D-day editor modal -->
+<div class="modal-overlay" id="ddayModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="ddayModalCancel">취소</button>
+      <span class="modal-title" id="ddayModalTitle">디데이 설정</span>
+      <button class="save-btn" id="ddayModalSave" disabled>완료</button>
+    </div>
+    <div class="modal-body">
+      <input class="field-input" id="ddayFieldName" placeholder="디데이 이름" />
+      <div class="field-row">
+        <span class="field-label">날짜</span>
+        <input class="field-select" type="date" id="ddayFieldDate" />
+      </div>
+      <button class="delete-btn" id="ddayDeleteBtn" style="display:none;">디데이 초기화</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- hidden file pickers for avatar / home photo ---- -->
 <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
 <input type="file" id="bannerFileInput" accept="image/*" style="display:none;" />
@@ -910,15 +931,60 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   updateClock();
   setInterval(updateClock, 1000 * 10);
 
+  let ddayName = "";
+  let ddayTargetDate = "";
+
   function updateDday() {
-    const target = new Date("2026-08-15T00:00:00");
-    target.setHours(0,0,0,0);
+    const ddayLabelEl = document.getElementById("ddayLabel");
+    const ddayValueEl = document.getElementById("ddayValue");
+    if (!ddayTargetDate) {
+      ddayLabelEl.textContent = "디데이 설정";
+      ddayValueEl.textContent = "+";
+      return;
+    }
+    const target = new Date(ddayTargetDate + "T00:00:00");
     const now = new Date(); now.setHours(0,0,0,0);
     const diffDays = Math.ceil((target - now) / 86400000);
     const label = diffDays === 0 ? "D-day" : diffDays > 0 ? `D-${diffDays}` : `D+${Math.abs(diffDays)}`;
-    document.getElementById("ddayValue").textContent = label;
+    ddayLabelEl.textContent = ddayName || "디데이";
+    ddayValueEl.textContent = label;
   }
   updateDday();
+
+  const ddayCard = document.getElementById("ddayCard");
+  const ddayOverlay = document.getElementById("ddayModalOverlay");
+  const ddayFieldName = document.getElementById("ddayFieldName");
+  const ddayFieldDate = document.getElementById("ddayFieldDate");
+  const ddayModalSave = document.getElementById("ddayModalSave");
+  const ddayDeleteBtn = document.getElementById("ddayDeleteBtn");
+
+  function validateDdaySave() { ddayModalSave.disabled = ddayFieldDate.value.trim().length === 0; }
+  function openDdayModal() {
+    ddayFieldName.value = ddayName;
+    ddayFieldDate.value = ddayTargetDate;
+    ddayDeleteBtn.style.display = ddayTargetDate ? "block" : "none";
+    validateDdaySave();
+    ddayOverlay.classList.add("show");
+    ddayFieldName.focus();
+  }
+  function closeDdayModal() { ddayOverlay.classList.remove("show"); }
+  ddayCard.onclick = openDdayModal;
+  ddayFieldDate.oninput = validateDdaySave;
+  document.getElementById("ddayModalCancel").onclick = closeDdayModal;
+  ddayOverlay.onclick = (e) => { if (e.target === ddayOverlay) closeDdayModal(); };
+  ddayModalSave.onclick = () => {
+    if (!ddayFieldDate.value) return;
+    ddayName = ddayFieldName.value.trim();
+    ddayTargetDate = ddayFieldDate.value;
+    closeDdayModal();
+    updateDday();
+  };
+  ddayDeleteBtn.onclick = () => {
+    ddayName = "";
+    ddayTargetDate = "";
+    closeDdayModal();
+    updateDday();
+  };
 
   function renderQuickNotesHome() {
     const el = document.getElementById("quickNotesList");
@@ -926,19 +992,17 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     quickNotes.forEach((n) => {
       const row = document.createElement("div");
       row.className = "note-row";
+      row.style.cursor = "pointer";
       row.innerHTML = `
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19l1-4.2L15.8 4 20 8.2 8.2 19H4z"/></svg>
         <span class="note-text">${n.title || n.content}</span>`;
+      row.onclick = () => window.openQuickNoteModal(n.id);
       el.appendChild(row);
     });
   }
   registerQuickNotesRenderer(renderQuickNotesHome);
   document.getElementById("quickAddBtn").onclick = () => {
-    const text = prompt("메모 내용을 입력하세요");
-    if (text && text.trim()) {
-      quickNotes.push({ id: "q" + Date.now(), title: "", content: text.trim() });
-      renderQuickNotesAll();
-    }
+    window.openQuickNoteModal(null);
   };
   renderQuickNotesHome();
 })();
@@ -947,11 +1011,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
    CALENDAR module
    ============================================================ */
 (function calendarModule() {
-  const CALENDARS = [
-    { id: "personal", name: "개인", color: "#FF3B30" },
-    { id: "work", name: "업무", color: "#007AFF" },
-    { id: "trpg", name: "TRPG", color: "#AF52DE" },
-  ];
+  const CALENDARS = [];
   const WEEKDAYS_KR = ["일","월","화","수","목","금","토"];
   const MONTHS_KR = ["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
 
@@ -965,7 +1025,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     return Array.from({length:42}, (_,i)=> addDays(gridStart, i));
   }
   function timeToMinutes(t){ if(!t) return 0; const [h,m]=t.split(":").map(Number); return h*60+m; }
-  function calColor(id){ return CALENDARS.find(c=>c.id===id).color; }
+  function calColor(id){ const c = CALENDARS.find(c=>c.id===id); return c ? c.color : "#B3A098"; }
 
   const today = new Date();
   let viewDate = new Date();
@@ -1211,7 +1271,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     const ev = id ? events.find(e=>e.id===id) : null;
     modalTitle.textContent = ev ? "일정 편집" : "새 일정";
     fieldTitle.value = ev ? ev.title : "";
-    fieldCalendar.value = ev ? ev.calendarId : CALENDARS[0].id;
+    fieldCalendar.value = ev ? ev.calendarId : (CALENDARS[0] ? CALENDARS[0].id : "");
     fieldDate.value = ev ? ev.date : dateKey(defaultDate || selectedDate);
     fieldAllDay.checked = ev ? !!ev.allDay : false;
     fieldStart.value = ev && ev.start ? ev.start : "09:00";
@@ -1695,6 +1755,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     qnOverlay.classList.add("show");
     qnFieldContent.focus();
   }
+  window.openQuickNoteModal = openQnModal;
   function closeQnModal() { qnOverlay.classList.remove("show"); }
   function validateQnSave() { qnModalSave.disabled = qnFieldContent.value.trim().length === 0; }
   qnFieldContent.oninput = validateQnSave;
