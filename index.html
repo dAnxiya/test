@@ -21,10 +21,10 @@
   }
   .avatar-block { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 26px; }
   .avatar-circle {
-    width: 62px; height: 62px; border-radius: 50%; background: #e2e2e6;
+    width: 92px; height: 92px; border-radius: 50%; background: #e2e2e6;
     display: flex; align-items: center; justify-content: center; color: #a6a6ab;
   }
-  .avatar-circle svg { width: 26px; height: 26px; }
+  .avatar-circle svg { width: 38px; height: 38px; }
   .avatar-name { font-size: 12.5px; font-weight: 600; color: #6e6e73; }
 
   .nav-list { display: flex; flex-direction: column; gap: 2px; }
@@ -74,12 +74,13 @@
   .col-right { flex: 1; min-width: 220px; }
 
   .photo-banner {
-    flex: 1; background: #eceded; border-radius: 16px; display: flex; align-items: center; justify-content: center;
-    color: #b0b0b5; font-size: 13px; font-weight: 600; gap: 8px; min-height: 180px;
+    flex: none; height: 46vh; max-height: 380px; background: #eceded; border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    color: #b0b0b5; font-size: 13px; font-weight: 600; gap: 8px; min-height: 160px;
   }
   .photo-banner svg { width: 22px; height: 22px; }
 
-  .bottom-row { display: flex; gap: 18px; height: 150px; }
+  .bottom-row { display: flex; gap: 18px; height: 150px; margin-top: auto; }
 
   .dday-card {
     flex: 1; background: #f4f4f5; border: 1px solid #ececef; border-radius: 16px; padding: 16px 18px;
@@ -177,8 +178,8 @@
         <button class="icon-btn" title="알림">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 10a6 6 0 1 1 12 0c0 4 1.4 5.4 1.4 5.4H4.6S6 14 6 10z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
         </button>
-        <button class="icon-btn" title="프로필">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+        <button class="icon-btn" title="설정">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4.5a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H10.6a1.7 1.7 0 0 0 1-1.6V4.5a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V10.6a1.7 1.7 0 0 0 1.6 1H19.5a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z"/></svg>
         </button>
       </div>
     </div>
