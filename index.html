@@ -255,6 +255,38 @@
   .toggle .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: left .15s; }
   .toggle.on .knob { left: 16px; }
 
+  /* ================= notes view ================= */
+  .notes-content { flex-direction: column; gap: 16px; }
+  .quicknotes-section { flex-shrink: 0; }
+  .section-title { font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: #1c1c1e; margin-bottom: 10px; }
+  .quicknotes-row { display: flex; align-items: center; gap: 8px; }
+  .qn-nav { border: 1px solid #e5e5ea; background: #fff; border-radius: 50%; width: 28px; height: 28px; flex-shrink: 0; cursor: pointer; color: #8e8e93; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .qn-nav:hover { background: #f4f4f5; }
+  .qn-scroll { flex: 1; display: flex; gap: 12px; overflow-x: auto; scroll-behavior: smooth; padding: 2px 2px 8px; }
+  .qn-scroll::-webkit-scrollbar { height: 5px; }
+  .qn-scroll::-webkit-scrollbar-thumb { background: #e5e5ea; border-radius: 3px; }
+  .qn-card { flex: 0 0 220px; background: #f4f4f5; border: 1px solid #ececef; border-radius: 14px; padding: 14px 16px; display: flex; gap: 10px; cursor: pointer; }
+  .qn-card:hover { background: #eeeeef; }
+  .qn-icon { width: 15px; height: 15px; color: #c7c7cc; flex-shrink: 0; margin-top: 2px; }
+  .qn-icon svg { width: 100%; height: 100%; }
+  .qn-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .qn-title { font-size: 13px; font-weight: 700; color: #1c1c1e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qn-content { font-size: 11.5px; color: #8e8e93; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .qn-card.add { flex: 0 0 90px; align-items: center; justify-content: center; border: 1px dashed #d4d4d8; background: transparent; color: #c7c7cc; font-weight: 700; font-size: 22px; }
+  .qn-card.add:hover { background: #f4f4f5; border-color: #c7c7cc; }
+
+  .notes-divider { height: 1px; background: #e5e5ea; flex-shrink: 0; }
+
+  .notes-grid-wrap { flex: 1; overflow-y: auto; min-height: 0; }
+  .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .note-card { background: #f4f4f5; border: 1px solid #ececef; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; }
+  .note-card:hover { background: #eeeeef; }
+  .note-thumb { flex: 1; min-height: 140px; background: #eceded; display: flex; align-items: center; justify-content: center; color: #b0b0b5; font-size: 12.5px; font-weight: 600; }
+  .note-card-title { padding: 9px 12px; font-size: 12.5px; font-weight: 600; color: #1c1c1e; border-top: 1px solid #e5e5ea; background: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note-card.add { align-items: center; justify-content: center; border: 1px dashed #d4d4d8; background: transparent; min-height: 100%; }
+  .note-card.add:hover { background: #f4f4f5; }
+  .note-card.add .note-thumb { background: transparent; font-size: 30px; font-weight: 700; color: #c7c7cc; min-height: 0; }
+
   /* ================= placeholder view ================= */
   .placeholder-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #c7c7cc; }
   .placeholder-view svg { width: 32px; height: 32px; }
@@ -447,7 +479,25 @@
       </div>
     </div>
 
-    <!-- ---------- placeholder view (TASKS / NOTES / HELP) ---------- -->
+    <!-- ---------- NOTES view ---------- -->
+    <div class="view" id="view-notes" style="display:none;">
+      <div class="content notes-content">
+        <div class="quicknotes-section">
+          <div class="section-title">QUICK NOTES</div>
+          <div class="quicknotes-row">
+            <button class="qn-nav" id="qnPrev">‹</button>
+            <div class="qn-scroll" id="qnScroll"></div>
+            <button class="qn-nav" id="qnNext">›</button>
+          </div>
+        </div>
+        <div class="notes-divider"></div>
+        <div class="notes-grid-wrap">
+          <div class="notes-grid" id="notesGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- placeholder view (TASKS / HELP) ---------- -->
     <div class="view" id="view-placeholder" style="display:none;">
       <div class="placeholder-view">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9.5 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.4 2-2.4 3.6"/><circle cx="12" cy="16.6" r="0.3" fill="currentColor"/><circle cx="12" cy="12" r="9"/></svg>
@@ -501,12 +551,12 @@
    NAVIGATION (sidebar -> view switching)
    ============================================================ */
 function showView(id) {
-  ["home", "calendar", "time"].forEach((k) => {
+  ["home", "calendar", "time", "notes"].forEach((k) => {
     const el = document.getElementById("view-" + k);
     if (el) el.style.display = k === id ? "flex" : "none";
   });
   document.getElementById("view-placeholder").style.display =
-    ["home", "calendar", "time"].includes(id) ? "none" : "flex";
+    ["home", "calendar", "time", "notes"].includes(id) ? "none" : "flex";
 }
 document.querySelectorAll(".nav-item").forEach((btn) => {
   btn.onclick = () => {
@@ -968,6 +1018,88 @@ function pad(n) { return String(n).padStart(2, "0"); }
   renderLog();
   renderStats();
   renderApps();
+})();
+
+/* ============================================================
+   NOTES module
+   ============================================================ */
+(function notesModule() {
+  const pencilIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 4.5l5 5L8 21H3v-5z"/></svg>`;
+
+  let quickNotes = [
+    { id: "q1", title: "장보기 목록", content: "우유, 계란, 식빵, 바나나" },
+    { id: "q2", title: "", content: "회의 전에 슬라이드 3장만 더 정리하기" },
+    { id: "q3", title: "", content: "저녁 약속 7시 강남역" },
+    { id: "q4", title: "아이디어", content: "주말 여행지 후보 조사" },
+  ];
+  let notes = [
+    { id: "n1", title: "제주 여행" },
+    { id: "n2", title: "카페 인테리어" },
+    { id: "n3", title: "스터디 자료" },
+    { id: "n4", title: "요리 레시피" },
+    { id: "n5", title: "운동 루틴" },
+    { id: "n6", title: "책 표지" },
+  ];
+
+  function renderQuickNotes() {
+    const el = document.getElementById("qnScroll");
+    el.innerHTML = "";
+    quickNotes.forEach((n) => {
+      const card = document.createElement("div");
+      card.className = "qn-card";
+      card.innerHTML = `
+        <span class="qn-icon">${pencilIcon}</span>
+        <span class="qn-body">
+          ${n.title ? `<span class="qn-title">${n.title}</span>` : ""}
+          <span class="qn-content">${n.content}</span>
+        </span>`;
+      el.appendChild(card);
+    });
+    const addCard = document.createElement("div");
+    addCard.className = "qn-card add";
+    addCard.textContent = "+";
+    addCard.onclick = () => {
+      const content = prompt("빠른 메모 내용을 입력하세요");
+      if (!content || !content.trim()) return;
+      const title = prompt("제목 (선택, 비워두면 제목 없이 저장돼요)") || "";
+      quickNotes.push({ id: "q" + Date.now(), title: title.trim(), content: content.trim() });
+      renderQuickNotes();
+    };
+    el.appendChild(addCard);
+  }
+
+  function renderNotesGrid() {
+    const el = document.getElementById("notesGrid");
+    el.innerHTML = "";
+    notes.forEach((n) => {
+      const card = document.createElement("div");
+      card.className = "note-card";
+      card.innerHTML = `
+        <div class="note-thumb">이미지</div>
+        <div class="note-card-title">${n.title}</div>`;
+      el.appendChild(card);
+    });
+    const addCard = document.createElement("div");
+    addCard.className = "note-card add";
+    addCard.innerHTML = `<div class="note-thumb">+</div>`;
+    addCard.onclick = () => {
+      const title = prompt("새 노트 제목을 입력하세요");
+      if (!title || !title.trim()) return;
+      notes.push({ id: "n" + Date.now(), title: title.trim() });
+      renderNotesGrid();
+    };
+    el.appendChild(addCard);
+  }
+
+  document.getElementById("qnPrev").onclick = () => {
+    document.getElementById("qnScroll").scrollBy({ left: -240, behavior: "smooth" });
+  };
+  document.getElementById("qnNext").onclick = () => {
+    document.getElementById("qnScroll").scrollBy({ left: 240, behavior: "smooth" });
+  };
+
+  renderQuickNotes();
+  renderNotesGrid();
 })();
 </script>
 </body>
