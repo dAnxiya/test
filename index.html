@@ -560,6 +560,21 @@
   }
   .settings-reset-btn:hover { background: var(--pink); border-color: var(--pink); }
 
+  /* ================= help (문의) view ================= */
+  .help-view { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow-y: auto; max-width: 460px; }
+  .help-view textarea.field-input { flex: 1; min-height: 160px; }
+  .help-send-btn {
+    align-self: flex-end; border: none; background: var(--brown); color: #fff;
+    font-size: 13px; font-weight: 700; padding: 10px 20px; border-radius: 10px; cursor: pointer;
+  }
+  .help-send-btn:disabled { background: var(--pink); color: var(--brown-light); cursor: default; }
+  .help-done-card { align-items: center; text-align: center; gap: 18px; padding: 32px 24px; }
+  .help-done-text { font-size: 13.5px; font-weight: 600; color: var(--brown-dark); line-height: 1.7; margin: 0; }
+  .help-done-confirm-btn {
+    border: none; background: var(--brown); color: #fff; font-size: 12.5px; font-weight: 700;
+    padding: 9px 22px; border-radius: 10px; cursor: pointer;
+  }
+
   /* ============================================================
      RESPONSIVE — tablet portrait (iPad) & mobile
      Same visual language as desktop (same photo-banner shape, same
@@ -969,7 +984,28 @@
       </div>
     </div>
 
-    <!-- ---------- placeholder view (HELP) ---------- -->
+    <!-- ---------- HELP view (문의하기) ---------- -->
+    <div class="view" id="view-help" style="display:none;">
+      <div class="help-view" id="helpFormState">
+        <div class="settings-card">
+          <div class="settings-card-head">
+            <span class="settings-card-title">문의하기</span>
+            <span class="settings-card-desc">궁금한 점이나 불편한 점을 남겨주시면 확인 후 답변드릴게요</span>
+          </div>
+          <input class="field-input" id="helpFieldTitle" placeholder="제목" />
+          <textarea class="field-input" id="helpFieldContent" placeholder="내용을 입력해주세요" rows="8"></textarea>
+          <button class="help-send-btn" id="helpSendBtn" disabled>보내기</button>
+        </div>
+      </div>
+      <div class="help-view" id="helpDoneState" style="display:none;">
+        <div class="settings-card help-done-card">
+          <p class="help-done-text">문의가 접수 되었습니다.<br>모든 답변은 트위터 계정(@xixyohi)를 통해 올라오며,<br>최대한 빠른 답변 드릴 수 있도록 노력하겠습니다.</p>
+          <button class="help-done-confirm-btn" id="helpDoneConfirmBtn">확인</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- placeholder view (fallback) ---------- -->
     <div class="view" id="view-placeholder" style="display:none;">
       <div class="placeholder-view">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9.5 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.4 2-2.4 3.6"/><circle cx="12" cy="16.6" r="0.3" fill="currentColor"/><circle cx="12" cy="12" r="9"/></svg>
@@ -1242,7 +1278,7 @@
 /* ============================================================
    NAVIGATION (sidebar -> view switching)
    ============================================================ */
-const FULL_VIEWS = ["home", "calendar", "time", "notes", "settings", "message"];
+const FULL_VIEWS = ["home", "calendar", "time", "notes", "settings", "message", "help"];
 function showView(id) {
   FULL_VIEWS.forEach((k) => {
     const el = document.getElementById("view-" + k);
@@ -1466,6 +1502,53 @@ document.getElementById("settingsResetBtn").onclick = () => {
   window._pinkWheel.setColor(DEFAULT_PINK);
   window._brownWheel.setColor(DEFAULT_BROWN);
 };
+
+/* ============================================================
+   HELP (문의하기): title + content -> mailto to oceanxae@icloud.com
+   (a static page has no server to send from, so a mailto: link,
+   pre-filled with the person's message, is used to hand it off to
+   their own mail app) then show a confirmation screen.
+   ============================================================ */
+(function helpModule() {
+  const HELP_EMAIL = "oceanxae@icloud.com";
+  const formState = document.getElementById("helpFormState");
+  const doneState = document.getElementById("helpDoneState");
+  const fieldTitle = document.getElementById("helpFieldTitle");
+  const fieldContent = document.getElementById("helpFieldContent");
+  const sendBtn = document.getElementById("helpSendBtn");
+  const confirmBtn = document.getElementById("helpDoneConfirmBtn");
+
+  function validate() {
+    sendBtn.disabled = fieldContent.value.trim().length === 0;
+  }
+  fieldContent.addEventListener("input", validate);
+  validate();
+
+  function resetForm() {
+    fieldTitle.value = "";
+    fieldContent.value = "";
+    validate();
+  }
+
+  sendBtn.onclick = () => {
+    if (sendBtn.disabled) return;
+    const subject = fieldTitle.value.trim() || "문의하기";
+    const body = fieldContent.value.trim();
+    const mailtoUrl = `mailto:${HELP_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
+
+    formState.style.display = "none";
+    doneState.style.display = "flex";
+    resetForm();
+  };
+
+  confirmBtn.onclick = () => {
+    doneState.style.display = "none";
+    formState.style.display = "flex";
+    const homeNavBtn = document.querySelector('.nav-item[data-id="home"]');
+    if (homeNavBtn) homeNavBtn.click();
+  };
+})();
 
 /* ============================================================
    SHARED: quick notes (used by both the Home widget and the
