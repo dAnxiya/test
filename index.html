@@ -180,8 +180,9 @@
   .todo-header { padding: 16px 18px 10px; font-size: 14px; font-weight: 700; }
   .todo-list { flex: 1; overflow-y: auto; padding: 0 14px; display: flex; flex-direction: column; gap: 4px; }
   .todo-row { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: 8px; background: #fff; }
-  .todo-check { width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0; cursor: pointer; border: 1.5px solid #c7c7cc; background: transparent; }
+  .todo-check { width: 17px; height: 17px; border-radius: 5px; flex-shrink: 0; cursor: pointer; border: 1.5px solid #c7c7cc; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0; }
   .todo-check.done { border: none; background: #34C759; }
+  .todo-check svg { width: 11px; height: 11px; pointer-events: none; }
   .todo-text { flex: 1; font-size: 13px; color: #1c1c1e; cursor: text; }
   .todo-text.done { color: #b0b0b5; text-decoration: line-through; }
   .todo-edit-input { flex: 1; font-size: 13px; color: #1c1c1e; border: 1px solid #007AFF; border-radius: 6px; padding: 2px 6px; outline: none; font-family: inherit; }
@@ -190,6 +191,13 @@
   .todo-input-row { padding: 14px; border-top: 1px solid #ececef; display: flex; gap: 6px; }
   .todo-input-row input { flex: 1; border: 1px solid #e5e5ea; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; outline: none; }
   .todo-add-btn { border: none; background: #1c1c1e; color: #fff; border-radius: 8px; width: 32px; font-size: 15px; cursor: pointer; }
+
+  .todo-cat-dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #d4d4d8; background: #fff; cursor: pointer; flex-shrink: 0; padding: 0; }
+  .todo-cat-dot:hover { border-color: #a6a6ab; }
+  .todo-cat-popover { position: fixed; z-index: 60; background: #fff; border: 1px solid #e5e5ea; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); padding: 6px; display: none; min-width: 120px; }
+  .todo-cat-popover.show { display: block; }
+  .todo-cat-option { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 7px; cursor: pointer; font-size: 12.5px; color: #1c1c1e; white-space: nowrap; }
+  .todo-cat-option:hover { background: #f4f4f5; }
 
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.28); display: none; align-items: center; justify-content: center; z-index: 50; }
   .modal-overlay.show { display: flex; }
@@ -234,38 +242,27 @@
   .note-image-picker { border: 1px dashed #d4d4d8; border-radius: 10px; min-height: 100px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #a6a6ab; font-size: 12.5px; font-weight: 600; overflow: hidden; }
   .note-image-picker:hover { background: #f9f9fa; }
 
-  /* ---- note editor: goodnotes-style paper feel ---- */
-  .note-modal-overlay { background: rgba(20,18,14,0.5); }
+  /* ---- note editor: clean white paper, view + edit modes ---- */
+  .note-modal-overlay { background: rgba(20,18,14,0.45); }
   .note-paper-box {
-    width: 640px; max-width: 94vw; height: 86vh; max-height: 780px;
-    background: #fffdf7; display: flex; flex-direction: column; border-radius: 16px;
-    box-shadow: 0 26px 70px rgba(0,0,0,0.35);
+    width: 600px; max-width: 94vw; height: 80vh; max-height: 720px;
+    background: #ffffff; display: flex; flex-direction: column; border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.3); overflow: hidden;
   }
-  .note-paper-box .modal-head { background: #fffdf7; border-bottom: 1px solid #ece7d8; flex-shrink: 0; padding: 15px 20px; }
-  .note-paper-box .modal-body {
-    flex: 1; overflow-y: auto; padding: 26px 32px 30px 70px; gap: 0; position: relative;
-    background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, #ece7d8 30px);
-    background-position: 0 84px;
-  }
-  .note-paper-box .modal-body::before {
-    content: ""; position: absolute; left: 42px; top: 0; bottom: 0; width: 1px; background: #f3cac2;
-  }
-  .note-paper-box #noteFieldTitle {
-    border: none; border-bottom: 2px solid #1c1c1e; border-radius: 0; padding: 4px 2px 12px; margin-bottom: 18px;
-    font-size: 19px; font-weight: 800; background: transparent;
-  }
-  .note-paper-box #noteFieldTitle::placeholder { color: #d4d1c4; }
-  .note-paper-box #noteFieldContent {
-    border: none; padding: 0 2px; font-size: 14.5px; line-height: 30px; min-height: 280px; background: transparent;
-  }
-  .note-paper-box #noteFieldContent::placeholder { color: #d4d1c4; }
-  .note-paper-box .note-image-picker { margin-top: 10px; background: #fffdf7; border-color: #d9d3bf; }
-  .note-paper-box .note-image-picker:hover { background: #fbf8ee; }
-  .note-paper-box .delete-btn { margin-top: 16px; }
-  @media (max-width: 480px) {
-    .note-paper-box .modal-body { padding-left: 34px; background-position: 0 84px; }
-    .note-paper-box .modal-body::before { left: 20px; }
-  }
+  .note-paper-box .modal-head { flex-shrink: 0; padding: 15px 20px; }
+
+  /* view mode */
+  .note-view-body { flex: 1; overflow-y: auto; padding: 26px 30px 32px; display: flex; flex-direction: column; gap: 16px; }
+  .note-view-image { width: 100%; min-height: 200px; border-radius: 12px; background-color: #f4f4f5; background-size: cover; background-position: center; flex-shrink: 0; }
+  .note-view-title { font-size: 20px; font-weight: 800; color: #1c1c1e; word-break: break-word; }
+  .note-view-content { font-size: 14.5px; line-height: 1.75; color: #3a3a3c; white-space: pre-wrap; word-break: break-word; }
+  .note-view-empty { font-size: 13px; color: #c7c7cc; }
+
+  /* edit mode */
+  .note-mode-toggle { display: flex; gap: 6px; }
+  .note-mode-btn { border: 1px solid #e5e5ea; background: #fff; color: #8e8e93; font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 7px; cursor: pointer; }
+  .note-mode-btn.active { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
+  .note-paper-box #noteFieldContent { min-height: 200px; }
   .note-image-picker img { width: 100%; height: 140px; object-fit: cover; display: block; }
 
   /* ================= time view ================= */
@@ -656,25 +653,49 @@
 <!-- note editor modal -->
 <div class="modal-overlay note-modal-overlay" id="noteModalOverlay">
   <div class="modal-box note-paper-box">
-    <div class="modal-head">
-      <button class="cancel-btn" id="noteModalCancel">취소</button>
-      <span class="modal-title" id="noteModalTitle">노트 추가</span>
-      <button class="save-btn" id="noteModalSave" disabled>완료</button>
-    </div>
-    <div class="modal-body">
-      <input class="field-input" id="noteFieldTitle" placeholder="제목" />
-      <textarea class="field-input" id="noteFieldContent" placeholder="내용" rows="4" style="resize:none;"></textarea>
-      <div class="note-image-picker" id="noteImagePicker">
-        <span id="noteImagePreviewText">+ 이미지 추가</span>
-        <img id="noteImagePreviewImg" style="display:none;" />
+
+    <!-- view mode -->
+    <div id="noteViewMode">
+      <div class="modal-head">
+        <button class="cancel-btn" id="noteViewClose">닫기</button>
+        <span class="modal-title">노트</span>
+        <button class="save-btn" id="noteViewEditBtn">편집</button>
       </div>
-      <input type="file" id="noteFieldImage" accept="image/*" style="display:none;" />
-      <button class="delete-btn" id="noteDeleteBtn" style="display:none;">노트 삭제</button>
+      <div class="note-view-body">
+        <div class="note-view-image" id="noteViewImage" style="display:none;"></div>
+        <div class="note-view-title" id="noteViewTitle"></div>
+        <div class="note-view-content" id="noteViewContent"></div>
+      </div>
     </div>
+
+    <!-- edit mode -->
+    <div id="noteEditMode" style="display:none;">
+      <div class="modal-head">
+        <button class="cancel-btn" id="noteModalCancel">취소</button>
+        <span class="modal-title" id="noteModalTitle">노트 추가</span>
+        <button class="save-btn" id="noteModalSave" disabled>완료</button>
+      </div>
+      <div class="modal-body">
+        <div class="note-image-picker" id="noteImagePicker">
+          <span id="noteImagePreviewText">+ 커버 이미지 추가</span>
+          <img id="noteImagePreviewImg" style="display:none;" />
+        </div>
+        <input type="file" id="noteFieldImage" accept="image/*" style="display:none;" />
+        <input class="field-input" id="noteFieldTitle" placeholder="제목" />
+        <div class="note-mode-toggle">
+          <button type="button" class="note-mode-btn active" id="noteModeNormal">일반</button>
+          <button type="button" class="note-mode-btn" id="noteModeHtml">HTML</button>
+        </div>
+        <textarea class="field-input" id="noteFieldContent" placeholder="내용" rows="4" style="resize:none;"></textarea>
+        <button class="delete-btn" id="noteDeleteBtn" style="display:none;">노트 삭제</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
+
 /* ============================================================
    NAVIGATION (sidebar -> view switching)
    ============================================================ */
@@ -971,9 +992,11 @@ function pad(n) { return String(n).padStart(2, "0"); }
     CALENDARS.splice(CALENDARS.findIndex(c=>c.id===editingCatId), 1);
     activeCalendars.delete(editingCatId);
     events = events.filter(e=>e.calendarId !== editingCatId);
+    todos.forEach(t => { if (t.calendarId === editingCatId) t.calendarId = null; });
     closeCategoryModal();
     refreshCalendarOptions();
     renderAll();
+    renderTodos();
   };
   document.getElementById("categoryAddBtn").onclick = () => openCategoryModal(null);
 
@@ -1100,10 +1123,47 @@ function pad(n) { return String(n).padStart(2, "0"); }
   };
 
   let todos = [
-    { id:"t1", text:"TRPG 시나리오 정리", done:false },
-    { id:"t2", text:"캘린더 앱 색상 다듬기", done:false },
-    { id:"t3", text:"장보기", done:true },
+    { id:"t1", text:"TRPG 시나리오 정리", done:false, calendarId:"trpg" },
+    { id:"t2", text:"캘린더 앱 색상 다듬기", done:false, calendarId:"work" },
+    { id:"t3", text:"장보기", done:true, calendarId:null },
   ];
+
+  /* ---- category color popover for todos ---- */
+  const todoCatPopover = document.createElement("div");
+  todoCatPopover.className = "todo-cat-popover";
+  document.body.appendChild(todoCatPopover);
+  let todoCatOpenFor = null;
+
+  function closeTodoCatPopover() {
+    todoCatPopover.classList.remove("show");
+    todoCatOpenFor = null;
+  }
+  function openTodoCatPopover(btn, it) {
+    todoCatOpenFor = it;
+    todoCatPopover.innerHTML = "";
+    const noneRow = document.createElement("div");
+    noneRow.className = "todo-cat-option";
+    noneRow.innerHTML = `<span class="cal-dot" style="background:#e2e2e6;"></span><span>없음</span>`;
+    noneRow.onclick = () => { it.calendarId = null; closeTodoCatPopover(); renderTodos(); };
+    todoCatPopover.appendChild(noneRow);
+    CALENDARS.forEach((c) => {
+      const row = document.createElement("div");
+      row.className = "todo-cat-option";
+      row.innerHTML = `<span class="cal-dot" style="background:${c.color};"></span><span>${c.name}</span>`;
+      row.onclick = () => { it.calendarId = c.id; closeTodoCatPopover(); renderTodos(); };
+      todoCatPopover.appendChild(row);
+    });
+    const rect = btn.getBoundingClientRect();
+    todoCatPopover.style.left = Math.min(rect.left, window.innerWidth - 140) + "px";
+    todoCatPopover.style.top = (rect.bottom + 6) + "px";
+    todoCatPopover.classList.add("show");
+  }
+  document.addEventListener("click", (e) => {
+    if (todoCatOpenFor && !todoCatPopover.contains(e.target) && !e.target.classList.contains("todo-cat-dot")) {
+      closeTodoCatPopover();
+    }
+  });
+
   function renderTodos(){
     const el = document.getElementById("todoList");
     el.innerHTML = "";
@@ -1114,10 +1174,14 @@ function pad(n) { return String(n).padStart(2, "0"); }
     todos.forEach(it=>{
       const row = document.createElement("div");
       row.className = "todo-row";
+      const dotColor = it.calendarId ? calColor(it.calendarId) : null;
+      const doneColor = dotColor || "#34C759";
       row.innerHTML = `
-        <button class="todo-check ${it.done?"done":""}"></button>
+        <button class="todo-cat-dot" style="${dotColor ? `background:${dotColor};border-color:${dotColor};` : ""}" title="카테고리 선택"></button>
+        <button class="todo-check ${it.done?"done":""}" style="${it.done ? `background:${doneColor};` : ""}">${it.done ? `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 13 10 18 19 7"></polyline></svg>` : ""}</button>
         <span class="todo-text ${it.done?"done":""}">${it.text}</span>
         <button class="todo-del">×</button>`;
+      row.querySelector(".todo-cat-dot").onclick = (e) => { e.stopPropagation(); openTodoCatPopover(e.currentTarget, it); };
       row.querySelector(".todo-check").onclick = () => { it.done = !it.done; renderTodos(); };
       row.querySelector(".todo-del").onclick = (e) => { e.stopPropagation(); todos = todos.filter(t=>t.id!==it.id); renderTodos(); };
       row.querySelector(".todo-text").onclick = () => startEditTodo(row, it);
@@ -1148,7 +1212,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
     const input = document.getElementById("todoInput");
     const text = input.value.trim();
     if (!text) return;
-    todos.push({ id:"t"+Date.now(), text, done:false });
+    todos.push({ id:"t"+Date.now(), text, done:false, calendarId:null });
     input.value = "";
     renderTodos();
   }
@@ -1406,6 +1470,14 @@ function pad(n) { return String(n).padStart(2, "0"); }
 
   /* ---------- image notes ---------- */
   const noteOverlay = document.getElementById("noteModalOverlay");
+  const noteViewMode = document.getElementById("noteViewMode");
+  const noteEditMode = document.getElementById("noteEditMode");
+  const noteViewTitleEl = document.getElementById("noteViewTitle");
+  const noteViewContentEl = document.getElementById("noteViewContent");
+  const noteViewImageEl = document.getElementById("noteViewImage");
+  const noteViewEditBtn = document.getElementById("noteViewEditBtn");
+  const noteViewCloseBtn = document.getElementById("noteViewClose");
+
   const noteFieldTitle = document.getElementById("noteFieldTitle");
   const noteFieldContent = document.getElementById("noteFieldContent");
   const noteModalTitle = document.getElementById("noteModalTitle");
@@ -1415,8 +1487,13 @@ function pad(n) { return String(n).padStart(2, "0"); }
   const noteImagePreviewText = document.getElementById("noteImagePreviewText");
   const noteImagePreviewImg = document.getElementById("noteImagePreviewImg");
   const noteFieldImage = document.getElementById("noteFieldImage");
+  const noteModeNormalBtn = document.getElementById("noteModeNormal");
+  const noteModeHtmlBtn = document.getElementById("noteModeHtml");
+
   let editingNoteId = null;
+  let viewingNoteId = null;
   let pendingImageData = null;
+  let noteIsHtml = false;
 
   noteImagePicker.onclick = () => noteFieldImage.click();
   noteFieldImage.onchange = () => {
@@ -1432,7 +1509,42 @@ function pad(n) { return String(n).padStart(2, "0"); }
     reader.readAsDataURL(file);
   };
 
-  function openNoteModal(id) {
+  function setNoteMode(isHtml) {
+    noteIsHtml = isHtml;
+    noteModeNormalBtn.classList.toggle("active", !isHtml);
+    noteModeHtmlBtn.classList.toggle("active", isHtml);
+    noteFieldContent.placeholder = isHtml ? "<p>HTML을 입력하세요</p>" : "내용";
+  }
+  noteModeNormalBtn.onclick = () => setNoteMode(false);
+  noteModeHtmlBtn.onclick = () => setNoteMode(true);
+
+  /* ---- view mode: shows note content with a separate 편집(edit) button ---- */
+  function openNoteViewModal(id) {
+    const n = notes.find((x) => x.id === id);
+    if (!n) return;
+    viewingNoteId = id;
+    noteViewTitleEl.textContent = n.title || "(제목 없음)";
+    if (n.content) {
+      if (n.isHtml) noteViewContentEl.innerHTML = n.content;
+      else noteViewContentEl.textContent = n.content;
+      noteViewContentEl.style.display = "block";
+    } else {
+      noteViewContentEl.innerHTML = "";
+      noteViewContentEl.style.display = "none";
+    }
+    if (n.image) {
+      noteViewImageEl.style.backgroundImage = `url('${n.image}')`;
+      noteViewImageEl.style.display = "block";
+    } else {
+      noteViewImageEl.style.display = "none";
+    }
+    noteEditMode.style.display = "none";
+    noteViewMode.style.display = "block";
+    noteOverlay.classList.add("show");
+  }
+
+  /* ---- edit mode: title / content(with HTML toggle) / image / delete ---- */
+  function openNoteEditModal(id) {
     editingNoteId = id;
     const n = id ? notes.find((x) => x.id === id) : null;
     noteModalTitle.textContent = n ? "노트 편집" : "노트 추가";
@@ -1440,6 +1552,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
     noteFieldContent.value = n && n.content ? n.content : "";
     pendingImageData = n && n.image ? n.image : null;
     noteFieldImage.value = "";
+    setNoteMode(n ? !!n.isHtml : false);
     if (pendingImageData) {
       noteImagePreviewImg.src = pendingImageData;
       noteImagePreviewImg.style.display = "block";
@@ -1450,13 +1563,18 @@ function pad(n) { return String(n).padStart(2, "0"); }
     }
     noteDeleteBtn.style.display = n ? "block" : "none";
     validateNoteSave();
+    noteViewMode.style.display = "none";
+    noteEditMode.style.display = "block";
     noteOverlay.classList.add("show");
     noteFieldTitle.focus();
   }
+
   function closeNoteModal() { noteOverlay.classList.remove("show"); }
   function validateNoteSave() { noteModalSave.disabled = noteFieldTitle.value.trim().length === 0; }
   noteFieldTitle.oninput = validateNoteSave;
   document.getElementById("noteModalCancel").onclick = closeNoteModal;
+  noteViewCloseBtn.onclick = closeNoteModal;
+  noteViewEditBtn.onclick = () => openNoteEditModal(viewingNoteId);
   noteOverlay.onclick = (e) => { if (e.target === noteOverlay) closeNoteModal(); };
 
   noteModalSave.onclick = () => {
@@ -1468,8 +1586,9 @@ function pad(n) { return String(n).padStart(2, "0"); }
       n.title = title;
       n.content = content;
       n.image = pendingImageData;
+      n.isHtml = noteIsHtml;
     } else {
-      notes.push({ id: "n" + Date.now(), title, content, image: pendingImageData });
+      notes.push({ id: "n" + Date.now(), title, content, image: pendingImageData, isHtml: noteIsHtml });
     }
     closeNoteModal();
     renderNotesGrid();
@@ -1495,13 +1614,13 @@ function pad(n) { return String(n).padStart(2, "0"); }
           <div class="note-thumb">이미지</div>
           <div class="note-card-title">${n.title}</div>`;
       }
-      card.onclick = () => openNoteModal(n.id);
+      card.onclick = () => openNoteViewModal(n.id);
       el.appendChild(card);
     });
     const addCard = document.createElement("div");
     addCard.className = "note-card add";
     addCard.innerHTML = `<div class="note-thumb">+</div>`;
-    addCard.onclick = () => openNoteModal(null);
+    addCard.onclick = () => openNoteEditModal(null);
     el.appendChild(addCard);
   }
 
