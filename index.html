@@ -259,6 +259,12 @@
   .note-back-btn:hover { background: #ececef; }
   .note-back-btn svg { width: 18px; height: 18px; }
   .note-fs-title { font-size: 14px; font-weight: 700; color: #1c1c1e; flex: 1; text-align: center; }
+  .note-fs-action-btn {
+    border: none; background: #1c1c1e; color: #fff; font-size: 12.5px; font-weight: 700;
+    padding: 8px 16px; border-radius: 9px; cursor: pointer; flex-shrink: 0;
+  }
+  .note-fs-action-btn:hover { background: #000; }
+  .note-fs-action-btn:disabled { background: #ececef; color: #c7c7cc; cursor: default; }
 
   /* view mode */
   .note-view-body { flex: 1; overflow-y: auto; padding: 34px 40px 60px; }
@@ -271,9 +277,15 @@
   /* edit mode */
   .note-edit-body { flex: 1; overflow-y: auto; padding: 30px 40px 60px; }
   .note-edit-body-inner { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
-  .note-mode-toggle { display: flex; gap: 6px; }
+  .note-mode-toggle { display: flex; align-items: center; gap: 6px; }
   .note-mode-btn { border: 1px solid #e5e5ea; background: #fff; color: #8e8e93; font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 7px; cursor: pointer; }
   .note-mode-btn.active { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
+  .note-paste-btn {
+    margin-left: auto; border: 1px solid #e5e5ea; background: #fff; color: #48484c; font-size: 11.5px; font-weight: 600;
+    padding: 5px 12px; border-radius: 7px; cursor: pointer;
+  }
+  .note-paste-btn:hover { background: #f4f4f5; }
+  .note-paste-btn:active { background: #ececef; }
   #noteFieldContent { min-height: 220px; }
   .note-image-picker img { width: 100%; height: 180px; object-fit: cover; display: block; }
   .note-html-preview-label { font-size: 11px; font-weight: 700; color: #a6a6ab; letter-spacing: 0.4px; margin-bottom: 6px; display: none; }
@@ -300,35 +312,40 @@
   .focus-note.show { display: flex; }
   .focus-dot { width: 6px; height: 6px; border-radius: 50%; background: #FF3B30; }
 
-  .log-card { padding: 16px 20px; flex: 1; overflow-y: auto; min-height: 0; }
+  .log-card { padding: 16px 20px; flex: 1; overflow-y: auto; min-height: 0; display: flex; flex-direction: column; }
   .card-title { font-size: 13px; font-weight: 700; color: #1c1c1e; margin-bottom: 10px; }
   .empty-note { font-size: 12px; color: #c7c7cc; }
-  .log-row { display: flex; align-items: center; gap: 10px; font-size: 12.5px; padding: 4px 0; }
-  .log-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .log-name { flex: 1; color: #1c1c1e; font-weight: 500; }
-  .log-time { color: #8e8e93; }
-  .log-ended { color: #c7c7cc; width: 56px; text-align: right; }
+  .subject-row { display: flex; align-items: center; gap: 12px; padding: 8px 2px; }
+  .subject-color-box { width: 32px; height: 32px; border-radius: 10px; flex-shrink: 0; }
+  .subject-name { flex: 1; font-size: 13.5px; font-weight: 700; color: #1c1c1e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .subject-time { font-size: 13px; font-weight: 600; color: #8e8e93; font-family: ui-monospace, "SF Mono", monospace; }
+  .subject-kebab { border: none; background: transparent; color: #b0b0b5; cursor: pointer; padding: 4px 8px; font-size: 16px; border-radius: 7px; line-height: 1; letter-spacing: 1px; }
+  .subject-kebab:hover { background: #f0f0f2; color: #6e6e73; }
+  .subject-add-row {
+    margin-top: 6px; border: 1px dashed #d4d4d8; background: transparent; border-radius: 10px; padding: 10px 4px;
+    display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: #8e8e93;
+    font-size: 12.5px; font-weight: 600; flex-shrink: 0;
+  }
+  .subject-add-row:hover { background: #f4f4f5; border-color: #c7c7cc; }
 
-  .stats-card { padding: 18px 20px; }
-  .stats-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+  .stats-card { padding: 18px 20px 14px; display: flex; flex-direction: column; min-height: 0; }
+  .stats-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; flex-shrink: 0; }
   .stats-header .label { font-size: 13px; font-weight: 700; }
   .stats-header .value { font-size: 15px; font-weight: 800; }
-  .stat-row { margin-bottom: 10px; }
-  .stat-row:last-child { margin-bottom: 0; }
-  .stat-labels { display: flex; justify-content: space-between; font-size: 11.5px; margin-bottom: 3px; }
-  .stat-labels .name { font-weight: 600; }
-  .stat-labels .val { color: #8e8e93; }
-  .bar-track { height: 6px; border-radius: 4px; background: #f0f0f3; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 4px; transition: width .2s; }
 
-  .apps-card { padding: 16px 20px; }
-  .apps-sub { font-size: 10.5px; color: #c7c7cc; margin-bottom: 10px; }
-  .app-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 2px; }
-  .app-name { font-size: 12.5px; color: #1c1c1e; }
-  .toggle { width: 34px; height: 20px; border-radius: 12px; background: #e5e5ea; position: relative; cursor: pointer; transition: background .15s; flex-shrink: 0; }
-  .toggle.on { background: #34C759; }
-  .toggle .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: left .15s; }
-  .toggle.on .knob { left: 16px; }
+  /* ---- timetable: 1 row = 1 hour, split into 6 cells of 10 minutes ---- */
+  .timetable-scroll { flex: 1; overflow-y: auto; max-height: 360px; border: 1px solid #ececef; border-radius: 10px; }
+  .timetable { display: flex; flex-direction: column; }
+  .tt-row { display: flex; align-items: stretch; height: 30px; border-bottom: 1px solid #ececef; }
+  .tt-row:last-child { border-bottom: none; }
+  .tt-hour-label {
+    width: 40px; flex-shrink: 0; font-size: 10px; font-weight: 700; color: #a6a6ab;
+    display: flex; align-items: center; justify-content: center; border-right: 1px solid #ececef; background: #fafafa;
+  }
+  .tt-cells { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); }
+  .tt-cell { border-right: 1px solid #ececef; }
+  .tt-cell:last-child { border-right: none; }
+  .tt-empty { font-size: 11.5px; color: #c7c7cc; text-align: center; padding: 20px 0; }
 
   /* ================= notes view ================= */
   .notes-content { flex-direction: column; gap: 16px; }
@@ -436,7 +453,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 10a6 6 0 1 1 12 0c0 4 1.4 5.4 1.4 5.4H4.6S6 14 6 10z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
         </button>
         <button class="icon-btn" title="설정">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 13.5a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4.5a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H10.6a1.7 1.7 0 0 0 1-1.6V4.5a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V10.6a1.7 1.7 0 0 0 1.6 1H19.5a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82A1.65 1.65 0 0 0 3 15.09H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
       </div>
     </div>
@@ -536,6 +553,10 @@
           <div class="card log-card">
             <div class="card-title">기록</div>
             <div id="logList"></div>
+            <button class="subject-add-row" id="subjectAddBtn">
+              <span style="font-size:14px;font-weight:700;">+</span>
+              <span>과목 추가</span>
+            </button>
           </div>
         </div>
         <div class="panel-right">
@@ -544,12 +565,9 @@
               <span class="label">오늘 공부 시간</span>
               <span class="value" id="totalToday">0분</span>
             </div>
-            <div id="statsList"></div>
-          </div>
-          <div class="card apps-card">
-            <div class="card-title">집중 중 허용할 앱</div>
-            <div class="apps-sub">설정만 저장돼요 — 실제 차단은 기기 앱에서만 가능해요</div>
-            <div id="appsList"></div>
+            <div class="timetable-scroll" id="timetableScroll">
+              <div class="timetable" id="timetable"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -653,6 +671,37 @@
   </div>
 </div>
 
+<!-- subject (study title) editor modal -->
+<div class="modal-overlay" id="subjModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="subjModalCancel">취소</button>
+      <span class="modal-title" id="subjModalTitle">과목 추가</span>
+      <button class="save-btn" id="subjModalSave" disabled>완료</button>
+    </div>
+    <div class="modal-body">
+      <input class="field-input" id="subjFieldName" placeholder="과목 이름" />
+      <div class="field-row" style="align-items:flex-start;">
+        <span class="field-label" style="margin-top:3px;">색상</span>
+        <div class="color-wheel-wrap">
+          <div class="color-wheel" id="subjColorWheel">
+            <div class="color-wheel-pointer" id="subjColorPointer"></div>
+          </div>
+          <div class="color-wheel-controls">
+            <div class="color-preview" id="subjColorPreview"></div>
+            <input type="range" id="subjBrightness" min="10" max="100" value="90" />
+            <div class="color-hex-input">
+              <span>#</span>
+              <input type="text" id="subjHexInput" maxlength="6" placeholder="FF3B30" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="delete-btn" id="subjDeleteBtn" style="display:none;">과목 삭제</button>
+    </div>
+  </div>
+</div>
+
 <!-- quick note editor modal -->
 <div class="modal-overlay" id="qnModalOverlay">
   <div class="modal-box">
@@ -679,7 +728,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <span class="note-fs-title">노트</span>
-      <button class="save-btn" id="noteViewEditBtn">편집</button>
+      <button class="note-fs-action-btn" id="noteViewEditBtn">편집</button>
     </div>
     <div class="note-view-body">
       <div class="note-view-body-inner">
@@ -698,7 +747,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
       </button>
       <span class="note-fs-title" id="noteModalTitle">노트 추가</span>
-      <button class="save-btn" id="noteModalSave" disabled>완료</button>
+      <button class="note-fs-action-btn" id="noteModalSave" disabled>완료</button>
     </div>
     <div class="note-edit-body">
       <div class="note-edit-body-inner">
@@ -711,6 +760,7 @@
         <div class="note-mode-toggle">
           <button type="button" class="note-mode-btn active" id="noteModeNormal">일반</button>
           <button type="button" class="note-mode-btn" id="noteModeHtml">HTML</button>
+          <button type="button" class="note-paste-btn" id="notePasteBtn" title="클립보드에서 붙여넣기">붙여넣기</button>
         </div>
         <textarea class="field-input" id="noteFieldContent" placeholder="내용" rows="4" style="resize:none;"></textarea>
         <div>
@@ -750,6 +800,38 @@ document.querySelectorAll(".nav-item").forEach((btn) => {
    SHARED HELPERS
    ============================================================ */
 function pad(n) { return String(n).padStart(2, "0"); }
+function hsvToHex(h, s, v) {
+  s /= 100; v /= 100;
+  const i = Math.floor(h / 60) % 6;
+  const f = h / 60 - Math.floor(h / 60);
+  const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+  let r, g, b;
+  switch (i) {
+    case 0: r=v; g=t; b=p; break;
+    case 1: r=q; g=v; b=p; break;
+    case 2: r=p; g=v; b=t; break;
+    case 3: r=p; g=q; b=v; break;
+    case 4: r=t; g=p; b=v; break;
+    default: r=v; g=p; b=q; break;
+  }
+  const toHex = (x) => Math.round(x * 255).toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+function hexToHsv(hex) {
+  hex = hex.replace("#", "");
+  const r = parseInt(hex.substr(0,2),16)/255, g = parseInt(hex.substr(2,2),16)/255, b = parseInt(hex.substr(4,2),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
+  let h = 0;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+    if (h < 0) h += 360;
+  }
+  const s = max === 0 ? 0 : d / max;
+  return [h, s * 100, max * 100];
+}
 
 /* ============================================================
    HOME: clock / D-day / quick notes
@@ -884,38 +966,6 @@ function pad(n) { return String(n).padStart(2, "0"); }
   let selectedCatColor = "#FF3B30";
   let currentHue = 4, currentSat = 100;
 
-  function hsvToHex(h, s, v) {
-    s /= 100; v /= 100;
-    const i = Math.floor(h / 60) % 6;
-    const f = h / 60 - Math.floor(h / 60);
-    const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
-    let r, g, b;
-    switch (i) {
-      case 0: r=v; g=t; b=p; break;
-      case 1: r=q; g=v; b=p; break;
-      case 2: r=p; g=v; b=t; break;
-      case 3: r=p; g=q; b=v; break;
-      case 4: r=t; g=p; b=v; break;
-      default: r=v; g=p; b=q; break;
-    }
-    const toHex = (x) => Math.round(x * 255).toString(16).padStart(2, "0");
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-  }
-  function hexToHsv(hex) {
-    hex = hex.replace("#", "");
-    const r = parseInt(hex.substr(0,2),16)/255, g = parseInt(hex.substr(2,2),16)/255, b = parseInt(hex.substr(4,2),16)/255;
-    const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
-    let h = 0;
-    if (d !== 0) {
-      if (max === r) h = ((g - b) / d) % 6;
-      else if (max === g) h = (b - r) / d + 2;
-      else h = (r - g) / d + 4;
-      h *= 60;
-      if (h < 0) h += 360;
-    }
-    const s = max === 0 ? 0 : d / max;
-    return [h, s * 100, max * 100];
-  }
   function updatePointerPosition() {
     const R = catColorWheel.clientWidth / 2;
     const rad = (currentHue * Math.PI) / 180;
@@ -1261,22 +1311,17 @@ function pad(n) { return String(n).padStart(2, "0"); }
    ============================================================ */
 (function timeModule() {
   const SUBJECTS = [
-    { id: "s1", name: "수학", color: "#FF3B30" },
-    { id: "s2", name: "코딩", color: "#007AFF" },
-    { id: "s3", name: "TRPG 준비", color: "#AF52DE" },
+    { id: "s1", name: "국어", color: "#8E8CD8" },
+    { id: "s2", name: "수학", color: "#FF3B30" },
+    { id: "s3", name: "영어", color: "#007AFF" },
+    { id: "s4", name: "세계지리", color: "#34C759" },
+    { id: "s5", name: "생활과윤리", color: "#FF9500" },
   ];
   let sessions = [
-    { id: "log1", subjectId: "s1", seconds: 3600, endedAt: "오전 10:20" },
-    { id: "log2", subjectId: "s2", seconds: 5400, endedAt: "오후 2:05" },
+    { id: "log1", subjectId: "s1", seconds: 8425, endedAt: "오전 10:20", startMin: 480, endMin: 620 },
+    { id: "log2", subjectId: "s2", seconds: 9781, endedAt: "오후 2:05", startMin: 682, endMin: 845 },
+    { id: "log3", subjectId: "s3", seconds: 5802, endedAt: "오후 4:40", startMin: 903, endMin: 1000 },
   ];
-  let apps = [
-    { id: "a1", name: "카카오톡", allowed: false },
-    { id: "a2", name: "인스타그램", allowed: false },
-    { id: "a3", name: "유튜브", allowed: false },
-    { id: "a4", name: "메모", allowed: true },
-    { id: "a5", name: "캘린더", allowed: true },
-  ];
-
   let running = false;
   let elapsed = 0;
   let timerHandle = null;
@@ -1292,8 +1337,14 @@ function pad(n) { return String(n).padStart(2, "0"); }
   function subjectById(id) { return SUBJECTS.find((s) => s.id === id); }
 
   const subjectSelect = document.getElementById("subjectSelect");
-  subjectSelect.innerHTML = SUBJECTS.map((s) => `<option value="${s.id}">${s.name}</option>`).join("");
-  subjectSelect.style.color = subjectById(subjectSelect.value).color;
+  function refreshSubjectSelect() {
+    const prev = subjectSelect.value;
+    subjectSelect.innerHTML = SUBJECTS.map((s) => `<option value="${s.id}">${s.name}</option>`).join("");
+    if (SUBJECTS.length === 0) return;
+    subjectSelect.value = SUBJECTS.some((s) => s.id === prev) ? prev : SUBJECTS[0].id;
+    subjectSelect.style.color = subjectById(subjectSelect.value).color;
+  }
+  refreshSubjectSelect();
   subjectSelect.onchange = () => { subjectSelect.style.color = subjectById(subjectSelect.value).color; };
 
   const startBtn = document.getElementById("startBtn");
@@ -1323,11 +1374,16 @@ function pad(n) { return String(n).padStart(2, "0"); }
   }
   function stopTimer() {
     if (elapsed > 0) {
+      const now = new Date();
+      const endMin = now.getHours() * 60 + now.getMinutes();
+      const startMin = Math.max(0, endMin - Math.round(elapsed / 60));
       sessions.unshift({
         id: "log" + Date.now(),
         subjectId: subjectSelect.value,
         seconds: elapsed,
-        endedAt: new Date().toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" }),
+        endedAt: now.toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" }),
+        startMin,
+        endMin,
       });
     }
     running = false;
@@ -1347,67 +1403,199 @@ function pad(n) { return String(n).padStart(2, "0"); }
 
   function renderLog() {
     const el = document.getElementById("logList");
-    if (sessions.length === 0) {
-      el.innerHTML = `<div class="empty-note">아직 기록이 없어요. 타이머를 시작해보세요.</div>`;
+    if (SUBJECTS.length === 0) {
+      el.innerHTML = `<div class="empty-note">과목이 없어요. 아래에서 추가해보세요.</div>`;
       return;
     }
-    el.innerHTML = sessions.map((s) => {
-      const subj = subjectById(s.subjectId);
-      return `
-        <div class="log-row">
-          <span class="log-dot" style="background:${subj ? subj.color : "#c7c7cc"}"></span>
-          <span class="log-name">${subj ? subj.name : "삭제된 과목"}</span>
-          <span class="log-time">${formatShort(s.seconds)}</span>
-          <span class="log-ended">${s.endedAt}</span>
-        </div>`;
-    }).join("");
+    const totals = {};
+    sessions.forEach((s) => { totals[s.subjectId] = (totals[s.subjectId] || 0) + s.seconds; });
+    el.innerHTML = "";
+    SUBJECTS.forEach((subj) => {
+      const total = totals[subj.id] || 0;
+      const row = document.createElement("div");
+      row.className = "subject-row";
+      row.innerHTML = `
+        <span class="subject-color-box" style="background:${subj.color}"></span>
+        <span class="subject-name">${subj.name}</span>
+        <span class="subject-time">${formatHMS(total)}</span>
+        <button class="subject-kebab" title="더보기">⋮</button>`;
+      row.querySelector(".subject-kebab").onclick = (e) => { e.stopPropagation(); openSubjectModal(subj.id); };
+      el.appendChild(row);
+    });
+  }
+
+  /* ---- subject (study title) add/edit modal with color wheel ---- */
+  const subjOverlay = document.getElementById("subjModalOverlay");
+  const subjFieldName = document.getElementById("subjFieldName");
+  const subjColorWheel = document.getElementById("subjColorWheel");
+  const subjColorPointer = document.getElementById("subjColorPointer");
+  const subjColorPreview = document.getElementById("subjColorPreview");
+  const subjBrightness = document.getElementById("subjBrightness");
+  const subjHexInput = document.getElementById("subjHexInput");
+  const subjModalTitle = document.getElementById("subjModalTitle");
+  const subjModalSave = document.getElementById("subjModalSave");
+  const subjDeleteBtn = document.getElementById("subjDeleteBtn");
+  let editingSubjId = null;
+  let selectedSubjColor = "#FF3B30";
+  let subjHue = 4, subjSat = 100;
+
+  function updateSubjPointerPosition() {
+    const R = subjColorWheel.clientWidth / 2;
+    const rad = (subjHue * Math.PI) / 180;
+    const dist = (subjSat / 100) * R;
+    const dx = Math.sin(rad) * dist;
+    const dy = -Math.cos(rad) * dist;
+    subjColorPointer.style.left = (R + dx) + "px";
+    subjColorPointer.style.top = (R + dy) + "px";
+  }
+  function applySubjColor() {
+    selectedSubjColor = hsvToHex(subjHue, subjSat, Number(subjBrightness.value));
+    subjColorPreview.style.background = selectedSubjColor;
+    if (document.activeElement !== subjHexInput) {
+      subjHexInput.value = selectedSubjColor.replace("#", "").toUpperCase();
+    }
+  }
+  function pickSubjFromEvent(e) {
+    const rect = subjColorWheel.getBoundingClientRect();
+    const R = rect.width / 2;
+    const dx = e.clientX - rect.left - R;
+    const dy = e.clientY - rect.top - R;
+    const dist = Math.min(Math.sqrt(dx*dx + dy*dy), R);
+    let hue = (Math.atan2(dx, -dy) * 180) / Math.PI;
+    if (hue < 0) hue += 360;
+    subjHue = hue;
+    subjSat = (dist / R) * 100;
+    updateSubjPointerPosition();
+    applySubjColor();
+  }
+  let draggingSubjWheel = false;
+  subjColorWheel.addEventListener("pointerdown", (e) => {
+    draggingSubjWheel = true;
+    subjColorWheel.setPointerCapture(e.pointerId);
+    pickSubjFromEvent(e);
+  });
+  subjColorWheel.addEventListener("pointermove", (e) => { if (draggingSubjWheel) pickSubjFromEvent(e); });
+  subjColorWheel.addEventListener("pointerup", () => { draggingSubjWheel = false; });
+  subjColorWheel.addEventListener("pointercancel", () => { draggingSubjWheel = false; });
+  subjBrightness.addEventListener("input", applySubjColor);
+  subjHexInput.addEventListener("input", () => {
+    let v = subjHexInput.value.trim().replace(/^#/, "");
+    if (/^[0-9a-fA-F]{3}$/.test(v)) v = v.split("").map((c) => c + c).join("");
+    if (!/^[0-9a-fA-F]{6}$/.test(v)) return;
+    const hex = "#" + v;
+    const [h, s, val] = hexToHsv(hex);
+    subjHue = h;
+    subjSat = Math.max(s, 4);
+    subjBrightness.value = Math.max(Math.round(val), 10);
+    selectedSubjColor = hex;
+    subjColorPreview.style.background = selectedSubjColor;
+    requestAnimationFrame(updateSubjPointerPosition);
+  });
+  subjHexInput.addEventListener("blur", () => {
+    subjHexInput.value = selectedSubjColor.replace("#", "").toUpperCase();
+  });
+  subjHexInput.addEventListener("keydown", (e) => { if (e.key === "Enter") subjHexInput.blur(); });
+
+  function openSubjectModal(id) {
+    editingSubjId = id;
+    const subj = id ? subjectById(id) : null;
+    subjModalTitle.textContent = subj ? "과목 편집" : "과목 추가";
+    subjFieldName.value = subj ? subj.name : "";
+    if (subj) {
+      const [h, s, v] = hexToHsv(subj.color);
+      subjHue = h;
+      subjSat = Math.max(s, 15);
+      subjBrightness.value = Math.max(Math.round(v), 30);
+    } else {
+      subjHue = Math.floor(Math.random() * 360);
+      subjSat = 75;
+      subjBrightness.value = 60;
+    }
+    requestAnimationFrame(updateSubjPointerPosition);
+    applySubjColor();
+    subjDeleteBtn.style.display = subj ? "block" : "none";
+    validateSubjSave();
+    subjOverlay.classList.add("show");
+    subjFieldName.focus();
+  }
+  function closeSubjectModal() { subjOverlay.classList.remove("show"); }
+  function validateSubjSave() { subjModalSave.disabled = subjFieldName.value.trim().length === 0; }
+  subjFieldName.oninput = validateSubjSave;
+  document.getElementById("subjModalCancel").onclick = closeSubjectModal;
+  subjOverlay.onclick = (e) => { if (e.target === subjOverlay) closeSubjectModal(); };
+
+  subjModalSave.onclick = () => {
+    const name = subjFieldName.value.trim();
+    if (!name) return;
+    if (editingSubjId) {
+      const subj = subjectById(editingSubjId);
+      subj.name = name;
+      subj.color = selectedSubjColor;
+    } else {
+      SUBJECTS.push({ id: "s" + Date.now(), name, color: selectedSubjColor });
+    }
+    closeSubjectModal();
+    refreshSubjectSelect();
+    renderLog();
+    renderStats();
+  };
+  subjDeleteBtn.onclick = () => {
+    if (!editingSubjId) return;
+    const idx = SUBJECTS.findIndex((s) => s.id === editingSubjId);
+    if (idx >= 0) SUBJECTS.splice(idx, 1);
+    sessions = sessions.filter((s) => s.subjectId !== editingSubjId);
+    closeSubjectModal();
+    refreshSubjectSelect();
+    renderLog();
+    renderStats();
+  };
+  document.getElementById("subjectAddBtn").onclick = () => openSubjectModal(null);
+
+  const TT_DAY_START = 6 * 60;   // 06:00
+  const TT_DAY_END = 24 * 60;    // 24:00
+  const TT_HOUR_PX = 30;
+
+  function ttLabel(min) {
+    const h = Math.floor(min / 60), m = min % 60;
+    return `${pad(h)}:${pad(m)}`;
   }
 
   function renderStats() {
-    const totals = {};
-    sessions.forEach((s) => { totals[s.subjectId] = (totals[s.subjectId] || 0) + s.seconds; });
     const totalToday = sessions.reduce((sum, s) => sum + s.seconds, 0);
-    const maxVal = Math.max(1, ...SUBJECTS.map((s) => totals[s.id] || 0));
-
     document.getElementById("totalToday").textContent = formatShort(totalToday);
-
-    const statsList = document.getElementById("statsList");
-    statsList.innerHTML = SUBJECTS.map((s) => {
-      const val = totals[s.id] || 0;
-      const pct = Math.round((val / maxVal) * 100);
-      return `
-        <div class="stat-row">
-          <div class="stat-labels">
-            <span class="name">${s.name}</span>
-            <span class="val">${val > 0 ? formatShort(val) : "-"}</span>
-          </div>
-          <div class="bar-track">
-            <div class="bar-fill" style="width:${pct}%;background:${s.color}"></div>
-          </div>
-        </div>`;
-    }).join("");
+    renderTimetable();
   }
 
-  function renderApps() {
-    const el = document.getElementById("appsList");
-    el.innerHTML = apps.map((a) => `
-      <div class="app-row">
-        <span class="app-name">${a.name}</span>
-        <span class="toggle ${a.allowed ? "on" : ""}" data-id="${a.id}"><span class="knob"></span></span>
-      </div>`).join("");
-    el.querySelectorAll(".toggle").forEach((t) => {
-      t.onclick = () => {
-        const id = t.getAttribute("data-id");
-        const app = apps.find((a) => a.id === id);
-        app.allowed = !app.allowed;
-        t.classList.toggle("on", app.allowed);
-      };
-    });
+  function renderTimetable() {
+    const el = document.getElementById("timetable");
+    const validSessions = sessions.filter((s) => typeof s.startMin === "number" && typeof s.endMin === "number");
+
+    let rows = "";
+    for (let m = TT_DAY_START; m < TT_DAY_END; m += 60) {
+      let cells = "";
+      for (let c = 0; c < 6; c++) {
+        const slotStart = m + c * 10;
+        const slotEnd = slotStart + 10;
+        const hit = validSessions.find((s) => slotStart < s.endMin && slotEnd > s.startMin);
+        const subj = hit ? subjectById(hit.subjectId) : null;
+        const bg = subj ? subj.color : "transparent";
+        const label = subj ? ` title="${subj.name} ${ttLabel(slotStart)}–${ttLabel(slotEnd)}"` : "";
+        cells += `<div class="tt-cell" style="background:${bg}"${label}></div>`;
+      }
+      rows += `<div class="tt-row"><span class="tt-hour-label">${pad(Math.floor(m / 60))}</span><div class="tt-cells">${cells}</div></div>`;
+    }
+    el.innerHTML = rows;
+
+    // auto-scroll so the first study block of the day is near the top
+    const scrollEl = document.getElementById("timetableScroll");
+    const firstStart = Math.min(TT_DAY_END, ...validSessions.map((s) => s.startMin));
+    if (scrollEl && isFinite(firstStart) && firstStart > TT_DAY_START) {
+      scrollEl.scrollTop = Math.max(0, ((firstStart - TT_DAY_START) / 60) * TT_HOUR_PX - 30);
+    }
   }
 
   renderLog();
   renderStats();
-  renderApps();
 })();
 
 /* ============================================================
@@ -1565,6 +1753,28 @@ function pad(n) { return String(n).padStart(2, "0"); }
   }
   noteModeNormalBtn.onclick = () => setNoteMode(false);
   noteModeHtmlBtn.onclick = () => setNoteMode(true);
+
+  /* ---- paste button: some embedded/sandboxed viewers block the Ctrl/Cmd+V
+     keyboard shortcut, so this gives an explicit way to pull text (including
+     long text or code) in from the clipboard. ---- */
+  const notePasteBtn = document.getElementById("notePasteBtn");
+  notePasteBtn.onclick = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text) return;
+      const start = noteFieldContent.selectionStart ?? noteFieldContent.value.length;
+      const end = noteFieldContent.selectionEnd ?? noteFieldContent.value.length;
+      const before = noteFieldContent.value.slice(0, start);
+      const after = noteFieldContent.value.slice(end);
+      noteFieldContent.value = before + text + after;
+      const caret = start + text.length;
+      noteFieldContent.setSelectionRange(caret, caret);
+      noteFieldContent.focus();
+      updateHtmlPreview();
+    } catch (err) {
+      alert("클립보드를 읽을 수 없어요. 브라우저의 클립보드 접근 권한을 허용해주세요.");
+    }
+  };
 
   /* ---- view mode: shows note content with a separate 편집(edit) button ---- */
   function openNoteViewModal(id) {
