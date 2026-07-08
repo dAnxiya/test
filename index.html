@@ -255,8 +255,9 @@
   .weekday-row div.sun { color: var(--brown); }
   .weekday-row div.sat { color: var(--brown); }
   .day-grid { flex: 1; display: grid; grid-template-columns: repeat(7,1fr); grid-template-rows: repeat(6,1fr); }
-  .day-cell { border-right: 1px solid var(--pink); border-bottom: 1px solid var(--pink); background: #fff; padding: 3px 4px; display: flex; flex-direction: column; gap: 1px; cursor: pointer; overflow: hidden; }
+  .day-cell { border-right: 1px solid var(--pink); border-bottom: 1px solid var(--pink); background: #fff; padding: 3px 4px; display: flex; flex-direction: column; gap: 1px; cursor: pointer; overflow: hidden; transition: background .12s; }
   .day-cell.selected { background: var(--pink-soft); }
+  .day-cell.drag-over { background: var(--pink-soft); outline: 2px dashed var(--brown-light); outline-offset: -2px; }
   .day-study-time {
     margin-top: auto; display: flex; align-items: center; gap: 3px;
     color: var(--brown); font-size: 9.5px; font-weight: 700; line-height: 1; padding: 1px 1px 0;
@@ -268,7 +269,9 @@
   .day-num.sun { color: var(--brown); }
   .day-num.sat { color: var(--brown); }
   .day-events { display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
-  .event-pill { display: flex; align-items: center; gap: 4px; width: 100%; text-align: left; border: none; border-radius: 4px; padding: 1px 4px; cursor: pointer; overflow: hidden; background: transparent; font: inherit; }
+  .event-pill { display: flex; align-items: center; gap: 4px; width: 100%; text-align: left; border: none; border-radius: 4px; padding: 1px 4px; cursor: grab; overflow: hidden; background: transparent; font: inherit; touch-action: none; }
+  .event-pill.dragging { opacity: 0.3; }
+  .event-pill-ghost { opacity: 0.92; box-shadow: 0 8px 20px rgba(0,0,0,0.22); cursor: grabbing; }
   .event-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
   .event-title { font-size: 10.5px; font-weight: 500; color: var(--brown-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .event-pill.allday .event-title { color: #fff; font-weight: 600; }
@@ -1072,27 +1075,60 @@
         <span class="field-label">캘린더</span>
         <select class="field-select" id="fieldCalendar"></select>
       </div>
-      <div class="field-row">
-        <span class="field-label">날짜</span>
-        <input class="field-select" type="date" id="fieldDate" />
-      </div>
       <div class="field-row between">
         <span class="field-label">하루 종일</span>
         <input type="checkbox" id="fieldAllDay" />
       </div>
-      <div id="timeFields">
+      <div class="field-row">
+        <span class="field-label">시작</span>
+        <input class="field-select" type="date" id="fieldDate" style="flex:1;" />
+        <input class="field-select" type="time" id="fieldStart" style="flex:1;" />
+      </div>
+      <div class="field-row" style="margin-top:12px;">
+        <span class="field-label">종료</span>
+        <input class="field-select" type="date" id="fieldEndDate" style="flex:1;" />
+        <input class="field-select" type="time" id="fieldEnd" style="flex:1;" />
+      </div>
+      <div class="field-row between">
+        <span class="field-label">반복</span>
+        <label class="switch">
+          <input type="checkbox" id="fieldRepeat" />
+          <span class="switch-track"></span>
+        </label>
+      </div>
+      <div style="font-size:11.5px; color:var(--brown-light); margin-top:-4px;">반복 중인 일정을 수정하면 이 일정부터 이후 회차에도 함께 적용돼요. 지난 회차는 그대로 남아요.</div>
+      <div id="repeatFields" style="display:none;">
         <div class="field-row">
-          <span class="field-label">시작</span>
-          <input class="field-select" type="time" id="fieldStart" />
+          <span class="field-label">주기</span>
+          <div style="display:flex; gap:6px; flex:1;">
+            <input class="field-select" type="number" id="fieldRepeatInterval" min="1" value="1" style="width:56px; flex:none;" />
+            <select class="field-select" id="fieldRepeatUnit" style="flex:1;">
+              <option value="day">일마다</option>
+              <option value="week">주마다</option>
+            </select>
+          </div>
         </div>
         <div class="field-row" style="margin-top:12px;">
-          <span class="field-label">종료</span>
-          <input class="field-select" type="time" id="fieldEnd" />
+          <span class="field-label">종료 조건</span>
+          <select class="field-select" id="fieldRepeatEndType">
+            <option value="date">날짜까지</option>
+            <option value="count">횟수만큼</option>
+          </select>
+        </div>
+        <div class="field-row" id="repeatEndDateRow" style="margin-top:12px;">
+          <span class="field-label"></span>
+          <input class="field-select" type="date" id="fieldRepeatEndDate" />
+        </div>
+        <div class="field-row" id="repeatEndCountRow" style="margin-top:12px; display:none;">
+          <span class="field-label"></span>
+          <input class="field-select" type="number" id="fieldRepeatEndCount" min="1" value="5" style="flex:none; width:70px;" />
+          <span style="font-size:13.5px; color:var(--brown);">회 반복</span>
         </div>
       </div>
       <input class="field-input" id="fieldLocation" placeholder="위치" />
       <textarea class="field-input" id="fieldNotes" placeholder="메모" rows="3" style="resize:none;"></textarea>
       <button class="delete-btn" id="deleteBtn" style="display:none;">일정 삭제</button>
+      <button class="delete-btn" id="deleteSeriesBtn" style="display:none;">반복 일정 전체 삭제</button>
     </div>
   </div>
 </div>
@@ -1990,11 +2026,21 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
   let selectedDate = new Date();
   let activeCalendars = new Set(CALENDARS.map(c=>c.id));
   let editingId = null;
+  let dragJustHappened = false;
 
   function eventsByDate(){
     const map = {};
     events.filter(e=>activeCalendars.has(e.calendarId)).forEach(e=>{
-      (map[e.date] = map[e.date] || []).push(e);
+      const endKey = e.endDate || e.date;
+      let cursor = new Date(e.date + "T00:00:00");
+      const last = new Date(endKey + "T00:00:00");
+      let guard = 0;
+      while (cursor <= last && guard < 366) {
+        const key = dateKey(cursor);
+        (map[key] = map[key] || []).push(e);
+        cursor = addDays(cursor, 1);
+        guard++;
+      }
     });
     Object.values(map).forEach(list => list.sort((a,b)=> (a.allDay?-1:0) - (b.allDay?-1:0) || timeToMinutes(a.start)-timeToMinutes(b.start)));
     return map;
@@ -2168,6 +2214,7 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
 
       const cell = document.createElement("div");
       cell.className = "day-cell" + (isSelected ? " selected" : "");
+      cell.dataset.dateKey = key;
       cell.onclick = () => { selectedDate = d; renderAll(); };
       cell.ondblclick = (e) => { e.stopPropagation(); openEditor(null, d); };
 
@@ -2181,10 +2228,17 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
       dayEvents.slice(0,2).forEach(ev=>{
         const pill = document.createElement("button");
         pill.className = "event-pill" + (ev.allDay ? " allday" : "");
+        pill.dataset.eventId = ev.id;
         if (ev.allDay) pill.style.background = calColor(ev.calendarId);
+        const isStartDay = ev.date === key;
+        const showTime = !ev.allDay && ev.start && isStartDay;
         pill.innerHTML = (ev.allDay ? "" : `<span class="event-dot" style="background:${calColor(ev.calendarId)}"></span>`) +
-          `<span class="event-title">${!ev.allDay && ev.start ? `<span class="event-time">${ev.start}</span>`:""}${ev.title}</span>`;
-        pill.onclick = (e) => { e.stopPropagation(); openEditor(ev.id, null); };
+          `<span class="event-title">${showTime ? `<span class="event-time">${ev.start}</span>`:""}${ev.title}</span>`;
+        pill.onclick = (e) => {
+          e.stopPropagation();
+          if (dragJustHappened) { dragJustHappened = false; return; }
+          openEditor(ev.id, null);
+        };
         evWrap.appendChild(pill);
       });
       if (dayEvents.length > 2) {
@@ -2212,6 +2266,78 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
   }
   window.addEventListener("studytime:update", renderMonth);
 
+  /* ---- 일정을 드래그해서 다른 날짜로 옮기기 ----
+     mousedown/touchdown 모두 pointer 이벤트 하나로 처리한다.
+     살짝만 누르면 기존처럼 클릭(편집창 열기)으로 동작하고,
+     일정 거리 이상 움직이면 드래그로 인식해 놓은 위치의 날짜로 옮긴다. */
+  const dayGridEl = document.getElementById("dayGrid");
+  const DRAG_THRESHOLD = 6;
+  let dragInfo = null; // { id, pill, startX, startY, dragging, pointerId, ghost }
+
+  function clearDragOverHighlight(){
+    const prev = dayGridEl.querySelector(".day-cell.drag-over");
+    if (prev) prev.classList.remove("drag-over");
+  }
+
+  dayGridEl.addEventListener("pointerdown", (e) => {
+    const pill = e.target.closest(".event-pill");
+    if (!pill || !pill.dataset.eventId) return;
+    const fromCell = pill.closest(".day-cell");
+    dragInfo = { id: pill.dataset.eventId, pill, fromDateKey: fromCell && fromCell.dataset.dateKey, startX: e.clientX, startY: e.clientY, dragging: false, pointerId: e.pointerId, ghost: null };
+  });
+
+  dayGridEl.addEventListener("pointermove", (e) => {
+    if (!dragInfo) return;
+    const dx = e.clientX - dragInfo.startX, dy = e.clientY - dragInfo.startY;
+    if (!dragInfo.dragging) {
+      if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+      dragInfo.dragging = true;
+      try { dragInfo.pill.setPointerCapture(dragInfo.pointerId); } catch (err) {}
+      dragInfo.pill.classList.add("dragging");
+      const ghost = dragInfo.pill.cloneNode(true);
+      ghost.classList.add("event-pill-ghost");
+      ghost.style.position = "fixed";
+      ghost.style.pointerEvents = "none";
+      ghost.style.zIndex = "999";
+      ghost.style.width = dragInfo.pill.offsetWidth + "px";
+      document.body.appendChild(ghost);
+      dragInfo.ghost = ghost;
+    }
+    if (dragInfo.ghost) {
+      dragInfo.ghost.style.left = (e.clientX - dragInfo.ghost.offsetWidth / 2) + "px";
+      dragInfo.ghost.style.top = (e.clientY - 14) + "px";
+    }
+    clearDragOverHighlight();
+    const under = document.elementFromPoint(e.clientX, e.clientY);
+    const cell = under && under.closest(".day-cell");
+    if (cell) cell.classList.add("drag-over");
+  });
+
+  function endDrag(e){
+    if (!dragInfo) return;
+    if (dragInfo.dragging) {
+      dragJustHappened = true;
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      const cell = under && under.closest(".day-cell");
+      if (cell && cell.dataset.dateKey) {
+        const ev = events.find(ev => ev.id === dragInfo.id);
+        const fromKey = dragInfo.fromDateKey || (ev && ev.date);
+        if (ev && fromKey && fromKey !== cell.dataset.dateKey) {
+          const deltaDays = Math.round((new Date(cell.dataset.dateKey + "T00:00:00") - new Date(fromKey + "T00:00:00")) / 86400000);
+          ev.date = dateKey(addDays(new Date(ev.date + "T00:00:00"), deltaDays));
+          if (ev.endDate) ev.endDate = dateKey(addDays(new Date(ev.endDate + "T00:00:00"), deltaDays));
+          renderAll();
+        }
+      }
+      if (dragInfo.ghost) dragInfo.ghost.remove();
+      dragInfo.pill.classList.remove("dragging");
+      clearDragOverHighlight();
+    }
+    dragInfo = null;
+  }
+  dayGridEl.addEventListener("pointerup", endDrag);
+  dayGridEl.addEventListener("pointercancel", endDrag);
+
   document.getElementById("todayBtn").onclick = () => { viewDate = new Date(); selectedDate = new Date(); renderAll(); };
   document.getElementById("prevBtn").onclick = () => { viewDate = addMonths(viewDate, -1); renderAll(); };
   document.getElementById("nextBtn").onclick = () => { viewDate = addMonths(viewDate, 1); renderAll(); };
@@ -2221,15 +2347,27 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
   const fieldTitle = document.getElementById("fieldTitle");
   const fieldCalendar = document.getElementById("fieldCalendar");
   const fieldDate = document.getElementById("fieldDate");
+  const fieldEndDate = document.getElementById("fieldEndDate");
   const fieldAllDay = document.getElementById("fieldAllDay");
   const fieldStart = document.getElementById("fieldStart");
   const fieldEnd = document.getElementById("fieldEnd");
   const fieldLocation = document.getElementById("fieldLocation");
   const fieldNotes = document.getElementById("fieldNotes");
-  const timeFields = document.getElementById("timeFields");
   const modalSave = document.getElementById("modalSave");
   const modalTitle = document.getElementById("modalTitle");
   const deleteBtn = document.getElementById("deleteBtn");
+  const fieldRepeat = document.getElementById("fieldRepeat");
+  const repeatFields = document.getElementById("repeatFields");
+  const fieldRepeatInterval = document.getElementById("fieldRepeatInterval");
+  const fieldRepeatUnit = document.getElementById("fieldRepeatUnit");
+  const fieldRepeatEndType = document.getElementById("fieldRepeatEndType");
+  const fieldRepeatEndDate = document.getElementById("fieldRepeatEndDate");
+  const fieldRepeatEndCount = document.getElementById("fieldRepeatEndCount");
+  const repeatEndDateRow = document.getElementById("repeatEndDateRow");
+  const repeatEndCountRow = document.getElementById("repeatEndCountRow");
+  const deleteSeriesBtn = document.getElementById("deleteSeriesBtn");
+  const MAX_REPEAT_OCCURRENCES = 366; // 무한 반복 방지용 안전장치
+  let origRepeat = null; // 편집창을 열 당시의 반복 설정 스냅샷 (저장할 때 바뀐 게 있는지 비교용)
 
   function refreshCalendarOptions(){
     fieldCalendar.innerHTML = CALENDARS.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
@@ -2244,47 +2382,167 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
     fieldTitle.value = ev ? ev.title : "";
     fieldCalendar.value = ev ? ev.calendarId : (CALENDARS[0] ? CALENDARS[0].id : "");
     fieldDate.value = ev ? ev.date : dateKey(defaultDate || selectedDate);
+    fieldEndDate.value = ev ? (ev.endDate || ev.date) : fieldDate.value;
     fieldAllDay.checked = ev ? !!ev.allDay : false;
     fieldStart.value = ev && ev.start ? ev.start : "09:00";
     fieldEnd.value = ev && ev.end ? ev.end : "10:00";
     fieldLocation.value = ev ? (ev.location||"") : "";
     fieldNotes.value = ev ? (ev.notes||"") : "";
     deleteBtn.style.display = ev ? "block" : "none";
+
+    // 반복 중인 일정을 편집할 때는 그 일정에 저장된 반복 규칙을 그대로 불러와 보여준다
+    const rule = ev && ev.recurrenceRule;
+    const defaultEnd = new Date(fieldDate.value || dateKey(new Date()));
+    defaultEnd.setMonth(defaultEnd.getMonth() + 1);
+    fieldRepeat.checked = !!rule;
+    fieldRepeatInterval.value = rule ? rule.interval : 1;
+    fieldRepeatUnit.value = rule ? rule.unit : "day";
+    fieldRepeatEndType.value = rule ? rule.endType : "date";
+    fieldRepeatEndDate.value = (rule && rule.endType === "date") ? rule.endDate : dateKey(defaultEnd);
+    fieldRepeatEndCount.value = (rule && rule.endType === "count") ? rule.endCount : 5;
+    updateRepeatFieldsVisibility();
+    updateRepeatEndFieldsVisibility();
+    origRepeat = {
+      checked: fieldRepeat.checked,
+      interval: Number(fieldRepeatInterval.value),
+      unit: fieldRepeatUnit.value,
+      endType: fieldRepeatEndType.value,
+      endDate: fieldRepeatEndDate.value,
+      endCount: Number(fieldRepeatEndCount.value),
+    };
+
+    deleteSeriesBtn.style.display = (ev && ev.recurrenceId) ? "block" : "none";
+
     updateTimeFieldsVisibility();
     validateSave();
     overlay.classList.add("show");
     fieldTitle.focus();
   }
   function closeEditor(){ overlay.classList.remove("show"); }
-  function updateTimeFieldsVisibility(){ timeFields.style.display = fieldAllDay.checked ? "none" : "block"; }
-  function validateSave(){ modalSave.disabled = fieldTitle.value.trim().length === 0; }
+  function updateTimeFieldsVisibility(){
+    fieldStart.style.display = fieldAllDay.checked ? "none" : "block";
+    fieldEnd.style.display = fieldAllDay.checked ? "none" : "block";
+  }
+  function updateRepeatFieldsVisibility(){ repeatFields.style.display = fieldRepeat.checked ? "block" : "none"; }
+  function updateRepeatEndFieldsVisibility(){
+    const byDate = fieldRepeatEndType.value === "date";
+    repeatEndDateRow.style.display = byDate ? "flex" : "none";
+    repeatEndCountRow.style.display = byDate ? "none" : "flex";
+  }
+  function validateSave(){
+    let ok = fieldTitle.value.trim().length > 0;
+    if (fieldEndDate.value && fieldDate.value && fieldEndDate.value < fieldDate.value) ok = false;
+    if (fieldRepeat.checked) {
+      const interval = Number(fieldRepeatInterval.value);
+      if (!(interval >= 1)) ok = false;
+      if (fieldRepeatEndType.value === "date" && !fieldRepeatEndDate.value) ok = false;
+      if (fieldRepeatEndType.value === "count" && !(Number(fieldRepeatEndCount.value) >= 1)) ok = false;
+    }
+    modalSave.disabled = !ok;
+  }
 
   fieldTitle.oninput = validateSave;
   fieldAllDay.onchange = updateTimeFieldsVisibility;
+  fieldDate.onchange = () => {
+    // 종료일이 시작일보다 앞서면 자동으로 시작일에 맞춰준다 (하루짜리 일정이 대부분이라 이 편이 편함)
+    if (fieldEndDate.value < fieldDate.value) fieldEndDate.value = fieldDate.value;
+    validateSave();
+  };
+  fieldEndDate.oninput = validateSave;
+  fieldRepeat.onchange = () => { updateRepeatFieldsVisibility(); validateSave(); };
+  fieldRepeatInterval.oninput = validateSave;
+  fieldRepeatEndType.onchange = () => { updateRepeatEndFieldsVisibility(); validateSave(); };
+  fieldRepeatEndDate.oninput = validateSave;
+  fieldRepeatEndCount.oninput = validateSave;
   document.getElementById("modalCancel").onclick = closeEditor;
   overlay.onclick = (e) => { if (e.target === overlay) closeEditor(); };
+
+  /* 반복 규칙에 따라 시작일부터 종료 조건(날짜/횟수)까지의 날짜 목록을 만든다 */
+  function buildRecurrenceDates(startDateStr, unit, interval, endType, endDateStr, endCount){
+    const step = unit === "week" ? 7 : 1;
+    const dates = [];
+    let cursor = new Date(startDateStr + "T00:00:00");
+    const endDate = endType === "date" ? new Date(endDateStr + "T00:00:00") : null;
+    const maxCount = endType === "count" ? Math.max(1, Math.floor(endCount)) : MAX_REPEAT_OCCURRENCES;
+    while (dates.length < maxCount) {
+      if (endDate && cursor > endDate) break;
+      dates.push(dateKey(cursor));
+      cursor = addDays(cursor, step * interval);
+      if (dates.length >= MAX_REPEAT_OCCURRENCES) break;
+    }
+    return dates;
+  }
+  function currentRepeatRule(){
+    return {
+      interval: Math.max(1, Math.floor(Number(fieldRepeatInterval.value) || 1)),
+      unit: fieldRepeatUnit.value,
+      endType: fieldRepeatEndType.value,
+      endDate: fieldRepeatEndDate.value,
+      endCount: Number(fieldRepeatEndCount.value),
+    };
+  }
+  function pushSeries(base, recurrenceId, rule, durationDays){
+    const dates = buildRecurrenceDates(fieldDate.value, rule.unit, rule.interval, rule.endType, rule.endDate, rule.endCount);
+    dates.forEach((d, i) => {
+      const endDate = durationDays > 0 ? dateKey(addDays(new Date(d + "T00:00:00"), durationDays)) : d;
+      events.push({ id: "e" + Date.now() + "_" + i, ...base, date: d, endDate, recurrenceId, recurrenceRule: rule });
+    });
+  }
 
   modalSave.onclick = () => {
     const title = fieldTitle.value.trim();
     if (!title) return;
-    const data = {
-      title, calendarId: fieldCalendar.value, date: fieldDate.value,
+    const base = {
+      title, calendarId: fieldCalendar.value,
       allDay: fieldAllDay.checked,
       start: fieldAllDay.checked ? null : fieldStart.value,
       end: fieldAllDay.checked ? null : fieldEnd.value,
       location: fieldLocation.value, notes: fieldNotes.value,
     };
+    const endDateVal = fieldEndDate.value || fieldDate.value;
+    const durationDays = Math.max(0, Math.round((new Date(endDateVal + "T00:00:00") - new Date(fieldDate.value + "T00:00:00")) / 86400000));
     if (editingId) {
-      const idx = events.findIndex(e=>e.id===editingId);
-      events[idx] = { ...events[idx], ...data };
+      const idx0 = events.findIndex(e=>e.id===editingId);
+      const ev = events[idx0];
+      const wasSeries = !!ev.recurrenceId;
+      const nowRepeat = fieldRepeat.checked;
+
+      if (wasSeries && !nowRepeat) {
+        // 반복을 껐다: 이 일정만 반복에서 빼서 단일 일정으로 만들고, 나머지 회차는 그대로 둔다
+        events[idx0] = { ...ev, ...base, date: fieldDate.value, endDate: endDateVal };
+        delete events[idx0].recurrenceId;
+        delete events[idx0].recurrenceRule;
+      } else if (nowRepeat) {
+        // 반복 중인 일정을 수정했다 (제목/시간/반복 규칙 등): 이 일정부터 이후 회차에 함께 적용하고, 지난 회차는 그대로 유지한다
+        const recurrenceId = wasSeries ? ev.recurrenceId : ("r" + Date.now());
+        if (wasSeries) {
+          events = events.filter(e => !(e.recurrenceId === recurrenceId && e.date >= ev.date));
+        } else {
+          events = events.filter(e => e.id !== editingId);
+        }
+        pushSeries(base, recurrenceId, currentRepeatRule(), durationDays);
+      } else {
+        // 반복 아닌 단일 일정 수정
+        events[idx0] = { ...ev, ...base, date: fieldDate.value, endDate: endDateVal };
+      }
+    } else if (fieldRepeat.checked) {
+      pushSeries(base, "r" + Date.now(), currentRepeatRule(), durationDays);
     } else {
-      events.push({ id: "e"+Date.now(), ...data });
+      events.push({ id: "e"+Date.now(), ...base, date: fieldDate.value, endDate: endDateVal });
     }
     closeEditor();
     renderAll();
   };
   deleteBtn.onclick = () => {
     events = events.filter(e=>e.id !== editingId);
+    closeEditor();
+    renderAll();
+  };
+  deleteSeriesBtn.onclick = () => {
+    const ev = events.find(e=>e.id===editingId);
+    if (!ev || !ev.recurrenceId) return;
+    if (!confirm("이 반복 일정을 모두 삭제할까요? 이미 지난 일정도 함께 삭제돼요.")) return;
+    events = events.filter(e=>e.recurrenceId !== ev.recurrenceId);
     closeEditor();
     renderAll();
   };
