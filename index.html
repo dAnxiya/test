@@ -277,9 +277,11 @@
   #noteFieldContent { min-height: 220px; }
   .note-image-picker img { width: 100%; height: 180px; object-fit: cover; display: block; }
   .note-html-preview-label { font-size: 11px; font-weight: 700; color: #a6a6ab; letter-spacing: 0.4px; margin-bottom: 6px; display: none; }
-  .note-html-preview {
-    border: 1px solid #e5e5ea; border-radius: 10px; padding: 14px 16px; font-size: 13.5px;
-    color: #3a3a3c; background: #fafafa; min-height: 80px; max-height: 260px; overflow-y: auto; display: none;
+  .note-html-preview-frame {
+    width: 100%; height: 260px; border: 1px solid #e5e5ea; border-radius: 10px; background: #fff; display: none;
+  }
+  .note-view-html-frame {
+    width: 100%; min-height: 420px; height: 60vh; border: none; border-radius: 12px; background: #fff; display: none;
   }
 
   /* ================= time view ================= */
@@ -684,6 +686,7 @@
         <div class="note-view-image" id="noteViewImage" style="display:none;"></div>
         <div class="note-view-title" id="noteViewTitle"></div>
         <div class="note-view-content" id="noteViewContent"></div>
+        <iframe class="note-view-html-frame" id="noteViewHtmlFrame" sandbox="allow-scripts"></iframe>
       </div>
     </div>
   </div>
@@ -711,8 +714,8 @@
         </div>
         <textarea class="field-input" id="noteFieldContent" placeholder="내용" rows="4" style="resize:none;"></textarea>
         <div>
-          <div class="note-html-preview-label" id="noteHtmlPreviewLabel">미리보기 (실제 적용된 모습)</div>
-          <div class="note-html-preview" id="noteHtmlPreview"></div>
+          <div class="note-html-preview-label" id="noteHtmlPreviewLabel">미리보기 (실제 적용된 모습 · 스타일·스크립트 포함)</div>
+          <iframe class="note-html-preview-frame" id="noteHtmlPreview" sandbox="allow-scripts"></iframe>
         </div>
         <button class="delete-btn" id="noteDeleteBtn" style="display:none;">노트 삭제</button>
       </div>
@@ -1503,6 +1506,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
   const noteViewTitleEl = document.getElementById("noteViewTitle");
   const noteViewContentEl = document.getElementById("noteViewContent");
   const noteViewImageEl = document.getElementById("noteViewImage");
+  const noteViewHtmlFrame = document.getElementById("noteViewHtmlFrame");
   const noteViewEditBtn = document.getElementById("noteViewEditBtn");
   const noteViewCloseBtn = document.getElementById("noteViewClose");
 
@@ -1542,7 +1546,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
   // shows a live-rendered preview of the HTML while typing, so it's clear the HTML is actually being applied
   function updateHtmlPreview() {
     if (noteIsHtml) {
-      noteHtmlPreview.innerHTML = noteFieldContent.value;
+      noteHtmlPreview.srcdoc = noteFieldContent.value;
       noteHtmlPreview.style.display = "block";
       noteHtmlPreviewLabel.style.display = "block";
     } else {
@@ -1569,12 +1573,19 @@ function pad(n) { return String(n).padStart(2, "0"); }
     viewingNoteId = id;
     noteViewTitleEl.textContent = n.title || "(제목 없음)";
     if (n.content) {
-      if (n.isHtml) noteViewContentEl.innerHTML = n.content;
-      else noteViewContentEl.textContent = n.content;
-      noteViewContentEl.style.display = "block";
+      if (n.isHtml) {
+        noteViewContentEl.style.display = "none";
+        noteViewHtmlFrame.srcdoc = n.content;
+        noteViewHtmlFrame.style.display = "block";
+      } else {
+        noteViewContentEl.textContent = n.content;
+        noteViewContentEl.style.display = "block";
+        noteViewHtmlFrame.style.display = "none";
+      }
     } else {
       noteViewContentEl.innerHTML = "";
       noteViewContentEl.style.display = "none";
+      noteViewHtmlFrame.style.display = "none";
     }
     if (n.image) {
       noteViewImageEl.style.backgroundImage = `url('${n.image}')`;
