@@ -252,6 +252,11 @@
   .day-grid { flex: 1; display: grid; grid-template-columns: repeat(7,1fr); grid-template-rows: repeat(6,1fr); }
   .day-cell { border-right: 1px solid var(--pink); border-bottom: 1px solid var(--pink); background: #fff; padding: 3px 4px; display: flex; flex-direction: column; gap: 1px; cursor: pointer; overflow: hidden; }
   .day-cell.selected { background: var(--pink-soft); }
+  .day-study-time {
+    margin-top: auto; display: flex; align-items: center; gap: 3px;
+    color: var(--brown); font-size: 9.5px; font-weight: 700; line-height: 1; padding: 1px 1px 0;
+  }
+  .day-study-time svg { width: 6px; height: 6px; flex-shrink: 0; }
   .day-num { align-self: flex-start; font-size: 11px; font-weight: 500; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--brown-dark); }
   .day-num.today { background: var(--brown); color: #fff; font-weight: 700; }
   .day-num.outmonth { color: var(--brown-light); }
@@ -559,6 +564,18 @@
     font-size: 12.5px; font-weight: 700; padding: 9px 16px; border-radius: 10px; cursor: pointer;
   }
   .settings-reset-btn:hover { background: var(--pink); border-color: var(--pink); }
+  .settings-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .switch { position: relative; display: inline-block; width: 38px; height: 22px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch-track {
+    position: absolute; inset: 0; background: var(--pink); border-radius: 999px; cursor: pointer; transition: background .15s;
+  }
+  .switch-track::before {
+    content: ""; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%;
+    transition: transform .15s; box-shadow: 0 1px 2px rgba(0,0,0,.15);
+  }
+  .switch input:checked + .switch-track { background: var(--brown); }
+  .switch input:checked + .switch-track::before { transform: translateX(16px); }
 
   /* ================= help (문의) view ================= */
   .help-view { flex: 1; display: flex; flex-direction: column; min-height: 0; overflow-y: auto; max-width: 460px; }
@@ -981,6 +998,18 @@
           </div>
         </div>
         <button class="settings-reset-btn" id="settingsResetBtn">기본 색상으로 되돌리기</button>
+        <div class="settings-card">
+          <div class="settings-toggle-row">
+            <div class="settings-card-head">
+              <span class="settings-card-title">달력에 공부 시간 표시</span>
+              <span class="settings-card-desc">날짜 칸 아래에 그날 공부한 시간을 보여줘요. 꺼도 기록은 지워지지 않고, 다시 켜면 이전 기록도 그대로 보여요</span>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="showStudyTimeToggle" checked />
+              <span class="switch-track"></span>
+            </label>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1352,6 +1381,31 @@ document.getElementById("settingsBtn").onclick = () => {
    SHARED HELPERS
    ============================================================ */
 function pad(n) { return String(n).padStart(2, "0"); }
+
+/* ---- shared study-time log ----
+   dateKey ("YYYY-M-D") -> total seconds studied that day.
+   Written by the TIME module whenever a session ends, read by the
+   CALENDAR module to draw the small time note under each day.
+   This object is never cleared by the display setting below — turning
+   the calendar note off only hides it, it never touches this data, so
+   turning it back on immediately shows every past record again. */
+const studyTimeLog = {};
+function studyDateKey(d) { return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+function addStudyTime(dateStr, seconds) {
+  if (!seconds) return;
+  studyTimeLog[dateStr] = (studyTimeLog[dateStr] || 0) + seconds;
+  window.dispatchEvent(new CustomEvent("studytime:update"));
+}
+/* hours + minutes only, no seconds, e.g. "7시간 3분" / "6시간" / "40분" */
+function formatStudyShort(totalSeconds) {
+  const h = Math.floor(totalSeconds / 3600), m = Math.floor((totalSeconds % 3600) / 60);
+  if (h > 0 && m > 0) return `${h}시간 ${m}분`;
+  if (h > 0) return `${h}시간`;
+  return `${m}분`;
+}
+/* setting: whether the calendar shows the daily study-time note.
+   Defaults on; the checkbox in Settings controls this. */
+let showStudyTimeOnCalendar = true;
 function hsvToHex(h, s, v) {
   s /= 100; v /= 100;
   const i = Math.floor(h / 60) % 6;
@@ -1512,6 +1566,13 @@ window._brownWheel = initColorWheel("brown", DEFAULT_BROWN, applyBrownTheme);
 document.getElementById("settingsResetBtn").onclick = () => {
   window._pinkWheel.setColor(DEFAULT_PINK);
   window._brownWheel.setColor(DEFAULT_BROWN);
+};
+
+/* 달력에 공부 시간 표시 토글: 표시 여부만 바꾸고 기록(studyTimeLog)은
+   절대 건드리지 않는다 -> 껐다 켜도 이전 기록이 그대로 다시 보임 */
+document.getElementById("showStudyTimeToggle").onchange = (e) => {
+  showStudyTimeOnCalendar = e.target.checked;
+  window.dispatchEvent(new CustomEvent("studytime:update"));
 };
 
 /* ============================================================
@@ -2054,9 +2115,23 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
         evWrap.appendChild(more);
       }
       cell.appendChild(evWrap);
+
+      if (showStudyTimeOnCalendar) {
+        const studySeconds = studyTimeLog[key] || 0;
+        if (studySeconds > 0) {
+          const studyEl = document.createElement("div");
+          studyEl.className = "day-study-time";
+          studyEl.innerHTML =
+            `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 4l14 8-14 8V4z"/></svg>` +
+            `<span>${formatStudyShort(studySeconds)}</span>`;
+          cell.appendChild(studyEl);
+        }
+      }
+
       grid.appendChild(cell);
     });
   }
+  window.addEventListener("studytime:update", renderMonth);
 
   document.getElementById("todayBtn").onclick = () => { viewDate = new Date(); selectedDate = new Date(); renderAll(); };
   document.getElementById("prevBtn").onclick = () => { viewDate = addMonths(viewDate, -1); renderAll(); };
@@ -2301,10 +2376,12 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
         id: "log" + Date.now(),
         subjectId: subjectSelect.value,
         seconds: elapsed,
+        date: studyDateKey(now),
         endedAt: now.toLocaleTimeString("ko-KR", { hour: "numeric", minute: "2-digit" }),
         startMin,
         endMin,
       });
+      addStudyTime(studyDateKey(now), elapsed);
     }
     running = false;
     elapsed = 0;
