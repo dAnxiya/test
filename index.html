@@ -242,28 +242,45 @@
   .note-image-picker { border: 1px dashed #d4d4d8; border-radius: 10px; min-height: 100px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #a6a6ab; font-size: 12.5px; font-weight: 600; overflow: hidden; }
   .note-image-picker:hover { background: #f9f9fa; }
 
-  /* ---- note editor: clean white paper, view + edit modes ---- */
-  .note-modal-overlay { background: rgba(20,18,14,0.45); }
-  .note-paper-box {
-    width: 600px; max-width: 94vw; height: 80vh; max-height: 720px;
-    background: #ffffff; display: flex; flex-direction: column; border-radius: 16px;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.3); overflow: hidden;
+  /* ---- note editor: full-screen panel over main area (sidebar stays visible) ---- */
+  .note-fullscreen-overlay {
+    position: fixed; top: 0; left: 216px; right: 0; bottom: 0;
+    background: #ffffff; z-index: 70; display: none; flex-direction: column;
   }
-  .note-paper-box .modal-head { flex-shrink: 0; padding: 15px 20px; }
+  .note-fullscreen-overlay.show { display: flex; }
+  .note-fs-head {
+    flex-shrink: 0; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #ececef; gap: 12px;
+  }
+  .note-back-btn {
+    border: none; background: #f4f4f5; color: #1c1c1e; width: 34px; height: 34px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
+  }
+  .note-back-btn:hover { background: #ececef; }
+  .note-back-btn svg { width: 18px; height: 18px; }
+  .note-fs-title { font-size: 14px; font-weight: 700; color: #1c1c1e; flex: 1; text-align: center; }
 
   /* view mode */
-  .note-view-body { flex: 1; overflow-y: auto; padding: 26px 30px 32px; display: flex; flex-direction: column; gap: 16px; }
-  .note-view-image { width: 100%; min-height: 200px; border-radius: 12px; background-color: #f4f4f5; background-size: cover; background-position: center; flex-shrink: 0; }
-  .note-view-title { font-size: 20px; font-weight: 800; color: #1c1c1e; word-break: break-word; }
-  .note-view-content { font-size: 14.5px; line-height: 1.75; color: #3a3a3c; white-space: pre-wrap; word-break: break-word; }
+  .note-view-body { flex: 1; overflow-y: auto; padding: 34px 40px 60px; }
+  .note-view-body-inner { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+  .note-view-image { width: 100%; min-height: 260px; border-radius: 14px; background-color: #f4f4f5; background-size: cover; background-position: center; flex-shrink: 0; }
+  .note-view-title { font-size: 26px; font-weight: 800; color: #1c1c1e; word-break: break-word; }
+  .note-view-content { font-size: 15px; line-height: 1.8; color: #3a3a3c; white-space: pre-wrap; word-break: break-word; }
   .note-view-empty { font-size: 13px; color: #c7c7cc; }
 
   /* edit mode */
+  .note-edit-body { flex: 1; overflow-y: auto; padding: 30px 40px 60px; }
+  .note-edit-body-inner { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
   .note-mode-toggle { display: flex; gap: 6px; }
   .note-mode-btn { border: 1px solid #e5e5ea; background: #fff; color: #8e8e93; font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 7px; cursor: pointer; }
   .note-mode-btn.active { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
-  .note-paper-box #noteFieldContent { min-height: 200px; }
-  .note-image-picker img { width: 100%; height: 140px; object-fit: cover; display: block; }
+  #noteFieldContent { min-height: 220px; }
+  .note-image-picker img { width: 100%; height: 180px; object-fit: cover; display: block; }
+  .note-html-preview-label { font-size: 11px; font-weight: 700; color: #a6a6ab; letter-spacing: 0.4px; margin-bottom: 6px; display: none; }
+  .note-html-preview {
+    border: 1px solid #e5e5ea; border-radius: 10px; padding: 14px 16px; font-size: 13.5px;
+    color: #3a3a3c; background: #fafafa; min-height: 80px; max-height: 260px; overflow-y: auto; display: none;
+  }
 
   /* ================= time view ================= */
   .panel-left { flex: 1.3; background: #f4f4f5; border: 1px solid #e5e5ea; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
@@ -650,32 +667,38 @@
   </div>
 </div>
 
-<!-- note editor modal -->
-<div class="modal-overlay note-modal-overlay" id="noteModalOverlay">
-  <div class="modal-box note-paper-box">
+<!-- note editor: full-screen panel (covers main area, sidebar stays visible) -->
+<div class="note-fullscreen-overlay" id="noteModalOverlay">
 
-    <!-- view mode -->
-    <div id="noteViewMode">
-      <div class="modal-head">
-        <button class="cancel-btn" id="noteViewClose">닫기</button>
-        <span class="modal-title">노트</span>
-        <button class="save-btn" id="noteViewEditBtn">편집</button>
-      </div>
-      <div class="note-view-body">
+  <!-- view mode -->
+  <div id="noteViewMode" style="display:flex; flex-direction:column; height:100%;">
+    <div class="note-fs-head">
+      <button class="note-back-btn" id="noteViewClose" title="나가기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="note-fs-title">노트</span>
+      <button class="save-btn" id="noteViewEditBtn">편집</button>
+    </div>
+    <div class="note-view-body">
+      <div class="note-view-body-inner">
         <div class="note-view-image" id="noteViewImage" style="display:none;"></div>
         <div class="note-view-title" id="noteViewTitle"></div>
         <div class="note-view-content" id="noteViewContent"></div>
       </div>
     </div>
+  </div>
 
-    <!-- edit mode -->
-    <div id="noteEditMode" style="display:none;">
-      <div class="modal-head">
-        <button class="cancel-btn" id="noteModalCancel">취소</button>
-        <span class="modal-title" id="noteModalTitle">노트 추가</span>
-        <button class="save-btn" id="noteModalSave" disabled>완료</button>
-      </div>
-      <div class="modal-body">
+  <!-- edit mode -->
+  <div id="noteEditMode" style="display:none; flex-direction:column; height:100%;">
+    <div class="note-fs-head">
+      <button class="note-back-btn" id="noteModalCancel" title="나가기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="note-fs-title" id="noteModalTitle">노트 추가</span>
+      <button class="save-btn" id="noteModalSave" disabled>완료</button>
+    </div>
+    <div class="note-edit-body">
+      <div class="note-edit-body-inner">
         <div class="note-image-picker" id="noteImagePicker">
           <span id="noteImagePreviewText">+ 커버 이미지 추가</span>
           <img id="noteImagePreviewImg" style="display:none;" />
@@ -687,11 +710,15 @@
           <button type="button" class="note-mode-btn" id="noteModeHtml">HTML</button>
         </div>
         <textarea class="field-input" id="noteFieldContent" placeholder="내용" rows="4" style="resize:none;"></textarea>
+        <div>
+          <div class="note-html-preview-label" id="noteHtmlPreviewLabel">미리보기 (실제 적용된 모습)</div>
+          <div class="note-html-preview" id="noteHtmlPreview"></div>
+        </div>
         <button class="delete-btn" id="noteDeleteBtn" style="display:none;">노트 삭제</button>
       </div>
     </div>
-
   </div>
+
 </div>
 
 <script>
@@ -712,6 +739,7 @@ document.querySelectorAll(".nav-item").forEach((btn) => {
     document.querySelectorAll(".nav-item").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     showView(btn.getAttribute("data-id"));
+    document.getElementById("noteModalOverlay").classList.remove("show");
   };
 });
 
@@ -1489,6 +1517,8 @@ function pad(n) { return String(n).padStart(2, "0"); }
   const noteFieldImage = document.getElementById("noteFieldImage");
   const noteModeNormalBtn = document.getElementById("noteModeNormal");
   const noteModeHtmlBtn = document.getElementById("noteModeHtml");
+  const noteHtmlPreview = document.getElementById("noteHtmlPreview");
+  const noteHtmlPreviewLabel = document.getElementById("noteHtmlPreviewLabel");
 
   let editingNoteId = null;
   let viewingNoteId = null;
@@ -1509,11 +1539,25 @@ function pad(n) { return String(n).padStart(2, "0"); }
     reader.readAsDataURL(file);
   };
 
+  // shows a live-rendered preview of the HTML while typing, so it's clear the HTML is actually being applied
+  function updateHtmlPreview() {
+    if (noteIsHtml) {
+      noteHtmlPreview.innerHTML = noteFieldContent.value;
+      noteHtmlPreview.style.display = "block";
+      noteHtmlPreviewLabel.style.display = "block";
+    } else {
+      noteHtmlPreview.style.display = "none";
+      noteHtmlPreviewLabel.style.display = "none";
+    }
+  }
+  noteFieldContent.addEventListener("input", updateHtmlPreview);
+
   function setNoteMode(isHtml) {
     noteIsHtml = isHtml;
     noteModeNormalBtn.classList.toggle("active", !isHtml);
     noteModeHtmlBtn.classList.toggle("active", isHtml);
     noteFieldContent.placeholder = isHtml ? "<p>HTML을 입력하세요</p>" : "내용";
+    updateHtmlPreview();
   }
   noteModeNormalBtn.onclick = () => setNoteMode(false);
   noteModeHtmlBtn.onclick = () => setNoteMode(true);
@@ -1539,7 +1583,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
       noteViewImageEl.style.display = "none";
     }
     noteEditMode.style.display = "none";
-    noteViewMode.style.display = "block";
+    noteViewMode.style.display = "flex";
     noteOverlay.classList.add("show");
   }
 
@@ -1564,7 +1608,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
     noteDeleteBtn.style.display = n ? "block" : "none";
     validateNoteSave();
     noteViewMode.style.display = "none";
-    noteEditMode.style.display = "block";
+    noteEditMode.style.display = "flex";
     noteOverlay.classList.add("show");
     noteFieldTitle.focus();
   }
