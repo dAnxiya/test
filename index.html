@@ -990,7 +990,7 @@
         <div class="settings-card">
           <div class="settings-card-head">
             <span class="settings-card-title">문의하기</span>
-            <span class="settings-card-desc">궁금한 점이나 불편한 점을 남겨주시면 확인 후 답변드리겠습니다</span>
+            <span class="settings-card-desc">궁금한 점이나 불편한 점을 남겨주시면 확인 후 답변드릴게요</span>
           </div>
           <input class="field-input" id="helpFieldTitle" placeholder="제목" />
           <textarea class="field-input" id="helpFieldContent" placeholder="내용을 입력해주세요" rows="8"></textarea>
@@ -1237,6 +1237,8 @@
           <button type="button" class="note-mode-btn active" id="noteModeNormal">일반</button>
           <button type="button" class="note-mode-btn" id="noteModeHtml">HTML</button>
           <button type="button" class="note-paste-btn" id="notePasteBtn" title="클립보드에서 붙여넣기">붙여넣기</button>
+          <button type="button" class="note-paste-btn" id="noteHtmlUploadBtn" title="HTML 파일 업로드">파일 업로드</button>
+          <input type="file" id="noteHtmlFileInput" accept=".html,.htm,text/html" style="display:none;" />
         </div>
 
         <div class="note-block-toolbar" id="noteBlockToolbar">
@@ -2823,6 +2825,7 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
     noteBlocksList.style.display = isHtml ? "none" : "flex";
     noteHtmlEditor.style.display = isHtml ? "block" : "none";
     notePasteBtn.style.display = isHtml ? "" : "none";
+    noteHtmlUploadBtn.style.display = isHtml ? "" : "none";
     updateHtmlPreview();
   }
   noteModeNormalBtn.onclick = () => setNoteMode(false);
@@ -2848,6 +2851,25 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
     } catch (err) {
       alert("클립보드를 읽을 수 없어요. 브라우저의 클립보드 접근 권한을 허용해주세요.");
     }
+  };
+
+  /* ---- upload button: lets people pick a local .html file and load its
+     contents straight into the editor, as an alternative to pasting. ---- */
+  const noteHtmlUploadBtn = document.getElementById("noteHtmlUploadBtn");
+  const noteHtmlFileInput = document.getElementById("noteHtmlFileInput");
+  noteHtmlUploadBtn.onclick = () => noteHtmlFileInput.click();
+  noteHtmlFileInput.onchange = () => {
+    const file = noteHtmlFileInput.files && noteHtmlFileInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      noteFieldContent.value = String(reader.result || "");
+      updateHtmlPreview();
+      noteFieldContent.focus();
+    };
+    reader.onerror = () => alert("파일을 읽는 중 문제가 생겼어요. 다시 시도해주세요.");
+    reader.readAsText(file);
+    noteHtmlFileInput.value = "";
   };
 
   /* ---- view mode: shows note content with a separate 편집(edit) button ---- */
