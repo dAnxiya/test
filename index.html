@@ -23,7 +23,13 @@
   .avatar-circle {
     width: 92px; height: 92px; border-radius: 50%; background: #e2e2e6;
     display: flex; align-items: center; justify-content: center; color: #a6a6ab;
+    position: relative; overflow: hidden; cursor: pointer; background-size: cover; background-position: center;
   }
+  .avatar-circle::after {
+    content: "변경"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.45); color: #fff; font-size: 11px; font-weight: 700; opacity: 0; transition: opacity .15s;
+  }
+  .avatar-circle:hover::after { opacity: 1; }
   .avatar-circle svg { width: 38px; height: 38px; }
   .avatar-name { font-size: 12.5px; font-weight: 600; color: #6e6e73; }
 
@@ -84,8 +90,15 @@
     flex: none; height: 42vh; max-height: 360px; background: #eceded; border-radius: 16px;
     display: flex; align-items: center; justify-content: center;
     color: #b0b0b5; font-size: 13px; font-weight: 600; gap: 8px; min-height: 160px;
+    position: relative; overflow: hidden; cursor: pointer; background-size: cover; background-position: center;
   }
+  .photo-banner::after {
+    content: "사진 변경"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.35); color: #fff; font-size: 13px; font-weight: 700; opacity: 0; transition: opacity .15s;
+  }
+  .photo-banner:hover::after { opacity: 1; }
   .photo-banner svg { width: 22px; height: 22px; }
+  .photo-banner-placeholder { display: flex; align-items: center; gap: 8px; }
 
   .bottom-row { display: flex; gap: 18px; height: 150px; }
 
@@ -209,6 +222,19 @@
   .save-btn:disabled { color: #c7c7cc; cursor: default; }
   .modal-title { font-size: 13px; font-weight: 600; }
   .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+
+  .crop-modal-box { width: 380px; }
+  .crop-stage {
+    position: relative; width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; overflow: hidden;
+    background: #000; touch-action: none; cursor: grab; user-select: none;
+  }
+  .crop-stage.circle { border-radius: 50%; }
+  .crop-stage:active { cursor: grabbing; }
+  .crop-stage img { position: absolute; top: 0; left: 0; max-width: none; pointer-events: none; }
+  .crop-zoom-row { display: flex; align-items: center; gap: 10px; }
+  .crop-zoom-label { font-size: 12px; font-weight: 600; color: #6e6e73; flex-shrink: 0; }
+  .crop-zoom-row input[type="range"] { flex: 1; }
+  .crop-hint { font-size: 11px; color: #b0b0b5; text-align: center; margin-top: -4px; }
   .field-input { border: 1px solid #e5e5ea; border-radius: 8px; padding: 9px 10px; font-size: 14px; outline: none; width: 100%; }
   .field-row { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
   .field-row.between { justify-content: space-between; }
@@ -333,13 +359,13 @@
   .stats-header .label { font-size: 13px; font-weight: 700; }
   .stats-header .value { font-size: 15px; font-weight: 800; }
 
-  /* ---- timetable: 1 row = 1 hour, split into 6 cells of 10 minutes ---- */
-  .timetable-scroll { flex: 1; overflow-y: auto; max-height: 360px; border: 1px solid #ececef; border-radius: 10px; }
-  .timetable { display: flex; flex-direction: column; }
-  .tt-row { display: flex; align-items: stretch; height: 30px; border-bottom: 1px solid #ececef; }
+  /* ---- timetable: 1 row = 1 hour, split into 6 cells of 10 minutes, all 24h visible (no scroll) ---- */
+  .timetable-scroll { flex: 1; display: flex; flex-direction: column; min-height: 0; border: 1px solid #ececef; border-radius: 10px; overflow: hidden; }
+  .timetable { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+  .tt-row { flex: 1; display: flex; align-items: stretch; border-bottom: 1px solid #ececef; min-height: 0; }
   .tt-row:last-child { border-bottom: none; }
   .tt-hour-label {
-    width: 40px; flex-shrink: 0; font-size: 10px; font-weight: 700; color: #a6a6ab;
+    width: 32px; flex-shrink: 0; font-size: 8.5px; font-weight: 700; color: #a6a6ab;
     display: flex; align-items: center; justify-content: center; border-right: 1px solid #ececef; background: #fafafa;
   }
   .tt-cells { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); }
@@ -397,8 +423,8 @@
   <!-- ================= sidebar ================= -->
   <div class="sidebar">
     <div class="avatar-block">
-      <div class="avatar-circle">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
+      <div class="avatar-circle" id="avatarCircle" title="클릭해서 사진 변경">
+        <svg id="avatarPlaceholderIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
       </div>
     </div>
 
@@ -462,9 +488,11 @@
     <div class="view" id="view-home">
       <div class="grid">
         <div class="col-left">
-          <div class="photo-banner">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5.5-5.5L6 19"/></svg>
-            사진
+          <div class="photo-banner" id="photoBanner" title="클릭해서 사진 변경">
+            <span class="photo-banner-placeholder" id="photoBannerPlaceholder">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5.5-5.5L6 19"/></svg>
+              사진
+            </span>
           </div>
           <div class="bottom-row">
             <div class="dday-card">
@@ -718,6 +746,31 @@
   </div>
 </div>
 
+<!-- hidden file pickers for avatar / home photo ---- -->
+<input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
+<input type="file" id="bannerFileInput" accept="image/*" style="display:none;" />
+
+<!-- image crop modal (shared by avatar + home photo) -->
+<div class="modal-overlay" id="cropModalOverlay">
+  <div class="modal-box crop-modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="cropModalCancel">취소</button>
+      <span class="modal-title" id="cropModalTitle">이미지 자르기</span>
+      <button class="save-btn" id="cropModalSave">적용</button>
+    </div>
+    <div class="modal-body">
+      <div class="crop-stage" id="cropStage">
+        <img id="cropImg" alt="" draggable="false" />
+      </div>
+      <div class="crop-zoom-row">
+        <span class="crop-zoom-label">확대</span>
+        <input type="range" id="cropZoom" min="100" max="300" value="100" />
+      </div>
+      <div class="crop-hint">드래그로 위치를 옮기고, 슬라이더로 확대해보세요</div>
+    </div>
+  </div>
+</div>
+
 <!-- note editor: full-screen panel (covers main area, sidebar stays visible) -->
 <div class="note-fullscreen-overlay" id="noteModalOverlay">
 
@@ -834,6 +887,20 @@ function hexToHsv(hex) {
 }
 
 /* ============================================================
+   SHARED: quick notes (used by both the Home widget and the
+   Notes tab's QUICK NOTES row — kept in sync via one data source)
+   ============================================================ */
+let quickNotes = [
+  { id: "q1", title: "장보기 목록", content: "우유, 계란, 식빵, 바나나" },
+  { id: "q2", title: "", content: "회의 전에 슬라이드 3장만 더 정리하기" },
+  { id: "q3", title: "", content: "저녁 약속 7시 강남역" },
+  { id: "q4", title: "아이디어", content: "주말 여행지 후보 조사" },
+];
+const quickNotesRenderers = [];
+function registerQuickNotesRenderer(fn) { quickNotesRenderers.push(fn); }
+function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
+
+/* ============================================================
    HOME: clock / D-day / quick notes
    ============================================================ */
 (function homeModule() {
@@ -858,11 +925,7 @@ function hexToHsv(hex) {
   }
   updateDday();
 
-  let quickNotes = [
-    { id: "q1", text: "TRPG 세션 시나리오 다듬기" },
-    { id: "q2", text: "캘린더 색상 최종 확정" },
-  ];
-  function renderQuickNotes() {
+  function renderQuickNotesHome() {
     const el = document.getElementById("quickNotesList");
     el.innerHTML = "";
     quickNotes.forEach((n) => {
@@ -870,18 +933,19 @@ function hexToHsv(hex) {
       row.className = "note-row";
       row.innerHTML = `
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19l1-4.2L15.8 4 20 8.2 8.2 19H4z"/></svg>
-        <span class="note-text">${n.text}</span>`;
+        <span class="note-text">${n.title || n.content}</span>`;
       el.appendChild(row);
     });
   }
+  registerQuickNotesRenderer(renderQuickNotesHome);
   document.getElementById("quickAddBtn").onclick = () => {
     const text = prompt("메모 내용을 입력하세요");
     if (text && text.trim()) {
-      quickNotes.push({ id: "q" + Date.now(), text: text.trim() });
-      renderQuickNotes();
+      quickNotes.push({ id: "q" + Date.now(), title: "", content: text.trim() });
+      renderQuickNotesAll();
     }
   };
-  renderQuickNotes();
+  renderQuickNotesHome();
 })();
 
 /* ============================================================
@@ -1355,6 +1419,7 @@ function hexToHsv(hex) {
   function tick() {
     elapsed += 1;
     clockDisplay.textContent = formatHMS(elapsed);
+    updateTotalDisplay();
   }
   function startPause() {
     running = !running;
@@ -1551,18 +1616,29 @@ function hexToHsv(hex) {
   };
   document.getElementById("subjectAddBtn").onclick = () => openSubjectModal(null);
 
-  const TT_DAY_START = 6 * 60;   // 06:00
-  const TT_DAY_END = 24 * 60;    // 24:00
-  const TT_HOUR_PX = 30;
+  const TT_DAY_START = 0;        // 00:00
+  const TT_DAY_END = 24 * 60;    // 24:00 (24 rows: 00 ~ 23)
 
   function ttLabel(min) {
     const h = Math.floor(min / 60), m = min % 60;
     return `${pad(h)}:${pad(m)}`;
   }
+  function formatPrecise(total) {
+    const h = Math.floor(total / 3600), m = Math.floor((total % 3600) / 60), s = total % 60;
+    const parts = [];
+    if (h > 0) parts.push(`${h}시간`);
+    if (h > 0 || m > 0) parts.push(`${m}분`);
+    parts.push(`${s}초`);
+    return parts.join(" ");
+  }
+  function updateTotalDisplay() {
+    const committed = sessions.reduce((sum, s) => sum + s.seconds, 0);
+    const total = committed + (running ? elapsed : 0);
+    document.getElementById("totalToday").textContent = formatPrecise(total);
+  }
 
   function renderStats() {
-    const totalToday = sessions.reduce((sum, s) => sum + s.seconds, 0);
-    document.getElementById("totalToday").textContent = formatShort(totalToday);
+    updateTotalDisplay();
     renderTimetable();
   }
 
@@ -1585,13 +1661,6 @@ function hexToHsv(hex) {
       rows += `<div class="tt-row"><span class="tt-hour-label">${pad(Math.floor(m / 60))}</span><div class="tt-cells">${cells}</div></div>`;
     }
     el.innerHTML = rows;
-
-    // auto-scroll so the first study block of the day is near the top
-    const scrollEl = document.getElementById("timetableScroll");
-    const firstStart = Math.min(TT_DAY_END, ...validSessions.map((s) => s.startMin));
-    if (scrollEl && isFinite(firstStart) && firstStart > TT_DAY_START) {
-      scrollEl.scrollTop = Math.max(0, ((firstStart - TT_DAY_START) / 60) * TT_HOUR_PX - 30);
-    }
   }
 
   renderLog();
@@ -1604,12 +1673,6 @@ function hexToHsv(hex) {
 (function notesModule() {
   const pencilIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 4.5l5 5L8 21H3v-5z"/></svg>`;
 
-  let quickNotes = [
-    { id: "q1", title: "장보기 목록", content: "우유, 계란, 식빵, 바나나" },
-    { id: "q2", title: "", content: "회의 전에 슬라이드 3장만 더 정리하기" },
-    { id: "q3", title: "", content: "저녁 약속 7시 강남역" },
-    { id: "q4", title: "아이디어", content: "주말 여행지 후보 조사" },
-  ];
   let notes = [
     { id: "n1", title: "제주 여행", content: "", image: null },
     { id: "n2", title: "카페 인테리어", content: "", image: null },
@@ -1619,8 +1682,8 @@ function hexToHsv(hex) {
     { id: "n6", title: "책 표지", content: "", image: null },
   ];
 
-  /* ---------- quick notes ---------- */
-  function renderQuickNotes() {
+  /* ---------- quick notes (shared data — see shared store above) ---------- */
+  function renderQuickNotesPanel() {
     const el = document.getElementById("qnScroll");
     el.innerHTML = "";
     quickNotes.forEach((n) => {
@@ -1641,6 +1704,7 @@ function hexToHsv(hex) {
     addCard.onclick = () => openQnModal(null);
     el.appendChild(addCard);
   }
+  registerQuickNotesRenderer(renderQuickNotesPanel);
 
   const qnOverlay = document.getElementById("qnModalOverlay");
   const qnFieldTitle = document.getElementById("qnFieldTitle");
@@ -1679,12 +1743,12 @@ function hexToHsv(hex) {
       quickNotes.push({ id: "q" + Date.now(), title, content });
     }
     closeQnModal();
-    renderQuickNotes();
+    renderQuickNotesAll();
   };
   qnDeleteBtn.onclick = () => {
     quickNotes = quickNotes.filter((q) => q.id !== editingQnId);
     closeQnModal();
-    renderQuickNotes();
+    renderQuickNotesAll();
   };
 
   /* ---------- image notes ---------- */
@@ -1896,8 +1960,156 @@ function hexToHsv(hex) {
     document.getElementById("qnScroll").scrollBy({ left: 240, behavior: "smooth" });
   };
 
-  renderQuickNotes();
+  renderQuickNotesPanel();
   renderNotesGrid();
+})();
+
+/* ============================================================
+   IMAGE CROP: click the avatar circle or the home photo to pick
+   an image, then drag/zoom to fit it exactly to that shape.
+   ============================================================ */
+(function cropModule() {
+  const avatarCircle = document.getElementById("avatarCircle");
+  const avatarIcon = document.getElementById("avatarPlaceholderIcon");
+  const photoBanner = document.getElementById("photoBanner");
+  const photoBannerPlaceholder = document.getElementById("photoBannerPlaceholder");
+  const avatarInput = document.getElementById("avatarFileInput");
+  const bannerInput = document.getElementById("bannerFileInput");
+
+  const overlay = document.getElementById("cropModalOverlay");
+  const stage = document.getElementById("cropStage");
+  const img = document.getElementById("cropImg");
+  const zoomInput = document.getElementById("cropZoom");
+  const titleEl = document.getElementById("cropModalTitle");
+  const cancelBtn = document.getElementById("cropModalCancel");
+  const saveBtn = document.getElementById("cropModalSave");
+
+  let currentTarget = null; // "avatar" | "banner"
+  let stageW = 0, stageH = 0, naturalW = 0, naturalH = 0;
+  let baseScale = 1, scale = 1, offsetX = 0, offsetY = 0;
+  let dragging = false, dragStartX = 0, dragStartY = 0, startOffsetX = 0, startOffsetY = 0;
+
+  avatarCircle.onclick = () => { currentTarget = "avatar"; avatarInput.click(); };
+  photoBanner.onclick = () => { currentTarget = "banner"; bannerInput.click(); };
+
+  avatarInput.onchange = () => {
+    const file = avatarInput.files[0];
+    avatarInput.value = "";
+    if (file) readAndOpen(file, "avatar");
+  };
+  bannerInput.onchange = () => {
+    const file = bannerInput.files[0];
+    bannerInput.value = "";
+    if (file) readAndOpen(file, "banner");
+  };
+
+  function readAndOpen(file, target) {
+    const reader = new FileReader();
+    reader.onload = () => openCropModal(target, reader.result);
+    reader.readAsDataURL(file);
+  }
+
+  function openCropModal(target, dataUrl) {
+    currentTarget = target;
+    titleEl.textContent = target === "avatar" ? "프로필 사진 자르기" : "사진 자르기";
+    stage.classList.toggle("circle", target === "avatar");
+    if (target === "avatar") {
+      stage.style.aspectRatio = "1 / 1";
+    } else {
+      const rect = photoBanner.getBoundingClientRect();
+      const ratio = rect.height > 0 ? rect.width / rect.height : 16 / 9;
+      stage.style.aspectRatio = String(ratio);
+    }
+    overlay.classList.add("show");
+    zoomInput.value = 100;
+    img.onload = () => {
+      requestAnimationFrame(() => {
+        stageW = stage.clientWidth;
+        stageH = stage.clientHeight;
+        naturalW = img.naturalWidth;
+        naturalH = img.naturalHeight;
+        baseScale = Math.max(stageW / naturalW, stageH / naturalH);
+        scale = baseScale;
+        offsetX = (stageW - naturalW * scale) / 2;
+        offsetY = (stageH - naturalH * scale) / 2;
+        applyTransform();
+      });
+    };
+    img.src = dataUrl;
+  }
+
+  function applyTransform() {
+    img.style.width = (naturalW * scale) + "px";
+    img.style.height = (naturalH * scale) + "px";
+    img.style.left = offsetX + "px";
+    img.style.top = offsetY + "px";
+  }
+
+  function clampOffset() {
+    const w = naturalW * scale, h = naturalH * scale;
+    offsetX = Math.min(0, Math.max(stageW - w, offsetX));
+    offsetY = Math.min(0, Math.max(stageH - h, offsetY));
+  }
+
+  zoomInput.oninput = () => {
+    const factor = Number(zoomInput.value) / 100;
+    const newScale = baseScale * factor;
+    const cx = stageW / 2, cy = stageH / 2;
+    const relX = (cx - offsetX) / scale;
+    const relY = (cy - offsetY) / scale;
+    scale = newScale;
+    offsetX = cx - relX * scale;
+    offsetY = cy - relY * scale;
+    clampOffset();
+    applyTransform();
+  };
+
+  function pointerDown(e) {
+    dragging = true;
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    startOffsetX = offsetX;
+    startOffsetY = offsetY;
+  }
+  function pointerMove(e) {
+    if (!dragging) return;
+    offsetX = startOffsetX + (e.clientX - dragStartX);
+    offsetY = startOffsetY + (e.clientY - dragStartY);
+    clampOffset();
+    applyTransform();
+  }
+  function pointerUp() { dragging = false; }
+  stage.addEventListener("pointerdown", pointerDown);
+  window.addEventListener("pointermove", pointerMove);
+  window.addEventListener("pointerup", pointerUp);
+
+  function closeCropModal() { overlay.classList.remove("show"); }
+  cancelBtn.onclick = closeCropModal;
+  overlay.onclick = (e) => { if (e.target === overlay) closeCropModal(); };
+
+  saveBtn.onclick = () => {
+    const outW = currentTarget === "avatar" ? 320 : 960;
+    const outH = currentTarget === "avatar" ? 320 : Math.round(outW * (stageH / stageW));
+    const canvas = document.createElement("canvas");
+    canvas.width = outW;
+    canvas.height = outH;
+    const ctx = canvas.getContext("2d");
+    const renderScale = outW / stageW;
+    ctx.drawImage(
+      img,
+      offsetX * renderScale, offsetY * renderScale,
+      naturalW * scale * renderScale, naturalH * scale * renderScale
+    );
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+    if (currentTarget === "avatar") {
+      avatarCircle.style.backgroundImage = `url('${dataUrl}')`;
+      avatarIcon.style.display = "none";
+    } else {
+      photoBanner.style.backgroundImage = `url('${dataUrl}')`;
+      photoBannerPlaceholder.style.display = "none";
+    }
+    closeCropModal();
+  };
 })();
 </script>
 </body>
