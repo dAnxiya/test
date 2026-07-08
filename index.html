@@ -1236,9 +1236,6 @@
         <div class="note-mode-toggle">
           <button type="button" class="note-mode-btn active" id="noteModeNormal">일반</button>
           <button type="button" class="note-mode-btn" id="noteModeHtml">HTML</button>
-          <button type="button" class="note-paste-btn" id="notePasteBtn" title="클립보드에서 붙여넣기">붙여넣기</button>
-          <button type="button" class="note-paste-btn" id="noteHtmlUploadBtn" title="HTML 파일 업로드">파일 업로드</button>
-          <input type="file" id="noteHtmlFileInput" accept=".html,.htm,text/html" style="display:none;" />
         </div>
 
         <div class="note-block-toolbar" id="noteBlockToolbar">
@@ -1257,6 +1254,18 @@
         </div>
         <input type="file" id="noteBlockImageInput" accept="image/*" style="display:none;" />
         <input type="file" id="noteBlockFileInput" style="display:none;" />
+
+        <div class="note-block-toolbar" id="noteHtmlToolbar" style="display:none;">
+          <button type="button" class="note-block-tool-btn" id="notePasteBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="4" width="10" height="16" rx="2"/><path d="M9.5 4V3a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v1"/></svg>
+            붙여넣기
+          </button>
+          <button type="button" class="note-block-tool-btn" id="noteHtmlUploadBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 16.5v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/><path d="M7 9l5-5 5 5"/><path d="M12 4v12"/></svg>
+            파일 업로드
+          </button>
+          <input type="file" id="noteHtmlFileInput" accept=".html,.htm,text/html" style="display:none;" />
+        </div>
 
         <div class="note-blocks-list" id="noteBlocksList"></div>
 
@@ -2637,6 +2646,7 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
   const noteHtmlPreview = document.getElementById("noteHtmlPreview");
   const noteHtmlPreviewLabel = document.getElementById("noteHtmlPreviewLabel");
   const noteBlockToolbar = document.getElementById("noteBlockToolbar");
+  const noteHtmlToolbar = document.getElementById("noteHtmlToolbar");
   const noteBlocksList = document.getElementById("noteBlocksList");
   const noteAddImageBtn = document.getElementById("noteAddImageBtn");
   const noteAddFileBtn = document.getElementById("noteAddFileBtn");
@@ -2824,8 +2834,7 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
     noteBlockToolbar.style.display = isHtml ? "none" : "flex";
     noteBlocksList.style.display = isHtml ? "none" : "flex";
     noteHtmlEditor.style.display = isHtml ? "block" : "none";
-    notePasteBtn.style.display = isHtml ? "" : "none";
-    noteHtmlUploadBtn.style.display = isHtml ? "" : "none";
+    noteHtmlToolbar.style.display = isHtml ? "flex" : "none";
     updateHtmlPreview();
   }
   noteModeNormalBtn.onclick = () => setNoteMode(false);
