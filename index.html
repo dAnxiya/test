@@ -16,12 +16,12 @@
 
   /* ================= sidebar ================= */
   .sidebar {
-    width: 216px; flex-shrink: 0; background: #fafafa; border-right: 1px solid #e8e8ea;
+    width: 216px; flex-shrink: 0; background: #FBF3F5; border-right: 1px solid #F3DEE1;
     display: flex; flex-direction: column; padding: 22px 16px;
   }
   .avatar-block { display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 26px; }
   .avatar-circle {
-    width: 92px; height: 92px; border-radius: 50%; background: #e2e2e6;
+    width: 92px; height: 92px; border-radius: 50%; background: #F3DEE1;
     display: flex; align-items: center; justify-content: center; color: #a6a6ab;
     position: relative; overflow: hidden; cursor: pointer; background-size: cover; background-position: center;
   }
@@ -40,14 +40,14 @@
     font-size: 13.5px; font-weight: 500; color: #48484c;
   }
   .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; color: #9a9a9e; }
-  .nav-item:hover { background: #f0f0f2; }
-  .nav-item.active { background: #1c1c1e; color: #fff; }
+  .nav-item:hover { background: #EBD3D8; }
+  .nav-item.active { background: #B3A098; color: #fff; }
   .nav-item.active svg { color: #fff; }
 
   .nav-spacer { height: 24px; }
 
   .date-card {
-    background: #1c1c1e; color: #fff; border-radius: 14px; padding: 14px 16px; margin-top: 14px;
+    background: #B3A098; color: #fff; border-radius: 14px; padding: 14px 16px; margin-top: 14px;
   }
   .date-year { font-size: 10.5px; color: #9a9a9e; font-weight: 600; margin-bottom: 2px; }
   .date-full { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
@@ -58,7 +58,7 @@
 
   .topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-shrink: 0; }
   .search-box {
-    flex: 1; display: flex; align-items: center; gap: 8px; background: #f4f4f5; border: 1px solid #ececef;
+    flex: 1; display: flex; align-items: center; gap: 8px; background: #F3DEE1; border: 1px solid #F3DEE1;
     border-radius: 12px; padding: 9px 14px; max-width: 480px;
   }
   .search-box svg { width: 16px; height: 16px; color: #a6a6ab; flex-shrink: 0; }
@@ -70,13 +70,13 @@
     width: 34px; height: 34px; border-radius: 9px; border: none; background: transparent; cursor: pointer;
     display: flex; align-items: center; justify-content: center; color: #6e6e73;
   }
-  .icon-btn:hover { background: #f0f0f2; }
+  .icon-btn:hover { background: #EBD3D8; }
   .icon-btn svg { width: 17px; height: 17px; }
 
   .view { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   .page-title {
     font-size: 22px; font-weight: 800; letter-spacing: 0.5px;
-    border-bottom: 2px dashed #FF3B30; padding-bottom: 5px; display: inline-block; margin-bottom: 18px; flex-shrink: 0;
+    border-bottom: 2px dashed #B3A098; padding-bottom: 5px; display: inline-block; margin-bottom: 18px; flex-shrink: 0;
   }
   .content { flex: 1; display: flex; gap: 18px; min-height: 0; }
   .card { background: #fff; border-radius: 14px; }
@@ -87,7 +87,7 @@
   .col-right { flex: 1; min-width: 220px; }
 
   .photo-banner {
-    flex: none; height: 42vh; max-height: 360px; background: #eceded; border-radius: 16px;
+    flex: none; height: 42vh; max-height: 360px; background: #F3DEE1; border-radius: 16px;
     display: flex; align-items: center; justify-content: center;
     color: #b0b0b5; font-size: 13px; font-weight: 600; gap: 8px; min-height: 160px;
     position: relative; overflow: hidden; cursor: pointer; background-size: cover; background-position: center;
@@ -103,26 +103,26 @@
   .bottom-row { display: flex; gap: 18px; height: 150px; }
 
   .dday-card {
-    flex: 1; background: #f4f4f5; border: 1px solid #ececef; border-radius: 16px; padding: 16px 18px;
+    flex: 1; background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 16px; padding: 16px 18px;
     display: flex; flex-direction: column; justify-content: center; gap: 6px;
   }
   .dday-label { font-size: 12px; font-weight: 600; color: #8e8e93; }
-  .dday-value { font-size: 30px; font-weight: 800; color: #FF3B30; letter-spacing: 0.3px; }
+  .dday-value { font-size: 30px; font-weight: 800; color: #B3A098; letter-spacing: 0.3px; }
 
   .notes-card {
-    flex: 1.3; background: #f4f4f5; border: 1px solid #ececef; border-radius: 16px; padding: 14px 16px;
+    flex: 1.3; background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 16px; padding: 14px 16px;
     display: flex; flex-direction: column; min-width: 0;
   }
   .notes-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .notes-head span { font-size: 12.5px; font-weight: 700; color: #1c1c1e; letter-spacing: 0.3px; }
-  .notes-add { width: 24px; height: 24px; border-radius: 50%; border: none; background: #1c1c1e; color: #fff; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .notes-add { width: 24px; height: 24px; border-radius: 50%; border: none; background: #B3A098; color: #fff; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
   .notes-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
   .note-row { display: flex; align-items: center; gap: 9px; background: #fff; border-radius: 9px; padding: 8px 10px; }
   .note-row svg { width: 14px; height: 14px; color: #c7c7cc; flex-shrink: 0; }
   .note-text { font-size: 12px; color: #48484c; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
   .pending-panel {
-    height: 100%; background: #fff; border: 1px solid #ececef; border-radius: 16px;
+    height: 100%; background: #fff; border: 1px solid #F3DEE1; border-radius: 16px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
     color: #c7c7cc; text-align: center; padding: 20px;
   }
@@ -130,11 +130,11 @@
   .pending-panel span { font-size: 13px; font-weight: 600; color: #a6a6ab; }
 
   /* ================= calendar view ================= */
-  .cal-panel { flex: 2.4; background: #f4f4f5; border: 1px solid #e5e5ea; border-radius: 14px; overflow: hidden; min-width: 0; display: flex; }
+  .cal-panel { flex: 2.4; background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 14px; overflow: hidden; min-width: 0; display: flex; }
   .cal-app { background: #fff; height: 100%; display: flex; flex: 1; min-width: 0; }
-  .todo-panel { flex: 1; background: #f4f4f5; border: 1px solid #e5e5ea; border-radius: 14px; overflow: hidden; min-width: 220px; display: flex; flex-direction: column; }
+  .todo-panel { flex: 1; background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 14px; overflow: hidden; min-width: 220px; display: flex; flex-direction: column; }
 
-  .cal-sidebar { width: 168px; flex-shrink: 0; border-right: 1px solid #ececef; overflow-y: auto; }
+  .cal-sidebar { width: 168px; flex-shrink: 0; border-right: 1px solid #F3DEE1; overflow-y: auto; }
   .mini-cal { padding: 0 12px 14px; }
   .mini-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
   .mini-cal-head button { border: none; background: transparent; color: #8e8e93; font-size: 14px; cursor: pointer; width: 18px; height: 18px; }
@@ -143,14 +143,14 @@
   .mini-cal-weekdays { display: grid; grid-template-columns: repeat(7,1fr); font-size: 9.5px; color: #a1a1a6; margin-bottom: 3px; }
   .mini-cal-weekdays span { text-align: center; }
   .mini-cal-grid button { border: none; background: transparent; font-size: 10.5px; width: 19px; height: 19px; border-radius: 50%; margin: 0 auto; cursor: pointer; display: block; color: #1c1c1e; }
-  .mini-cal-grid button.today { color: #FF3B30; font-weight: 700; }
-  .mini-cal-grid button.selected { background: #FF3B30; color: #fff; font-weight: 700; }
+  .mini-cal-grid button.today { color: #B3A098; font-weight: 700; }
+  .mini-cal-grid button.selected { background: #B3A098; color: #fff; font-weight: 700; }
   .mini-cal-grid button.outmonth { color: #d4d4d8; }
 
   .category-panel { padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; height: 100%; }
   .category-title { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; color: #1c1c1e; margin-bottom: 10px; }
   .category-row { display: flex; align-items: center; gap: 8px; padding: 7px 4px; border-radius: 8px; cursor: pointer; }
-  .category-row:hover { background: #f4f4f5; }
+  .category-row:hover { background: #F3DEE1; }
   .category-row input[type=checkbox] { width: 12px; height: 12px; flex-shrink: 0; }
   .cal-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
   .category-name { flex: 1; font-size: 12.5px; color: #1c1c1e; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -158,30 +158,30 @@
   .category-count { font-size: 11px; color: #a6a6ab; font-weight: 600; min-width: 14px; text-align: right; }
   .category-count.inactive { color: #d4d4d8; }
   .category-add { margin-top: 8px; border: 1px dashed #d4d4d8; background: transparent; border-radius: 9px; padding: 8px 4px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: #8e8e93; font-size: 12px; font-weight: 600; }
-  .category-add:hover { background: #f4f4f5; border-color: #c7c7cc; }
+  .category-add:hover { background: #F3DEE1; border-color: #c7c7cc; }
   .category-add-icon { font-size: 13px; font-weight: 700; }
 
   .cal-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-  .cal-toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #ececef; }
-  .cal-toolbar .today-btn { border: 1px solid #e2e2e6; background: #fff; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
-  .cal-toolbar .nav-btn { border: 1px solid #e2e2e6; background: #fff; font-size: 13px; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; }
+  .cal-toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #F3DEE1; }
+  .cal-toolbar .today-btn { border: 1px solid #F3DEE1; background: #fff; font-size: 11.5px; font-weight: 600; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+  .cal-toolbar .nav-btn { border: 1px solid #F3DEE1; background: #fff; font-size: 13px; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; }
   .cal-toolbar .month-label { font-size: 14.5px; font-weight: 700; }
   .cal-toolbar .spacer { flex: 1; }
-  .add-btn { border: none; background: #007AFF; color: #fff; font-size: 12px; font-weight: 600; border-radius: 7px; padding: 6px 12px; cursor: pointer; }
+  .add-btn { border: none; background: #B3A098; color: #fff; font-size: 12px; font-weight: 600; border-radius: 7px; padding: 6px 12px; cursor: pointer; }
 
   .month-grid-wrap { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-  .weekday-row { display: grid; grid-template-columns: repeat(7,1fr); border-bottom: 1px solid #e2e2e6; }
+  .weekday-row { display: grid; grid-template-columns: repeat(7,1fr); border-bottom: 1px solid #F3DEE1; }
   .weekday-row div { text-align: center; font-size: 10px; font-weight: 600; color: #8e8e93; padding: 5px 0; }
-  .weekday-row div.sun { color: #FF3B30; }
-  .weekday-row div.sat { color: #007AFF; }
+  .weekday-row div.sun { color: #B3A098; }
+  .weekday-row div.sat { color: #B3A098; }
   .day-grid { flex: 1; display: grid; grid-template-columns: repeat(7,1fr); grid-template-rows: repeat(6,1fr); }
-  .day-cell { border-right: 1px solid #ececef; border-bottom: 1px solid #ececef; background: #fff; padding: 3px 4px; display: flex; flex-direction: column; gap: 1px; cursor: pointer; overflow: hidden; }
-  .day-cell.selected { background: #eef5ff; }
+  .day-cell { border-right: 1px solid #F3DEE1; border-bottom: 1px solid #F3DEE1; background: #fff; padding: 3px 4px; display: flex; flex-direction: column; gap: 1px; cursor: pointer; overflow: hidden; }
+  .day-cell.selected { background: #F8EBEE; }
   .day-num { align-self: flex-start; font-size: 11px; font-weight: 500; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #1c1c1e; }
-  .day-num.today { background: #FF3B30; color: #fff; font-weight: 700; }
+  .day-num.today { background: #B3A098; color: #fff; font-weight: 700; }
   .day-num.outmonth { color: #d4d4d8; }
-  .day-num.sun { color: #FF3B30; }
-  .day-num.sat { color: #007AFF; }
+  .day-num.sun { color: #B3A098; }
+  .day-num.sat { color: #B3A098; }
   .day-events { display: flex; flex-direction: column; gap: 1px; overflow: hidden; }
   .event-pill { display: flex; align-items: center; gap: 4px; width: 100%; text-align: left; border: none; border-radius: 4px; padding: 1px 4px; cursor: pointer; overflow: hidden; background: transparent; font: inherit; }
   .event-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
@@ -194,31 +194,31 @@
   .todo-list { flex: 1; overflow-y: auto; padding: 0 14px; display: flex; flex-direction: column; gap: 4px; }
   .todo-row { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: 8px; background: #fff; }
   .todo-check { width: 17px; height: 17px; border-radius: 5px; flex-shrink: 0; cursor: pointer; border: 1.5px solid #c7c7cc; background: transparent; display: flex; align-items: center; justify-content: center; padding: 0; }
-  .todo-check.done { border: none; background: #34C759; }
+  .todo-check.done { border: none; background: #B3A098; }
   .todo-check svg { width: 11px; height: 11px; pointer-events: none; }
   .todo-text { flex: 1; font-size: 13px; color: #1c1c1e; cursor: text; }
   .todo-text.done { color: #b0b0b5; text-decoration: line-through; }
-  .todo-edit-input { flex: 1; font-size: 13px; color: #1c1c1e; border: 1px solid #007AFF; border-radius: 6px; padding: 2px 6px; outline: none; font-family: inherit; }
+  .todo-edit-input { flex: 1; font-size: 13px; color: #1c1c1e; border: 1px solid #B3A098; border-radius: 6px; padding: 2px 6px; outline: none; font-family: inherit; }
   .todo-del { border: none; background: none; color: #c7c7cc; font-size: 15px; cursor: pointer; padding: 0 2px; }
   .todo-empty { font-size: 12.5px; color: #c7c7cc; padding: 10px 4px; }
-  .todo-input-row { padding: 14px; border-top: 1px solid #ececef; display: flex; gap: 6px; }
-  .todo-input-row input { flex: 1; border: 1px solid #e5e5ea; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; outline: none; }
-  .todo-add-btn { border: none; background: #1c1c1e; color: #fff; border-radius: 8px; width: 32px; font-size: 15px; cursor: pointer; }
+  .todo-input-row { padding: 14px; border-top: 1px solid #F3DEE1; display: flex; gap: 6px; }
+  .todo-input-row input { flex: 1; border: 1px solid #F3DEE1; border-radius: 8px; padding: 7px 10px; font-size: 12.5px; outline: none; }
+  .todo-add-btn { border: none; background: #B3A098; color: #fff; border-radius: 8px; width: 32px; font-size: 15px; cursor: pointer; }
 
   .todo-cat-dot { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #d4d4d8; background: #fff; cursor: pointer; flex-shrink: 0; padding: 0; }
   .todo-cat-dot:hover { border-color: #a6a6ab; }
-  .todo-cat-popover { position: fixed; z-index: 60; background: #fff; border: 1px solid #e5e5ea; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); padding: 6px; display: none; min-width: 120px; }
+  .todo-cat-popover { position: fixed; z-index: 60; background: #fff; border: 1px solid #F3DEE1; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.18); padding: 6px; display: none; min-width: 120px; }
   .todo-cat-popover.show { display: block; }
   .todo-cat-option { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 7px; cursor: pointer; font-size: 12.5px; color: #1c1c1e; white-space: nowrap; }
-  .todo-cat-option:hover { background: #f4f4f5; }
+  .todo-cat-option:hover { background: #F3DEE1; }
 
   .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.28); display: none; align-items: center; justify-content: center; z-index: 50; }
   .modal-overlay.show { display: flex; }
   .modal-box { width: 360px; max-width: 92vw; background: #fff; border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); overflow: hidden; }
-  .modal-head { padding: 14px 16px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+  .modal-head { padding: 14px 16px; border-bottom: 1px solid #F3DEE1; display: flex; justify-content: space-between; align-items: center; }
   .modal-head button { border: none; background: none; font-size: 14px; cursor: pointer; }
-  .cancel-btn { color: #007AFF; }
-  .save-btn { color: #007AFF; font-weight: 600; }
+  .cancel-btn { color: #B3A098; }
+  .save-btn { color: #B3A098; font-weight: 600; }
   .save-btn:disabled { color: #c7c7cc; cursor: default; }
   .modal-title { font-size: 13px; font-weight: 600; }
   .modal-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
@@ -235,18 +235,18 @@
   .crop-zoom-label { font-size: 12px; font-weight: 600; color: #6e6e73; flex-shrink: 0; }
   .crop-zoom-row input[type="range"] { flex: 1; }
   .crop-hint { font-size: 11px; color: #b0b0b5; text-align: center; margin-top: -4px; }
-  .field-input { border: 1px solid #e5e5ea; border-radius: 8px; padding: 9px 10px; font-size: 14px; outline: none; width: 100%; }
+  .field-input { border: 1px solid #F3DEE1; border-radius: 8px; padding: 9px 10px; font-size: 14px; outline: none; width: 100%; }
   .field-row { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
   .field-row.between { justify-content: space-between; }
   .field-label { color: #6e6e73; width: 56px; flex-shrink: 0; }
-  .field-select { border: 1px solid #e5e5ea; border-radius: 8px; padding: 7px 8px; font-size: 14px; outline: none; flex: 1; }
-  .delete-btn { margin-top: 4px; border: none; background: #fff1f0; color: #FF3B30; font-size: 13.5px; font-weight: 600; border-radius: 8px; padding: 9px 0; cursor: pointer; width: 100%; }
+  .field-select { border: 1px solid #F3DEE1; border-radius: 8px; padding: 7px 8px; font-size: 14px; outline: none; flex: 1; }
+  .delete-btn { margin-top: 4px; border: none; background: #F8EBEE; color: #B3A098; font-size: 13.5px; font-weight: 600; border-radius: 8px; padding: 9px 0; cursor: pointer; width: 100%; }
 
   .color-wheel-wrap { flex: 1; display: flex; align-items: center; gap: 16px; }
   .color-wheel {
     position: relative; width: 116px; height: 116px; border-radius: 50%; flex-shrink: 0; cursor: crosshair;
     background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
-    box-shadow: 0 0 0 1px #e5e5ea;
+    box-shadow: 0 0 0 1px #F3DEE1;
     touch-action: none;
   }
   .color-wheel::after {
@@ -259,14 +259,14 @@
     pointer-events: none;
   }
   .color-wheel-controls { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-  .color-preview { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #e5e5ea; flex-shrink: 0; }
-  .color-wheel-controls input[type=range] { width: 88px; accent-color: #1c1c1e; }
-  .color-hex-input { display: flex; align-items: center; gap: 2px; border: 1px solid #e2e2e6; border-radius: 7px; padding: 5px 8px; background: #fff; }
+  .color-preview { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #F3DEE1; flex-shrink: 0; }
+  .color-wheel-controls input[type=range] { width: 88px; accent-color: #B3A098; }
+  .color-hex-input { display: flex; align-items: center; gap: 2px; border: 1px solid #F3DEE1; border-radius: 7px; padding: 5px 8px; background: #fff; }
   .color-hex-input span { font-size: 12px; color: #a6a6ab; font-weight: 700; }
   .color-hex-input input { border: none; outline: none; width: 62px; font-size: 12.5px; font-family: ui-monospace, "SF Mono", monospace; letter-spacing: 0.5px; text-transform: uppercase; color: #1c1c1e; background: transparent; }
 
   .note-image-picker { border: 1px dashed #d4d4d8; border-radius: 10px; min-height: 100px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #a6a6ab; font-size: 12.5px; font-weight: 600; overflow: hidden; }
-  .note-image-picker:hover { background: #f9f9fa; }
+  .note-image-picker:hover { background: #FBF3F5; }
 
   /* ---- note editor: full-screen panel over main area (sidebar stays visible) ---- */
   .note-fullscreen-overlay {
@@ -276,26 +276,26 @@
   .note-fullscreen-overlay.show { display: flex; }
   .note-fs-head {
     flex-shrink: 0; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 1px solid #ececef; gap: 12px;
+    border-bottom: 1px solid #F3DEE1; gap: 12px;
   }
   .note-back-btn {
-    border: none; background: #f4f4f5; color: #1c1c1e; width: 34px; height: 34px; border-radius: 9px;
+    border: none; background: #F3DEE1; color: #1c1c1e; width: 34px; height: 34px; border-radius: 9px;
     display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;
   }
-  .note-back-btn:hover { background: #ececef; }
+  .note-back-btn:hover { background: #F3DEE1; }
   .note-back-btn svg { width: 18px; height: 18px; }
   .note-fs-title { font-size: 14px; font-weight: 700; color: #1c1c1e; flex: 1; text-align: center; }
   .note-fs-action-btn {
-    border: none; background: #1c1c1e; color: #fff; font-size: 12.5px; font-weight: 700;
+    border: none; background: #B3A098; color: #fff; font-size: 12.5px; font-weight: 700;
     padding: 8px 16px; border-radius: 9px; cursor: pointer; flex-shrink: 0;
   }
   .note-fs-action-btn:hover { background: #000; }
-  .note-fs-action-btn:disabled { background: #ececef; color: #c7c7cc; cursor: default; }
+  .note-fs-action-btn:disabled { background: #F3DEE1; color: #c7c7cc; cursor: default; }
 
   /* view mode */
   .note-view-body { flex: 1; overflow-y: auto; padding: 34px 40px 60px; }
   .note-view-body-inner { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
-  .note-view-image { width: 100%; min-height: 260px; border-radius: 14px; background-color: #f4f4f5; background-size: cover; background-position: center; flex-shrink: 0; }
+  .note-view-image { width: 100%; min-height: 260px; border-radius: 14px; background-color: #F3DEE1; background-size: cover; background-position: center; flex-shrink: 0; }
   .note-view-title { font-size: 26px; font-weight: 800; color: #1c1c1e; word-break: break-word; }
   .note-view-content { font-size: 15px; line-height: 1.8; color: #3a3a3c; white-space: pre-wrap; word-break: break-word; }
   .note-view-empty { font-size: 13px; color: #c7c7cc; }
@@ -304,39 +304,39 @@
   .note-edit-body { flex: 1; overflow-y: auto; padding: 30px 40px 60px; }
   .note-edit-body-inner { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
   .note-mode-toggle { display: flex; align-items: center; gap: 6px; }
-  .note-mode-btn { border: 1px solid #e5e5ea; background: #fff; color: #8e8e93; font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 7px; cursor: pointer; }
-  .note-mode-btn.active { background: #1c1c1e; color: #fff; border-color: #1c1c1e; }
+  .note-mode-btn { border: 1px solid #F3DEE1; background: #fff; color: #8e8e93; font-size: 11.5px; font-weight: 700; padding: 5px 12px; border-radius: 7px; cursor: pointer; }
+  .note-mode-btn.active { background: #B3A098; color: #fff; border-color: #B3A098; }
   .note-paste-btn {
-    margin-left: auto; border: 1px solid #e5e5ea; background: #fff; color: #48484c; font-size: 11.5px; font-weight: 600;
+    margin-left: auto; border: 1px solid #F3DEE1; background: #fff; color: #48484c; font-size: 11.5px; font-weight: 600;
     padding: 5px 12px; border-radius: 7px; cursor: pointer;
   }
-  .note-paste-btn:hover { background: #f4f4f5; }
-  .note-paste-btn:active { background: #ececef; }
+  .note-paste-btn:hover { background: #F3DEE1; }
+  .note-paste-btn:active { background: #F3DEE1; }
   #noteFieldContent { min-height: 220px; }
   .note-image-picker img { width: 100%; height: 180px; object-fit: cover; display: block; }
   .note-html-preview-label { font-size: 11px; font-weight: 700; color: #a6a6ab; letter-spacing: 0.4px; margin-bottom: 6px; display: none; }
   .note-html-preview-frame {
-    width: 100%; height: 260px; border: 1px solid #e5e5ea; border-radius: 10px; background: #fff; display: none;
+    width: 100%; height: 260px; border: 1px solid #F3DEE1; border-radius: 10px; background: #fff; display: none;
   }
   .note-view-html-frame {
     width: 100%; min-height: 420px; height: 60vh; border: none; border-radius: 12px; background: #fff; display: none;
   }
 
   /* ================= time view ================= */
-  .panel-left { flex: 1.3; background: #f4f4f5; border: 1px solid #e5e5ea; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+  .panel-left { flex: 1.3; background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
   .panel-right { flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 240px; }
 
   .timer-card { padding: 26px 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
-  .subject-select { border: 1px solid #e5e5ea; border-radius: 20px; padding: 5px 14px; font-size: 12.5px; font-weight: 600; outline: none; cursor: pointer; }
+  .subject-select { border: 1px solid #F3DEE1; border-radius: 20px; padding: 5px 14px; font-size: 12.5px; font-weight: 600; outline: none; cursor: pointer; }
   .clock { font-size: 52px; font-weight: 800; letter-spacing: 1px; color: #1c1c1e; font-family: ui-monospace, "SF Mono", monospace; }
   .timer-btns { display: flex; gap: 10px; }
-  .btn-start { border: none; background: #1c1c1e; color: #fff; font-size: 13.5px; font-weight: 700; border-radius: 24px; padding: 10px 28px; cursor: pointer; }
-  .btn-start.running { background: #FF9500; }
-  .btn-stop { border: 1px solid #e5e5ea; background: #fff; color: #FF3B30; font-size: 13.5px; font-weight: 700; border-radius: 24px; padding: 10px 22px; cursor: pointer; }
+  .btn-start { border: none; background: #B3A098; color: #fff; font-size: 13.5px; font-weight: 700; border-radius: 24px; padding: 10px 28px; cursor: pointer; }
+  .btn-start.running { background: #B3A098; }
+  .btn-stop { border: 1px solid #F3DEE1; background: #fff; color: #B3A098; font-size: 13.5px; font-weight: 700; border-radius: 24px; padding: 10px 22px; cursor: pointer; }
   .btn-stop:disabled { color: #d4d4d8; cursor: default; }
   .focus-note { font-size: 11.5px; color: #8e8e93; display: none; align-items: center; gap: 5px; }
   .focus-note.show { display: flex; }
-  .focus-dot { width: 6px; height: 6px; border-radius: 50%; background: #FF3B30; }
+  .focus-dot { width: 6px; height: 6px; border-radius: 50%; background: #B3A098; }
 
   .log-card { padding: 16px 20px; flex: 1; overflow-y: auto; min-height: 0; display: flex; flex-direction: column; }
   .card-title { font-size: 13px; font-weight: 700; color: #1c1c1e; margin-bottom: 10px; }
@@ -346,13 +346,13 @@
   .subject-name { flex: 1; font-size: 13.5px; font-weight: 700; color: #1c1c1e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .subject-time { font-size: 13px; font-weight: 600; color: #8e8e93; font-family: ui-monospace, "SF Mono", monospace; }
   .subject-kebab { border: none; background: transparent; color: #b0b0b5; cursor: pointer; padding: 4px 8px; font-size: 16px; border-radius: 7px; line-height: 1; letter-spacing: 1px; }
-  .subject-kebab:hover { background: #f0f0f2; color: #6e6e73; }
+  .subject-kebab:hover { background: #EBD3D8; color: #6e6e73; }
   .subject-add-row {
     margin-top: 6px; border: 1px dashed #d4d4d8; background: transparent; border-radius: 10px; padding: 10px 4px;
     display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: #8e8e93;
     font-size: 12.5px; font-weight: 600; flex-shrink: 0;
   }
-  .subject-add-row:hover { background: #f4f4f5; border-color: #c7c7cc; }
+  .subject-add-row:hover { background: #F3DEE1; border-color: #c7c7cc; }
 
   .stats-card { padding: 18px 20px 14px; display: flex; flex-direction: column; min-height: 0; }
   .stats-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; flex-shrink: 0; }
@@ -360,16 +360,16 @@
   .stats-header .value { font-size: 15px; font-weight: 800; }
 
   /* ---- timetable: 1 row = 1 hour, split into 6 cells of 10 minutes, all 24h visible (no scroll) ---- */
-  .timetable-scroll { flex: 1; display: flex; flex-direction: column; min-height: 0; border: 1px solid #ececef; border-radius: 10px; overflow: hidden; }
+  .timetable-scroll { flex: 1; display: flex; flex-direction: column; min-height: 0; border: 1px solid #F3DEE1; border-radius: 10px; overflow: hidden; }
   .timetable { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-  .tt-row { flex: 1; display: flex; align-items: stretch; border-bottom: 1px solid #ececef; min-height: 0; }
+  .tt-row { flex: 1; display: flex; align-items: stretch; border-bottom: 1px solid #F3DEE1; min-height: 0; }
   .tt-row:last-child { border-bottom: none; }
   .tt-hour-label {
     width: 32px; flex-shrink: 0; font-size: 8.5px; font-weight: 700; color: #a6a6ab;
-    display: flex; align-items: center; justify-content: center; border-right: 1px solid #ececef; background: #fafafa;
+    display: flex; align-items: center; justify-content: center; border-right: 1px solid #F3DEE1; background: #FBF3F5;
   }
   .tt-cells { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); }
-  .tt-cell { border-right: 1px solid #ececef; }
+  .tt-cell { border-right: 1px solid #F3DEE1; }
   .tt-cell:last-child { border-right: none; }
   .tt-empty { font-size: 11.5px; color: #c7c7cc; text-align: center; padding: 20px 0; }
 
@@ -378,22 +378,22 @@
   .quicknotes-section { flex-shrink: 0; }
   .section-title { font-size: 13px; font-weight: 800; letter-spacing: 0.5px; color: #1c1c1e; margin-bottom: 10px; }
   .quicknotes-row { display: flex; align-items: center; gap: 8px; }
-  .qn-nav { border: 1px solid #e5e5ea; background: #fff; border-radius: 50%; width: 28px; height: 28px; flex-shrink: 0; cursor: pointer; color: #8e8e93; font-size: 14px; display: flex; align-items: center; justify-content: center; }
-  .qn-nav:hover { background: #f4f4f5; }
+  .qn-nav { border: 1px solid #F3DEE1; background: #fff; border-radius: 50%; width: 28px; height: 28px; flex-shrink: 0; cursor: pointer; color: #8e8e93; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+  .qn-nav:hover { background: #F3DEE1; }
   .qn-scroll { flex: 1; display: flex; gap: 12px; overflow-x: auto; scroll-behavior: smooth; padding: 2px 2px 8px; }
   .qn-scroll::-webkit-scrollbar { height: 5px; }
-  .qn-scroll::-webkit-scrollbar-thumb { background: #e5e5ea; border-radius: 3px; }
-  .qn-card { flex: 0 0 220px; background: #f4f4f5; border: 1px solid #ececef; border-radius: 14px; padding: 14px 16px; display: flex; gap: 10px; cursor: pointer; }
-  .qn-card:hover { background: #eeeeef; }
+  .qn-scroll::-webkit-scrollbar-thumb { background: #F3DEE1; border-radius: 3px; }
+  .qn-card { flex: 0 0 220px; background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 14px; padding: 14px 16px; display: flex; gap: 10px; cursor: pointer; }
+  .qn-card:hover { background: #EBD3D8; }
   .qn-icon { width: 15px; height: 15px; color: #c7c7cc; flex-shrink: 0; margin-top: 2px; }
   .qn-icon svg { width: 100%; height: 100%; }
   .qn-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
   .qn-title { font-size: 13px; font-weight: 700; color: #1c1c1e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .qn-content { font-size: 11.5px; color: #8e8e93; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .qn-card.add { flex: 0 0 90px; align-items: center; justify-content: center; border: 1px dashed #d4d4d8; background: transparent; color: #c7c7cc; font-weight: 700; font-size: 22px; }
-  .qn-card.add:hover { background: #f4f4f5; border-color: #c7c7cc; }
+  .qn-card.add:hover { background: #F3DEE1; border-color: #c7c7cc; }
 
-  .notes-divider { height: 1px; background: #e5e5ea; flex-shrink: 0; }
+  .notes-divider { height: 1px; background: #F3DEE1; flex-shrink: 0; }
 
   .notes-grid-wrap { flex: 1; overflow-y: auto; min-height: 0; }
   .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -403,12 +403,12 @@
   @media (min-width: 1300px) and (orientation: landscape) {
     .notes-grid { grid-template-columns: repeat(5, 1fr); }
   }
-  .note-card { background: #f4f4f5; border: 1px solid #ececef; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; }
-  .note-card:hover { background: #eeeeef; }
-  .note-thumb { flex: 1; min-height: 140px; background: #eceded; display: flex; align-items: center; justify-content: center; color: #b0b0b5; font-size: 12.5px; font-weight: 600; }
-  .note-card-title { padding: 9px 12px; font-size: 12.5px; font-weight: 600; color: #1c1c1e; border-top: 1px solid #e5e5ea; background: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note-card { background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; }
+  .note-card:hover { background: #EBD3D8; }
+  .note-thumb { flex: 1; min-height: 140px; background: #F3DEE1; display: flex; align-items: center; justify-content: center; color: #b0b0b5; font-size: 12.5px; font-weight: 600; }
+  .note-card-title { padding: 9px 12px; font-size: 12.5px; font-weight: 600; color: #1c1c1e; border-top: 1px solid #F3DEE1; background: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .note-card.add { align-items: center; justify-content: center; border: 1px dashed #d4d4d8; background: transparent; min-height: 100%; }
-  .note-card.add:hover { background: #f4f4f5; }
+  .note-card.add:hover { background: #F3DEE1; }
   .note-card.add .note-thumb { background: transparent; font-size: 30px; font-weight: 700; color: #c7c7cc; min-height: 0; }
 
   /* ================= placeholder view ================= */
@@ -583,7 +583,7 @@
             <div id="logList"></div>
             <button class="subject-add-row" id="subjectAddBtn">
               <span style="font-size:14px;font-weight:700;">+</span>
-              <span>과목 추가</span>
+              <span>공부 추가</span>
             </button>
           </div>
         </div>
@@ -689,7 +689,7 @@
             <input type="range" id="catBrightness" min="10" max="100" value="90" />
             <div class="color-hex-input">
               <span>#</span>
-              <input type="text" id="catHexInput" maxlength="6" placeholder="FF3B30" />
+              <input type="text" id="catHexInput" maxlength="6" placeholder="B3A098" />
             </div>
           </div>
         </div>
@@ -704,11 +704,11 @@
   <div class="modal-box">
     <div class="modal-head">
       <button class="cancel-btn" id="subjModalCancel">취소</button>
-      <span class="modal-title" id="subjModalTitle">과목 추가</span>
+      <span class="modal-title" id="subjModalTitle">공부 추가</span>
       <button class="save-btn" id="subjModalSave" disabled>완료</button>
     </div>
     <div class="modal-body">
-      <input class="field-input" id="subjFieldName" placeholder="과목 이름" />
+      <input class="field-input" id="subjFieldName" placeholder="공부 이름" />
       <div class="field-row" style="align-items:flex-start;">
         <span class="field-label" style="margin-top:3px;">색상</span>
         <div class="color-wheel-wrap">
@@ -720,12 +720,12 @@
             <input type="range" id="subjBrightness" min="10" max="100" value="90" />
             <div class="color-hex-input">
               <span>#</span>
-              <input type="text" id="subjHexInput" maxlength="6" placeholder="FF3B30" />
+              <input type="text" id="subjHexInput" maxlength="6" placeholder="B3A098" />
             </div>
           </div>
         </div>
       </div>
-      <button class="delete-btn" id="subjDeleteBtn" style="display:none;">과목 삭제</button>
+      <button class="delete-btn" id="subjDeleteBtn" style="display:none;">공부 삭제</button>
     </div>
   </div>
 </div>
@@ -890,12 +890,7 @@ function hexToHsv(hex) {
    SHARED: quick notes (used by both the Home widget and the
    Notes tab's QUICK NOTES row — kept in sync via one data source)
    ============================================================ */
-let quickNotes = [
-  { id: "q1", title: "장보기 목록", content: "우유, 계란, 식빵, 바나나" },
-  { id: "q2", title: "", content: "회의 전에 슬라이드 3장만 더 정리하기" },
-  { id: "q3", title: "", content: "저녁 약속 7시 강남역" },
-  { id: "q4", title: "아이디어", content: "주말 여행지 후보 조사" },
-];
+let quickNotes = [];
 const quickNotesRenderers = [];
 function registerQuickNotesRenderer(fn) { quickNotesRenderers.push(fn); }
 function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
@@ -976,11 +971,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   let viewDate = new Date();
   let selectedDate = new Date();
   let activeCalendars = new Set(CALENDARS.map(c=>c.id));
-  let events = [
-    { id:"e1", title:"TRPG 세션 - 겨울 시나리오", calendarId:"trpg", date: dateKey(today), start:"19:00", end:"23:00", allDay:false, location:"Discord", notes:"" },
-    { id:"e2", title:"일정표 앱 배포", calendarId:"work", date: dateKey(addDays(today,2)), start:"10:00", end:"11:00", allDay:false, location:"", notes:"" },
-    { id:"e3", title:"생일", calendarId:"personal", date: dateKey(addDays(today,5)), allDay:true, location:"", notes:"" },
-  ];
+  let events = [];
   let editingId = null;
 
   function eventsByDate(){
@@ -1027,7 +1018,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   const catModalSave = document.getElementById("catModalSave");
   const catDeleteBtn = document.getElementById("catDeleteBtn");
   let editingCatId = null;
-  let selectedCatColor = "#FF3B30";
+  let selectedCatColor = "#B3A098";
   let currentHue = 4, currentSat = 100;
 
   function updatePointerPosition() {
@@ -1267,11 +1258,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     renderAll();
   };
 
-  let todos = [
-    { id:"t1", text:"TRPG 시나리오 정리", done:false, calendarId:"trpg" },
-    { id:"t2", text:"캘린더 앱 색상 다듬기", done:false, calendarId:"work" },
-    { id:"t3", text:"장보기", done:true, calendarId:null },
-  ];
+  let todos = [];
 
   /* ---- category color popover for todos ---- */
   const todoCatPopover = document.createElement("div");
@@ -1288,7 +1275,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     todoCatPopover.innerHTML = "";
     const noneRow = document.createElement("div");
     noneRow.className = "todo-cat-option";
-    noneRow.innerHTML = `<span class="cal-dot" style="background:#e2e2e6;"></span><span>없음</span>`;
+    noneRow.innerHTML = `<span class="cal-dot" style="background:#F3DEE1;"></span><span>없음</span>`;
     noneRow.onclick = () => { it.calendarId = null; closeTodoCatPopover(); renderTodos(); };
     todoCatPopover.appendChild(noneRow);
     CALENDARS.forEach((c) => {
@@ -1320,7 +1307,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
       const row = document.createElement("div");
       row.className = "todo-row";
       const dotColor = it.calendarId ? calColor(it.calendarId) : null;
-      const doneColor = dotColor || "#34C759";
+      const doneColor = dotColor || "#B3A098";
       row.innerHTML = `
         <button class="todo-cat-dot" style="${dotColor ? `background:${dotColor};border-color:${dotColor};` : ""}" title="카테고리 선택"></button>
         <button class="todo-check ${it.done?"done":""}" style="${it.done ? `background:${doneColor};` : ""}">${it.done ? `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 13 10 18 19 7"></polyline></svg>` : ""}</button>
@@ -1374,18 +1361,8 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
    TIME module
    ============================================================ */
 (function timeModule() {
-  const SUBJECTS = [
-    { id: "s1", name: "국어", color: "#8E8CD8" },
-    { id: "s2", name: "수학", color: "#FF3B30" },
-    { id: "s3", name: "영어", color: "#007AFF" },
-    { id: "s4", name: "세계지리", color: "#34C759" },
-    { id: "s5", name: "생활과윤리", color: "#FF9500" },
-  ];
-  let sessions = [
-    { id: "log1", subjectId: "s1", seconds: 8425, endedAt: "오전 10:20", startMin: 480, endMin: 620 },
-    { id: "log2", subjectId: "s2", seconds: 9781, endedAt: "오후 2:05", startMin: 682, endMin: 845 },
-    { id: "log3", subjectId: "s3", seconds: 5802, endedAt: "오후 4:40", startMin: 903, endMin: 1000 },
-  ];
+  const SUBJECTS = [];
+  let sessions = [];
   let running = false;
   let elapsed = 0;
   let timerHandle = null;
@@ -1469,7 +1446,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   function renderLog() {
     const el = document.getElementById("logList");
     if (SUBJECTS.length === 0) {
-      el.innerHTML = `<div class="empty-note">과목이 없어요. 아래에서 추가해보세요.</div>`;
+      el.innerHTML = `<div class="empty-note">공부가 없어요. 아래에서 추가해보세요.</div>`;
       return;
     }
     const totals = {};
@@ -1501,7 +1478,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   const subjModalSave = document.getElementById("subjModalSave");
   const subjDeleteBtn = document.getElementById("subjDeleteBtn");
   let editingSubjId = null;
-  let selectedSubjColor = "#FF3B30";
+  let selectedSubjColor = "#B3A098";
   let subjHue = 4, subjSat = 100;
 
   function updateSubjPointerPosition() {
@@ -1564,7 +1541,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   function openSubjectModal(id) {
     editingSubjId = id;
     const subj = id ? subjectById(id) : null;
-    subjModalTitle.textContent = subj ? "과목 편집" : "과목 추가";
+    subjModalTitle.textContent = subj ? "공부 편집" : "공부 추가";
     subjFieldName.value = subj ? subj.name : "";
     if (subj) {
       const [h, s, v] = hexToHsv(subj.color);
@@ -1673,14 +1650,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
 (function notesModule() {
   const pencilIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 4.5l5 5L8 21H3v-5z"/></svg>`;
 
-  let notes = [
-    { id: "n1", title: "제주 여행", content: "", image: null },
-    { id: "n2", title: "카페 인테리어", content: "", image: null },
-    { id: "n3", title: "스터디 자료", content: "", image: null },
-    { id: "n4", title: "요리 레시피", content: "", image: null },
-    { id: "n5", title: "운동 루틴", content: "", image: null },
-    { id: "n6", title: "책 표지", content: "", image: null },
-  ];
+  let notes = [];
 
   /* ---------- quick notes (shared data — see shared store above) ---------- */
   function renderQuickNotesPanel() {
