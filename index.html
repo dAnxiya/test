@@ -66,8 +66,6 @@
   }
   .icon-btn:hover { background: #f0f0f2; }
   .icon-btn svg { width: 17px; height: 17px; }
-  .icon-btn.accent { color: #fff; background: #FF3B30; }
-  .icon-btn.accent:hover { background: #e6362b; }
 
   .view { flex: 1; display: flex; flex-direction: column; min-height: 0; }
   .page-title {
@@ -184,8 +182,9 @@
   .todo-row { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: 8px; background: #fff; }
   .todo-check { width: 17px; height: 17px; border-radius: 50%; flex-shrink: 0; cursor: pointer; border: 1.5px solid #c7c7cc; background: transparent; }
   .todo-check.done { border: none; background: #34C759; }
-  .todo-text { flex: 1; font-size: 13px; color: #1c1c1e; }
+  .todo-text { flex: 1; font-size: 13px; color: #1c1c1e; cursor: text; }
   .todo-text.done { color: #b0b0b5; text-decoration: line-through; }
+  .todo-edit-input { flex: 1; font-size: 13px; color: #1c1c1e; border: 1px solid #007AFF; border-radius: 6px; padding: 2px 6px; outline: none; font-family: inherit; }
   .todo-del { border: none; background: none; color: #c7c7cc; font-size: 15px; cursor: pointer; padding: 0 2px; }
   .todo-empty { font-size: 12.5px; color: #c7c7cc; padding: 10px 4px; }
   .todo-input-row { padding: 14px; border-top: 1px solid #ececef; display: flex; gap: 6px; }
@@ -208,6 +207,14 @@
   .field-label { color: #6e6e73; width: 56px; flex-shrink: 0; }
   .field-select { border: 1px solid #e5e5ea; border-radius: 8px; padding: 7px 8px; font-size: 14px; outline: none; flex: 1; }
   .delete-btn { margin-top: 4px; border: none; background: #fff1f0; color: #FF3B30; font-size: 13.5px; font-weight: 600; border-radius: 8px; padding: 9px 0; cursor: pointer; width: 100%; }
+
+  .color-swatch-grid { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .color-swatch { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+  .color-swatch.selected { border-color: #1c1c1e; box-shadow: 0 0 0 2px #fff inset; }
+
+  .note-image-picker { border: 1px dashed #d4d4d8; border-radius: 10px; min-height: 100px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #a6a6ab; font-size: 12.5px; font-weight: 600; overflow: hidden; }
+  .note-image-picker:hover { background: #f9f9fa; }
+  .note-image-picker img { width: 100%; height: 140px; object-fit: cover; display: block; }
 
   /* ================= time view ================= */
   .panel-left { flex: 1.3; background: #f4f4f5; border: 1px solid #e5e5ea; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
@@ -302,17 +309,12 @@
       <div class="avatar-circle">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg>
       </div>
-      <div class="avatar-name">사진</div>
     </div>
 
     <div class="nav-list">
       <button class="nav-item active" data-id="home">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h4v-6h2v6h4a1 1 0 0 0 1-1v-9"/></svg>
         HOME
-      </button>
-      <button class="nav-item" data-id="tasks">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l2.3 2.3L16 9"/></svg>
-        TASKS
       </button>
       <button class="nav-item" data-id="notes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3.5h9L19 8v12.5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M14 3.5V8h5"/><path d="M8 13h8M8 16.5h5"/></svg>
@@ -350,7 +352,7 @@
       </div>
       <div class="topbar-spacer"></div>
       <div class="icon-btn-group">
-        <button class="icon-btn accent" title="추가">
+        <button class="icon-btn" title="추가">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         </button>
         <button class="icon-btn" title="메일">
@@ -546,6 +548,62 @@
   </div>
 </div>
 
+<!-- category editor modal -->
+<div class="modal-overlay" id="catModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="catModalCancel">취소</button>
+      <span class="modal-title" id="catModalTitle">카테고리 추가</span>
+      <button class="save-btn" id="catModalSave" disabled>완료</button>
+    </div>
+    <div class="modal-body">
+      <input class="field-input" id="catFieldName" placeholder="카테고리 이름" />
+      <div class="field-row" style="align-items:flex-start;">
+        <span class="field-label" style="margin-top:3px;">색상</span>
+        <div class="color-swatch-grid" id="catColorGrid"></div>
+      </div>
+      <button class="delete-btn" id="catDeleteBtn" style="display:none;">카테고리 삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- quick note editor modal -->
+<div class="modal-overlay" id="qnModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="qnModalCancel">취소</button>
+      <span class="modal-title" id="qnModalTitle">빠른 메모 추가</span>
+      <button class="save-btn" id="qnModalSave" disabled>완료</button>
+    </div>
+    <div class="modal-body">
+      <input class="field-input" id="qnFieldTitle" placeholder="제목 (선택)" />
+      <textarea class="field-input" id="qnFieldContent" placeholder="내용" rows="4" style="resize:none;"></textarea>
+      <button class="delete-btn" id="qnDeleteBtn" style="display:none;">메모 삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- note editor modal -->
+<div class="modal-overlay" id="noteModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="noteModalCancel">취소</button>
+      <span class="modal-title" id="noteModalTitle">노트 추가</span>
+      <button class="save-btn" id="noteModalSave" disabled>완료</button>
+    </div>
+    <div class="modal-body">
+      <input class="field-input" id="noteFieldTitle" placeholder="제목" />
+      <textarea class="field-input" id="noteFieldContent" placeholder="내용" rows="4" style="resize:none;"></textarea>
+      <div class="note-image-picker" id="noteImagePicker">
+        <span id="noteImagePreviewText">+ 이미지 추가</span>
+        <img id="noteImagePreviewImg" style="display:none;" />
+      </div>
+      <input type="file" id="noteFieldImage" accept="image/*" style="display:none;" />
+      <button class="delete-btn" id="noteDeleteBtn" style="display:none;">노트 삭제</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ============================================================
    NAVIGATION (sidebar -> view switching)
@@ -675,31 +733,88 @@ function pad(n) { return String(n).padStart(2, "0"); }
     CALENDARS.forEach(c=>{
       const active = activeCalendars.has(c.id);
       const count = events.filter(e=>e.calendarId===c.id).length;
-      const row = document.createElement("label");
+      const row = document.createElement("div");
       row.className = "category-row";
       row.innerHTML = `
         <input type="checkbox" ${active?"checked":""} />
         <span class="cal-dot" style="background:${c.color}"></span>
         <span class="category-name ${active?"":"inactive"}">${c.name}</span>
         <span class="category-count ${active?"":"inactive"}">${count}</span>`;
-      row.querySelector("input").onchange = () => {
+      const checkbox = row.querySelector("input");
+      checkbox.onclick = (e) => e.stopPropagation();
+      checkbox.onchange = () => {
         active ? activeCalendars.delete(c.id) : activeCalendars.add(c.id);
         renderAll();
       };
+      row.onclick = () => openCategoryModal(c.id);
       el.appendChild(row);
     });
   }
-  document.getElementById("categoryAddBtn").onclick = () => {
-    const name = prompt("새 카테고리 이름을 입력하세요");
-    if (!name || !name.trim()) return;
-    const id = "cat" + Date.now();
-    const color = CATEGORY_PALETTE[paletteIdx % CATEGORY_PALETTE.length];
-    paletteIdx++;
-    CALENDARS.push({ id, name: name.trim(), color });
-    activeCalendars.add(id);
+
+  const catOverlay = document.getElementById("catModalOverlay");
+  const catFieldName = document.getElementById("catFieldName");
+  const catColorGrid = document.getElementById("catColorGrid");
+  const catModalTitle = document.getElementById("catModalTitle");
+  const catModalSave = document.getElementById("catModalSave");
+  const catDeleteBtn = document.getElementById("catDeleteBtn");
+  let editingCatId = null;
+  let selectedCatColor = CATEGORY_PALETTE[0];
+
+  function renderCatColorGrid(){
+    catColorGrid.innerHTML = "";
+    CATEGORY_PALETTE.forEach(color=>{
+      const sw = document.createElement("span");
+      sw.className = "color-swatch" + (color === selectedCatColor ? " selected" : "");
+      sw.style.background = color;
+      sw.onclick = () => { selectedCatColor = color; renderCatColorGrid(); };
+      catColorGrid.appendChild(sw);
+    });
+  }
+  function openCategoryModal(id){
+    editingCatId = id;
+    const cat = id ? CALENDARS.find(c=>c.id===id) : null;
+    catModalTitle.textContent = cat ? "카테고리 편집" : "카테고리 추가";
+    catFieldName.value = cat ? cat.name : "";
+    selectedCatColor = cat ? cat.color : CATEGORY_PALETTE[paletteIdx % CATEGORY_PALETTE.length];
+    renderCatColorGrid();
+    catDeleteBtn.style.display = cat ? "block" : "none";
+    validateCatSave();
+    catOverlay.classList.add("show");
+    catFieldName.focus();
+  }
+  function closeCategoryModal(){ catOverlay.classList.remove("show"); }
+  function validateCatSave(){ catModalSave.disabled = catFieldName.value.trim().length === 0; }
+  catFieldName.oninput = validateCatSave;
+  document.getElementById("catModalCancel").onclick = closeCategoryModal;
+  catOverlay.onclick = (e) => { if (e.target === catOverlay) closeCategoryModal(); };
+
+  catModalSave.onclick = () => {
+    const name = catFieldName.value.trim();
+    if (!name) return;
+    if (editingCatId) {
+      const cat = CALENDARS.find(c=>c.id===editingCatId);
+      cat.name = name;
+      cat.color = selectedCatColor;
+    } else {
+      const id = "cat" + Date.now();
+      CALENDARS.push({ id, name, color: selectedCatColor });
+      activeCalendars.add(id);
+      paletteIdx++;
+    }
+    closeCategoryModal();
     refreshCalendarOptions();
     renderAll();
   };
+  catDeleteBtn.onclick = () => {
+    if (!editingCatId) return;
+    CALENDARS.splice(CALENDARS.findIndex(c=>c.id===editingCatId), 1);
+    activeCalendars.delete(editingCatId);
+    events = events.filter(e=>e.calendarId !== editingCatId);
+    closeCategoryModal();
+    refreshCalendarOptions();
+    renderAll();
+  };
+  document.getElementById("categoryAddBtn").onclick = () => openCategoryModal(null);
 
   function renderMonth(){
     document.getElementById("monthLabel").textContent = `${viewDate.getFullYear()}년 ${MONTHS_KR[viewDate.getMonth()]}`;
@@ -843,9 +958,28 @@ function pad(n) { return String(n).padStart(2, "0"); }
         <span class="todo-text ${it.done?"done":""}">${it.text}</span>
         <button class="todo-del">×</button>`;
       row.querySelector(".todo-check").onclick = () => { it.done = !it.done; renderTodos(); };
-      row.querySelector(".todo-del").onclick = () => { todos = todos.filter(t=>t.id!==it.id); renderTodos(); };
+      row.querySelector(".todo-del").onclick = (e) => { e.stopPropagation(); todos = todos.filter(t=>t.id!==it.id); renderTodos(); };
+      row.querySelector(".todo-text").onclick = () => startEditTodo(row, it);
       el.appendChild(row);
     });
+  }
+  function startEditTodo(row, it){
+    const textEl = row.querySelector(".todo-text");
+    const input = document.createElement("input");
+    input.className = "todo-edit-input";
+    input.value = it.text;
+    row.replaceChild(input, textEl);
+    input.focus();
+    input.select();
+    input.onblur = () => {
+      const val = input.value.trim();
+      if (val) it.text = val;
+      renderTodos();
+    };
+    input.onkeydown = (e) => {
+      if (e.key === "Enter") input.blur();
+      if (e.key === "Escape") { input.onblur = null; renderTodos(); }
+    };
   }
   document.getElementById("todoAddBtn").onclick = addTodo;
   document.getElementById("todoInput").addEventListener("keydown", (e)=>{ if(e.key==="Enter") addTodo(); });
@@ -1033,14 +1167,15 @@ function pad(n) { return String(n).padStart(2, "0"); }
     { id: "q4", title: "아이디어", content: "주말 여행지 후보 조사" },
   ];
   let notes = [
-    { id: "n1", title: "제주 여행" },
-    { id: "n2", title: "카페 인테리어" },
-    { id: "n3", title: "스터디 자료" },
-    { id: "n4", title: "요리 레시피" },
-    { id: "n5", title: "운동 루틴" },
-    { id: "n6", title: "책 표지" },
+    { id: "n1", title: "제주 여행", content: "", image: null },
+    { id: "n2", title: "카페 인테리어", content: "", image: null },
+    { id: "n3", title: "스터디 자료", content: "", image: null },
+    { id: "n4", title: "요리 레시피", content: "", image: null },
+    { id: "n5", title: "운동 루틴", content: "", image: null },
+    { id: "n6", title: "책 표지", content: "", image: null },
   ];
 
+  /* ---------- quick notes ---------- */
   function renderQuickNotes() {
     const el = document.getElementById("qnScroll");
     el.innerHTML = "";
@@ -1053,20 +1188,136 @@ function pad(n) { return String(n).padStart(2, "0"); }
           ${n.title ? `<span class="qn-title">${n.title}</span>` : ""}
           <span class="qn-content">${n.content}</span>
         </span>`;
+      card.onclick = () => openQnModal(n.id);
       el.appendChild(card);
     });
     const addCard = document.createElement("div");
     addCard.className = "qn-card add";
     addCard.textContent = "+";
-    addCard.onclick = () => {
-      const content = prompt("빠른 메모 내용을 입력하세요");
-      if (!content || !content.trim()) return;
-      const title = prompt("제목 (선택, 비워두면 제목 없이 저장돼요)") || "";
-      quickNotes.push({ id: "q" + Date.now(), title: title.trim(), content: content.trim() });
-      renderQuickNotes();
-    };
+    addCard.onclick = () => openQnModal(null);
     el.appendChild(addCard);
   }
+
+  const qnOverlay = document.getElementById("qnModalOverlay");
+  const qnFieldTitle = document.getElementById("qnFieldTitle");
+  const qnFieldContent = document.getElementById("qnFieldContent");
+  const qnModalTitle = document.getElementById("qnModalTitle");
+  const qnModalSave = document.getElementById("qnModalSave");
+  const qnDeleteBtn = document.getElementById("qnDeleteBtn");
+  let editingQnId = null;
+
+  function openQnModal(id) {
+    editingQnId = id;
+    const n = id ? quickNotes.find((q) => q.id === id) : null;
+    qnModalTitle.textContent = n ? "빠른 메모 편집" : "빠른 메모 추가";
+    qnFieldTitle.value = n ? n.title : "";
+    qnFieldContent.value = n ? n.content : "";
+    qnDeleteBtn.style.display = n ? "block" : "none";
+    validateQnSave();
+    qnOverlay.classList.add("show");
+    qnFieldContent.focus();
+  }
+  function closeQnModal() { qnOverlay.classList.remove("show"); }
+  function validateQnSave() { qnModalSave.disabled = qnFieldContent.value.trim().length === 0; }
+  qnFieldContent.oninput = validateQnSave;
+  document.getElementById("qnModalCancel").onclick = closeQnModal;
+  qnOverlay.onclick = (e) => { if (e.target === qnOverlay) closeQnModal(); };
+
+  qnModalSave.onclick = () => {
+    const content = qnFieldContent.value.trim();
+    if (!content) return;
+    const title = qnFieldTitle.value.trim();
+    if (editingQnId) {
+      const n = quickNotes.find((q) => q.id === editingQnId);
+      n.title = title;
+      n.content = content;
+    } else {
+      quickNotes.push({ id: "q" + Date.now(), title, content });
+    }
+    closeQnModal();
+    renderQuickNotes();
+  };
+  qnDeleteBtn.onclick = () => {
+    quickNotes = quickNotes.filter((q) => q.id !== editingQnId);
+    closeQnModal();
+    renderQuickNotes();
+  };
+
+  /* ---------- image notes ---------- */
+  const noteOverlay = document.getElementById("noteModalOverlay");
+  const noteFieldTitle = document.getElementById("noteFieldTitle");
+  const noteFieldContent = document.getElementById("noteFieldContent");
+  const noteModalTitle = document.getElementById("noteModalTitle");
+  const noteModalSave = document.getElementById("noteModalSave");
+  const noteDeleteBtn = document.getElementById("noteDeleteBtn");
+  const noteImagePicker = document.getElementById("noteImagePicker");
+  const noteImagePreviewText = document.getElementById("noteImagePreviewText");
+  const noteImagePreviewImg = document.getElementById("noteImagePreviewImg");
+  const noteFieldImage = document.getElementById("noteFieldImage");
+  let editingNoteId = null;
+  let pendingImageData = null;
+
+  noteImagePicker.onclick = () => noteFieldImage.click();
+  noteFieldImage.onchange = () => {
+    const file = noteFieldImage.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      pendingImageData = reader.result;
+      noteImagePreviewImg.src = pendingImageData;
+      noteImagePreviewImg.style.display = "block";
+      noteImagePreviewText.style.display = "none";
+    };
+    reader.readAsDataURL(file);
+  };
+
+  function openNoteModal(id) {
+    editingNoteId = id;
+    const n = id ? notes.find((x) => x.id === id) : null;
+    noteModalTitle.textContent = n ? "노트 편집" : "노트 추가";
+    noteFieldTitle.value = n ? n.title : "";
+    noteFieldContent.value = n && n.content ? n.content : "";
+    pendingImageData = n && n.image ? n.image : null;
+    noteFieldImage.value = "";
+    if (pendingImageData) {
+      noteImagePreviewImg.src = pendingImageData;
+      noteImagePreviewImg.style.display = "block";
+      noteImagePreviewText.style.display = "none";
+    } else {
+      noteImagePreviewImg.style.display = "none";
+      noteImagePreviewText.style.display = "block";
+    }
+    noteDeleteBtn.style.display = n ? "block" : "none";
+    validateNoteSave();
+    noteOverlay.classList.add("show");
+    noteFieldTitle.focus();
+  }
+  function closeNoteModal() { noteOverlay.classList.remove("show"); }
+  function validateNoteSave() { noteModalSave.disabled = noteFieldTitle.value.trim().length === 0; }
+  noteFieldTitle.oninput = validateNoteSave;
+  document.getElementById("noteModalCancel").onclick = closeNoteModal;
+  noteOverlay.onclick = (e) => { if (e.target === noteOverlay) closeNoteModal(); };
+
+  noteModalSave.onclick = () => {
+    const title = noteFieldTitle.value.trim();
+    if (!title) return;
+    const content = noteFieldContent.value.trim();
+    if (editingNoteId) {
+      const n = notes.find((x) => x.id === editingNoteId);
+      n.title = title;
+      n.content = content;
+      n.image = pendingImageData;
+    } else {
+      notes.push({ id: "n" + Date.now(), title, content, image: pendingImageData });
+    }
+    closeNoteModal();
+    renderNotesGrid();
+  };
+  noteDeleteBtn.onclick = () => {
+    notes = notes.filter((x) => x.id !== editingNoteId);
+    closeNoteModal();
+    renderNotesGrid();
+  };
 
   function renderNotesGrid() {
     const el = document.getElementById("notesGrid");
@@ -1074,20 +1325,22 @@ function pad(n) { return String(n).padStart(2, "0"); }
     notes.forEach((n) => {
       const card = document.createElement("div");
       card.className = "note-card";
-      card.innerHTML = `
-        <div class="note-thumb">이미지</div>
-        <div class="note-card-title">${n.title}</div>`;
+      if (n.image) {
+        card.innerHTML = `
+          <div class="note-thumb" style="background-image:url('${n.image}');background-size:cover;background-position:center;"></div>
+          <div class="note-card-title">${n.title}</div>`;
+      } else {
+        card.innerHTML = `
+          <div class="note-thumb">이미지</div>
+          <div class="note-card-title">${n.title}</div>`;
+      }
+      card.onclick = () => openNoteModal(n.id);
       el.appendChild(card);
     });
     const addCard = document.createElement("div");
     addCard.className = "note-card add";
     addCard.innerHTML = `<div class="note-thumb">+</div>`;
-    addCard.onclick = () => {
-      const title = prompt("새 노트 제목을 입력하세요");
-      if (!title || !title.trim()) return;
-      notes.push({ id: "n" + Date.now(), title: title.trim() });
-      renderNotesGrid();
-    };
+    addCard.onclick = () => openNoteModal(null);
     el.appendChild(addCard);
   }
 
