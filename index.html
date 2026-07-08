@@ -208,12 +208,64 @@
   .field-select { border: 1px solid #e5e5ea; border-radius: 8px; padding: 7px 8px; font-size: 14px; outline: none; flex: 1; }
   .delete-btn { margin-top: 4px; border: none; background: #fff1f0; color: #FF3B30; font-size: 13.5px; font-weight: 600; border-radius: 8px; padding: 9px 0; cursor: pointer; width: 100%; }
 
-  .color-swatch-grid { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-  .color-swatch { width: 26px; height: 26px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
-  .color-swatch.selected { border-color: #1c1c1e; box-shadow: 0 0 0 2px #fff inset; }
+  .color-wheel-wrap { flex: 1; display: flex; align-items: center; gap: 16px; }
+  .color-wheel {
+    position: relative; width: 116px; height: 116px; border-radius: 50%; flex-shrink: 0; cursor: crosshair;
+    background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red);
+    box-shadow: 0 0 0 1px #e5e5ea;
+    touch-action: none;
+  }
+  .color-wheel::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at center, #fff 0%, rgba(255,255,255,0) 100%);
+  }
+  .color-wheel-pointer {
+    position: absolute; top: 0; left: 0; width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.35); transform: translate(-50%,-50%);
+    pointer-events: none;
+  }
+  .color-wheel-controls { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .color-preview { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #e5e5ea; flex-shrink: 0; }
+  .color-wheel-controls input[type=range] { width: 88px; accent-color: #1c1c1e; }
+  .color-hex-input { display: flex; align-items: center; gap: 2px; border: 1px solid #e2e2e6; border-radius: 7px; padding: 5px 8px; background: #fff; }
+  .color-hex-input span { font-size: 12px; color: #a6a6ab; font-weight: 700; }
+  .color-hex-input input { border: none; outline: none; width: 62px; font-size: 12.5px; font-family: ui-monospace, "SF Mono", monospace; letter-spacing: 0.5px; text-transform: uppercase; color: #1c1c1e; background: transparent; }
 
   .note-image-picker { border: 1px dashed #d4d4d8; border-radius: 10px; min-height: 100px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #a6a6ab; font-size: 12.5px; font-weight: 600; overflow: hidden; }
   .note-image-picker:hover { background: #f9f9fa; }
+
+  /* ---- note editor: goodnotes-style paper feel ---- */
+  .note-modal-overlay { background: rgba(20,18,14,0.5); }
+  .note-paper-box {
+    width: 640px; max-width: 94vw; height: 86vh; max-height: 780px;
+    background: #fffdf7; display: flex; flex-direction: column; border-radius: 16px;
+    box-shadow: 0 26px 70px rgba(0,0,0,0.35);
+  }
+  .note-paper-box .modal-head { background: #fffdf7; border-bottom: 1px solid #ece7d8; flex-shrink: 0; padding: 15px 20px; }
+  .note-paper-box .modal-body {
+    flex: 1; overflow-y: auto; padding: 26px 32px 30px 70px; gap: 0; position: relative;
+    background-image: repeating-linear-gradient(to bottom, transparent, transparent 29px, #ece7d8 30px);
+    background-position: 0 84px;
+  }
+  .note-paper-box .modal-body::before {
+    content: ""; position: absolute; left: 42px; top: 0; bottom: 0; width: 1px; background: #f3cac2;
+  }
+  .note-paper-box #noteFieldTitle {
+    border: none; border-bottom: 2px solid #1c1c1e; border-radius: 0; padding: 4px 2px 12px; margin-bottom: 18px;
+    font-size: 19px; font-weight: 800; background: transparent;
+  }
+  .note-paper-box #noteFieldTitle::placeholder { color: #d4d1c4; }
+  .note-paper-box #noteFieldContent {
+    border: none; padding: 0 2px; font-size: 14.5px; line-height: 30px; min-height: 280px; background: transparent;
+  }
+  .note-paper-box #noteFieldContent::placeholder { color: #d4d1c4; }
+  .note-paper-box .note-image-picker { margin-top: 10px; background: #fffdf7; border-color: #d9d3bf; }
+  .note-paper-box .note-image-picker:hover { background: #fbf8ee; }
+  .note-paper-box .delete-btn { margin-top: 16px; }
+  @media (max-width: 480px) {
+    .note-paper-box .modal-body { padding-left: 34px; background-position: 0 84px; }
+    .note-paper-box .modal-body::before { left: 20px; }
+  }
   .note-image-picker img { width: 100%; height: 140px; object-fit: cover; display: block; }
 
   /* ================= time view ================= */
@@ -286,6 +338,12 @@
 
   .notes-grid-wrap { flex: 1; overflow-y: auto; min-height: 0; }
   .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (min-width: 900px) {
+    .notes-grid { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (min-width: 1300px) {
+    .notes-grid { grid-template-columns: repeat(5, 1fr); }
+  }
   .note-card { background: #f4f4f5; border: 1px solid #ececef; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; }
   .note-card:hover { background: #eeeeef; }
   .note-thumb { flex: 1; min-height: 140px; background: #eceded; display: flex; align-items: center; justify-content: center; color: #b0b0b5; font-size: 12.5px; font-weight: 600; }
@@ -560,7 +618,19 @@
       <input class="field-input" id="catFieldName" placeholder="카테고리 이름" />
       <div class="field-row" style="align-items:flex-start;">
         <span class="field-label" style="margin-top:3px;">색상</span>
-        <div class="color-swatch-grid" id="catColorGrid"></div>
+        <div class="color-wheel-wrap">
+          <div class="color-wheel" id="catColorWheel">
+            <div class="color-wheel-pointer" id="catColorPointer"></div>
+          </div>
+          <div class="color-wheel-controls">
+            <div class="color-preview" id="catColorPreview"></div>
+            <input type="range" id="catBrightness" min="10" max="100" value="90" />
+            <div class="color-hex-input">
+              <span>#</span>
+              <input type="text" id="catHexInput" maxlength="6" placeholder="FF3B30" />
+            </div>
+          </div>
+        </div>
       </div>
       <button class="delete-btn" id="catDeleteBtn" style="display:none;">카테고리 삭제</button>
     </div>
@@ -584,8 +654,8 @@
 </div>
 
 <!-- note editor modal -->
-<div class="modal-overlay" id="noteModalOverlay">
-  <div class="modal-box">
+<div class="modal-overlay note-modal-overlay" id="noteModalOverlay">
+  <div class="modal-box note-paper-box">
     <div class="modal-head">
       <button class="cancel-btn" id="noteModalCancel">취소</button>
       <span class="modal-title" id="noteModalTitle">노트 추가</span>
@@ -704,9 +774,6 @@ function pad(n) { return String(n).padStart(2, "0"); }
   function timeToMinutes(t){ if(!t) return 0; const [h,m]=t.split(":").map(Number); return h*60+m; }
   function calColor(id){ return CALENDARS.find(c=>c.id===id).color; }
 
-  const CATEGORY_PALETTE = ["#FF9500","#34C759","#5AC8FA","#FF2D55","#AF52DE","#007AFF","#FF3B30","#00C7BE"];
-  let paletteIdx = 0;
-
   const today = new Date();
   let viewDate = new Date();
   let selectedDate = new Date();
@@ -753,30 +820,125 @@ function pad(n) { return String(n).padStart(2, "0"); }
 
   const catOverlay = document.getElementById("catModalOverlay");
   const catFieldName = document.getElementById("catFieldName");
-  const catColorGrid = document.getElementById("catColorGrid");
+  const catColorWheel = document.getElementById("catColorWheel");
+  const catColorPointer = document.getElementById("catColorPointer");
+  const catColorPreview = document.getElementById("catColorPreview");
+  const catBrightness = document.getElementById("catBrightness");
+  const catHexInput = document.getElementById("catHexInput");
   const catModalTitle = document.getElementById("catModalTitle");
   const catModalSave = document.getElementById("catModalSave");
   const catDeleteBtn = document.getElementById("catDeleteBtn");
   let editingCatId = null;
-  let selectedCatColor = CATEGORY_PALETTE[0];
+  let selectedCatColor = "#FF3B30";
+  let currentHue = 4, currentSat = 100;
 
-  function renderCatColorGrid(){
-    catColorGrid.innerHTML = "";
-    CATEGORY_PALETTE.forEach(color=>{
-      const sw = document.createElement("span");
-      sw.className = "color-swatch" + (color === selectedCatColor ? " selected" : "");
-      sw.style.background = color;
-      sw.onclick = () => { selectedCatColor = color; renderCatColorGrid(); };
-      catColorGrid.appendChild(sw);
-    });
+  function hsvToHex(h, s, v) {
+    s /= 100; v /= 100;
+    const i = Math.floor(h / 60) % 6;
+    const f = h / 60 - Math.floor(h / 60);
+    const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+    let r, g, b;
+    switch (i) {
+      case 0: r=v; g=t; b=p; break;
+      case 1: r=q; g=v; b=p; break;
+      case 2: r=p; g=v; b=t; break;
+      case 3: r=p; g=q; b=v; break;
+      case 4: r=t; g=p; b=v; break;
+      default: r=v; g=p; b=q; break;
+    }
+    const toHex = (x) => Math.round(x * 255).toString(16).padStart(2, "0");
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
   }
+  function hexToHsv(hex) {
+    hex = hex.replace("#", "");
+    const r = parseInt(hex.substr(0,2),16)/255, g = parseInt(hex.substr(2,2),16)/255, b = parseInt(hex.substr(4,2),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
+    let h = 0;
+    if (d !== 0) {
+      if (max === r) h = ((g - b) / d) % 6;
+      else if (max === g) h = (b - r) / d + 2;
+      else h = (r - g) / d + 4;
+      h *= 60;
+      if (h < 0) h += 360;
+    }
+    const s = max === 0 ? 0 : d / max;
+    return [h, s * 100, max * 100];
+  }
+  function updatePointerPosition() {
+    const R = catColorWheel.clientWidth / 2;
+    const rad = (currentHue * Math.PI) / 180;
+    const dist = (currentSat / 100) * R;
+    const dx = Math.sin(rad) * dist;
+    const dy = -Math.cos(rad) * dist;
+    catColorPointer.style.left = (R + dx) + "px";
+    catColorPointer.style.top = (R + dy) + "px";
+  }
+  function applyCatColor() {
+    selectedCatColor = hsvToHex(currentHue, currentSat, Number(catBrightness.value));
+    catColorPreview.style.background = selectedCatColor;
+    if (document.activeElement !== catHexInput) {
+      catHexInput.value = selectedCatColor.replace("#", "").toUpperCase();
+    }
+  }
+  function pickFromEvent(e) {
+    const rect = catColorWheel.getBoundingClientRect();
+    const R = rect.width / 2;
+    const dx = e.clientX - rect.left - R;
+    const dy = e.clientY - rect.top - R;
+    const dist = Math.min(Math.sqrt(dx*dx + dy*dy), R);
+    let hue = (Math.atan2(dx, -dy) * 180) / Math.PI;
+    if (hue < 0) hue += 360;
+    currentHue = hue;
+    currentSat = (dist / R) * 100;
+    updatePointerPosition();
+    applyCatColor();
+  }
+  let draggingWheel = false;
+  catColorWheel.addEventListener("pointerdown", (e) => {
+    draggingWheel = true;
+    catColorWheel.setPointerCapture(e.pointerId);
+    pickFromEvent(e);
+  });
+  catColorWheel.addEventListener("pointermove", (e) => { if (draggingWheel) pickFromEvent(e); });
+  catColorWheel.addEventListener("pointerup", () => { draggingWheel = false; });
+  catColorWheel.addEventListener("pointercancel", () => { draggingWheel = false; });
+  catBrightness.addEventListener("input", applyCatColor);
+  catHexInput.addEventListener("input", () => {
+    let v = catHexInput.value.trim().replace(/^#/, "");
+    if (/^[0-9a-fA-F]{3}$/.test(v)) v = v.split("").map((c) => c + c).join("");
+    if (!/^[0-9a-fA-F]{6}$/.test(v)) return;
+    const hex = "#" + v;
+    const [h, s, val] = hexToHsv(hex);
+    currentHue = h;
+    currentSat = Math.max(s, 4);
+    catBrightness.value = Math.max(Math.round(val), 10);
+    selectedCatColor = hex;
+    catColorPreview.style.background = selectedCatColor;
+    requestAnimationFrame(updatePointerPosition);
+  });
+  catHexInput.addEventListener("blur", () => {
+    catHexInput.value = selectedCatColor.replace("#", "").toUpperCase();
+  });
+  catHexInput.addEventListener("keydown", (e) => { if (e.key === "Enter") catHexInput.blur(); });
+
   function openCategoryModal(id){
     editingCatId = id;
     const cat = id ? CALENDARS.find(c=>c.id===id) : null;
     catModalTitle.textContent = cat ? "카테고리 편집" : "카테고리 추가";
     catFieldName.value = cat ? cat.name : "";
-    selectedCatColor = cat ? cat.color : CATEGORY_PALETTE[paletteIdx % CATEGORY_PALETTE.length];
-    renderCatColorGrid();
+    if (cat) {
+      const [h, s, v] = hexToHsv(cat.color);
+      currentHue = h;
+      currentSat = Math.max(s, 15);
+      catBrightness.value = Math.max(Math.round(v), 30);
+    } else {
+      currentHue = Math.floor(Math.random() * 360);
+      currentSat = 75;
+      catBrightness.value = 60;
+    }
+    // wait for layout before positioning pointer
+    requestAnimationFrame(updatePointerPosition);
+    applyCatColor();
     catDeleteBtn.style.display = cat ? "block" : "none";
     validateCatSave();
     catOverlay.classList.add("show");
@@ -799,7 +961,6 @@ function pad(n) { return String(n).padStart(2, "0"); }
       const id = "cat" + Date.now();
       CALENDARS.push({ id, name, color: selectedCatColor });
       activeCalendars.add(id);
-      paletteIdx++;
     }
     closeCategoryModal();
     refreshCalendarOptions();
