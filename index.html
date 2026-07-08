@@ -338,10 +338,10 @@
 
   .notes-grid-wrap { flex: 1; overflow-y: auto; min-height: 0; }
   .notes-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  @media (min-width: 900px) {
+  @media (min-width: 900px) and (orientation: landscape) {
     .notes-grid { grid-template-columns: repeat(4, 1fr); }
   }
-  @media (min-width: 1300px) {
+  @media (min-width: 1300px) and (orientation: landscape) {
     .notes-grid { grid-template-columns: repeat(5, 1fr); }
   }
   .note-card { background: #f4f4f5; border: 1px solid #ececef; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; }
