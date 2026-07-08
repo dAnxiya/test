@@ -372,8 +372,8 @@
     width: 32px; flex-shrink: 0; font-size: 8.5px; font-weight: 700; color: #a6a6ab;
     display: flex; align-items: center; justify-content: center; border-right: 1px solid #F3DEE1; background: #FBF3F5;
   }
-  .tt-cells { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); }
-  .tt-cell { border-right: 1px solid #F3DEE1; aspect-ratio: 1 / 1; }
+  .tt-cells { display: flex; }
+  .tt-cell { border-right: 1px solid #F3DEE1; width: var(--tt-size, 40px); height: var(--tt-size, 40px); flex-shrink: 0; }
   .tt-cell:last-child { border-right: none; }
   .tt-empty { font-size: 11.5px; color: #c7c7cc; text-align: center; padding: 20px 0; }
 
@@ -485,12 +485,12 @@
 
     /* ---- row 2: nav buttons, icon-only, evenly spaced on one line ---- */
     .nav-list {
-      order: 4; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: visible;
+      order: 4; flex: 1 1 100%; flex-direction: row; flex-wrap: nowrap; overflow-x: visible;
       gap: 6px; padding-top: 6px; margin-top: 2px; border-top: 1px solid #F3DEE1;
     }
     .nav-item {
       flex: 1 1 0; min-width: 0; padding: 10px 0; gap: 0;
-      justify-content: center; background: #F3DEE1; border-radius: 12px;
+      justify-content: center; background: #F3DEE1; border-radius: 999px;
     }
     .nav-item:hover { background: #EBD3D8; }
     .nav-item.active { background: #B3A098; }
@@ -1798,6 +1798,26 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   function renderStats() {
     updateTotalDisplay();
     renderTimetable();
+    sizeTimetableCells();
+  }
+
+  /* keep the 6 columns exactly matching the box width so nothing gets cut off on the side */
+  function sizeTimetableCells() {
+    const scrollEl = document.getElementById("timetableScroll");
+    if (!scrollEl) return;
+    const w = scrollEl.clientWidth;
+    if (!w) return;
+    const HOUR_LABEL_WIDTH = 32;
+    const cellSize = Math.floor(Math.max(0, w - HOUR_LABEL_WIDTH) / 6);
+    scrollEl.style.setProperty("--tt-size", cellSize + "px");
+  }
+  const timetableScrollEl = document.getElementById("timetableScroll");
+  if (timetableScrollEl) {
+    if (window.ResizeObserver) {
+      new ResizeObserver(sizeTimetableCells).observe(timetableScrollEl);
+    } else {
+      window.addEventListener("resize", sizeTimetableCells);
+    }
   }
 
   function renderTimetable() {
