@@ -40,6 +40,7 @@
     font-size: 13.5px; font-weight: 500; color: #48484c;
   }
   .nav-item svg { width: 17px; height: 17px; flex-shrink: 0; color: #9a9a9e; }
+  .nav-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
   .nav-item:hover { background: #EBD3D8; }
   .nav-item.active { background: #B3A098; color: #fff; }
   .nav-item.active svg { color: #fff; }
@@ -355,22 +356,24 @@
   }
   .subject-add-row:hover { background: #F3DEE1; border-color: #c7c7cc; }
 
-  .stats-card { padding: 18px 20px 14px; display: flex; flex-direction: column; min-height: 0; }
+  .stats-card { flex: 1; padding: 18px 20px 14px; display: flex; flex-direction: column; min-height: 0; }
   .stats-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; flex-shrink: 0; }
   .stats-header .label { font-size: 13px; font-weight: 700; }
   .stats-header .value { font-size: 15px; font-weight: 800; }
 
-  /* ---- timetable: 1 row = 1 hour, split into 6 cells of 10 minutes, all 24h visible (no scroll) ---- */
-  .timetable-scroll { flex: 1; display: flex; flex-direction: column; min-height: 0; border: 1px solid #F3DEE1; border-radius: 10px; overflow: hidden; }
-  .timetable { flex: 1; display: flex; flex-direction: column; min-height: 0; }
-  .tt-row { flex: 1; display: flex; align-items: stretch; border-bottom: 1px solid #F3DEE1; min-height: 0; }
+  /* ---- timetable: 1 row = 1 hour, split into 6 SQUARE cells of 10 minutes.
+     The grid grows to its natural (tall) height and the box scrolls internally,
+     so it stretches to fill the full height beside the timer/log column. ---- */
+  .timetable-scroll { flex: 1; display: flex; flex-direction: column; min-height: 0; border: 1px solid #F3DEE1; border-radius: 10px; overflow-y: auto; overflow-x: hidden; }
+  .timetable { display: flex; flex-direction: column; }
+  .tt-row { display: flex; align-items: stretch; border-bottom: 1px solid #F3DEE1; }
   .tt-row:last-child { border-bottom: none; }
   .tt-hour-label {
     width: 32px; flex-shrink: 0; font-size: 8.5px; font-weight: 700; color: #a6a6ab;
     display: flex; align-items: center; justify-content: center; border-right: 1px solid #F3DEE1; background: #FBF3F5;
   }
   .tt-cells { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); }
-  .tt-cell { border-right: 1px solid #F3DEE1; }
+  .tt-cell { border-right: 1px solid #F3DEE1; aspect-ratio: 1 / 1; }
   .tt-cell:last-child { border-right: none; }
   .tt-empty { font-size: 11.5px; color: #c7c7cc; text-align: center; padding: 20px 0; }
 
@@ -416,6 +419,101 @@
   .placeholder-view { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #c7c7cc; }
   .placeholder-view svg { width: 32px; height: 32px; }
   .placeholder-view span { font-size: 13.5px; font-weight: 600; color: #a6a6ab; }
+
+  /* ============================================================
+     RESPONSIVE — tablet portrait (iPad) & mobile
+     Same visual language as desktop (same photo-banner shape, same
+     calendar grid shape, etc.) — columns stack and spacing rescales
+     so everything stays comfortable to use on a narrow screen.
+     ============================================================ */
+
+  /* ---- shared: tablet portrait & mobile (≤1024px) ---- */
+  @media (max-width: 1024px) {
+    html, body { height: auto; }
+    #app { min-height: 100vh; height: auto; }
+    .main { overflow-y: auto; }
+
+    .grid, .content { flex-direction: column; }
+    .col-left, .col-right,
+    .panel-left, .panel-right,
+    .cal-panel, .todo-panel { flex: none; width: 100%; min-width: 0; }
+
+    .todo-panel { min-height: 320px; }
+
+    /* photo banner: keep the same wide "banner" shape as desktop instead of a vh-based box */
+    .photo-banner { height: auto; aspect-ratio: 16 / 8; max-height: none; min-height: 160px; }
+
+    .bottom-row { height: auto; flex-wrap: wrap; }
+    .dday-card, .notes-card { flex: 1 1 260px; min-height: 130px; }
+
+    /* calendar: mini calendar + categories sit above the month grid instead of squeezing it */
+    .cal-app { flex-direction: column; }
+    .cal-sidebar { width: 100%; border-right: none; border-bottom: 1px solid #F3DEE1; display: flex; flex-wrap: wrap; overflow-y: visible; }
+    .mini-cal { flex: 1 1 210px; }
+    .category-panel { flex: 1 1 210px; height: auto; }
+    .day-grid { min-height: 380px; }
+    .day-num { width: 22px; height: 22px; font-size: 12px; }
+    .mini-cal-grid button { width: 22px; height: 22px; font-size: 11px; }
+
+    .notes-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ---- mobile phones (≤640px): sidebar becomes a horizontal top bar ---- */
+  @media (max-width: 640px) {
+    #app { flex-direction: column; }
+
+    /* ---- row 1: home avatar · date/time (centered) · utility icons ---- */
+    .sidebar {
+      width: 100%; display: flex; flex-wrap: wrap; align-items: center;
+      gap: 8px 10px; padding: 10px 10px 8px; border-right: none; border-bottom: 1px solid #F3DEE1;
+    }
+    .avatar-block { order: 1; margin-bottom: 0; flex: 0 0 auto; }
+    .avatar-circle { width: 38px; height: 38px; }
+    .avatar-circle svg { width: 18px; height: 18px; }
+
+    .date-card {
+      order: 2; flex: 1 1 auto; min-width: 0; margin-top: 0; background: transparent; padding: 0;
+      display: flex; flex-direction: row; align-items: baseline; justify-content: center; gap: 6px;
+    }
+    .date-year { display: none; }
+    .date-full { font-size: 12px; font-weight: 700; margin-bottom: 0; color: #48484c; }
+    .date-time { font-size: 13.5px; font-weight: 800; color: #B3A098; letter-spacing: 0; }
+
+    .icon-btn-group { order: 3; flex: 0 0 auto; gap: 0; }
+    .icon-btn { width: 28px; height: 28px; }
+    .icon-btn svg { width: 14px; height: 14px; }
+
+    /* ---- row 2: nav buttons, icon-only, evenly spaced on one line ---- */
+    .nav-list {
+      order: 4; flex: 1 1 100%; flex-wrap: nowrap; overflow-x: visible;
+      gap: 6px; padding-top: 6px; margin-top: 2px; border-top: 1px solid #F3DEE1;
+    }
+    .nav-item {
+      flex: 1 1 0; min-width: 0; padding: 10px 0; gap: 0;
+      justify-content: center; background: #F3DEE1; border-radius: 12px;
+    }
+    .nav-item:hover { background: #EBD3D8; }
+    .nav-item.active { background: #B3A098; }
+    .nav-item svg { width: 19px; height: 19px; flex-shrink: 0; }
+    .nav-label { display: none; }
+    .nav-spacer { display: none; }
+
+    .note-fullscreen-overlay { left: 0; top: 92px; }
+
+    /* ---- row 3: search bar (icon buttons already moved up to row 1) ---- */
+    .main { padding: 14px 16px; }
+    .topbar { flex-wrap: wrap; gap: 8px; }
+    .search-box { max-width: none; width: 100%; }
+    .topbar-spacer { display: none; }
+
+    .page-title { font-size: 18px; }
+
+    .notes-grid { grid-template-columns: repeat(2, 1fr); }
+    .qn-card { flex-basis: 190px; }
+
+    .clock { font-size: 40px; }
+    .timer-card { padding: 20px 16px; }
+  }
 </style>
 </head>
 <body>
@@ -432,23 +530,23 @@
     <div class="nav-list">
       <button class="nav-item active" data-id="home">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v9a1 1 0 0 0 1 1h4v-6h2v6h4a1 1 0 0 0 1-1v-9"/></svg>
-        HOME
+        <span class="nav-label">HOME</span>
       </button>
       <button class="nav-item" data-id="notes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3.5h9L19 8v12.5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M14 3.5V8h5"/><path d="M8 13h8M8 16.5h5"/></svg>
-        NOTES
+        <span class="nav-label">NOTES</span>
       </button>
       <button class="nav-item" data-id="calendar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M3.5 9.5h17"/><path d="M8 3v3.4M16 3v3.4"/></svg>
-        CALENDAR
+        <span class="nav-label">CALENDAR</span>
       </button>
       <button class="nav-item" data-id="time">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></svg>
-        TIME
+        <span class="nav-label">TIME</span>
       </button>
       <button class="nav-item" data-id="help">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.4 2-2.4 3.6"/><circle cx="12" cy="16.6" r="0.3" fill="currentColor"/></svg>
-        HELP
+        <span class="nav-label">HELP</span>
       </button>
     </div>
 
@@ -869,6 +967,29 @@ document.querySelectorAll(".nav-item").forEach((btn) => {
     document.getElementById("noteModalOverlay").classList.remove("show");
   };
 });
+
+/* ============================================================
+   MOBILE HEADER: on narrow phones, move the icon buttons
+   (add / mail / notification / settings) out of the topbar and
+   into the sidebar's top row, next to the avatar and date/time.
+   On wider screens they move back to their original spot.
+   ============================================================ */
+(function mobileHeaderModule() {
+  const iconGroup = document.querySelector(".icon-btn-group");
+  const topbar = document.querySelector(".topbar");
+  const sidebar = document.querySelector(".sidebar");
+  const mq = window.matchMedia("(max-width: 640px)");
+
+  function place(matches) {
+    if (matches) {
+      sidebar.appendChild(iconGroup);
+    } else {
+      topbar.appendChild(iconGroup);
+    }
+  }
+  place(mq.matches);
+  mq.addEventListener("change", (e) => place(e.matches));
+})();
 
 /* ============================================================
    SHARED HELPERS
