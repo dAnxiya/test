@@ -324,6 +324,61 @@
     width: 100%; min-height: 420px; height: 60vh; border: none; border-radius: 12px; background: #fff; display: none;
   }
 
+  /* ---- note view: rendered content blocks (text / image / file / link) ---- */
+  .note-view-text-block { white-space: pre-wrap; word-break: break-word; margin-bottom: 16px; }
+  .note-view-text-block:last-child { margin-bottom: 0; }
+  .note-view-inline-image { width: 100%; border-radius: 12px; display: block; margin-bottom: 16px; }
+  .note-view-file-chip, .note-view-link-chip {
+    display: flex; align-items: center; gap: 9px; padding: 11px 14px; border-radius: 12px;
+    background: #FBF3F5; border: 1px solid #F3DEE1; margin-bottom: 16px; text-decoration: none;
+    color: #1c1c1e; font-size: 13.5px; font-weight: 600; max-width: 100%;
+  }
+  .note-view-file-chip:hover, .note-view-link-chip:hover { background: #F3DEE1; }
+  .note-view-file-chip svg, .note-view-link-chip svg { width: 17px; height: 17px; color: #B3A098; flex-shrink: 0; }
+  .note-view-file-chip span, .note-view-link-chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ---- note edit: block-based body editor ---- */
+  .note-block-toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+  .note-block-tool-btn {
+    display: flex; align-items: center; gap: 5px; padding: 7px 12px; border-radius: 9px;
+    border: 1px solid #F3DEE1; background: #FBF3F5; color: #6e6e73; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .note-block-tool-btn:hover { background: #F3DEE1; }
+  .note-block-tool-btn svg { width: 15px; height: 15px; flex-shrink: 0; color: #B3A098; }
+
+  .note-blocks-list { display: flex; flex-direction: column; gap: 10px; }
+  .note-block { position: relative; }
+  .note-block-textarea {
+    width: 100%; box-sizing: border-box; border: 1px solid #eee; border-radius: 10px; padding: 10px 34px 10px 12px;
+    font-size: 13.5px; line-height: 1.6; color: #1c1c1e; resize: none; overflow: hidden; min-height: 42px;
+    outline: none; font-family: inherit; display: block;
+  }
+  .note-block-textarea:focus { border-color: #B3A098; }
+  .note-block-image .note-block-image-preview {
+    width: 100%; border-radius: 10px; overflow: hidden; border: 1px solid #F3DEE1; max-height: 260px;
+    display: flex; cursor: pointer;
+  }
+  .note-block-image img { width: 100%; display: block; object-fit: cover; }
+  .note-block-media {
+    border: 1px solid #F3DEE1; border-radius: 10px; padding: 9px 34px 9px 10px; display: flex; align-items: center;
+    gap: 10px; background: #FBF3F5; cursor: pointer;
+  }
+  .note-block-media svg { width: 18px; height: 18px; color: #B3A098; flex-shrink: 0; }
+  .note-block-file-info { flex: 1; min-width: 0; }
+  .note-block-file-name { font-size: 12.5px; font-weight: 700; color: #1c1c1e; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .note-block-file-size { font-size: 11px; color: #a6a6ab; }
+  .note-block-link-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .note-block-link-input { border: none; background: transparent; font-size: 13px; width: 100%; outline: none; color: #1c1c1e; padding: 0; font-family: inherit; }
+  .note-block-link-input.note-block-url-input { color: #8e8e93; font-size: 11.5px; }
+  .note-block-remove {
+    position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; border: 1px solid #F3DEE1; color: #a6a6ab; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.12); z-index: 1;
+  }
+  .note-block-remove:hover { color: #d9534f; border-color: #f3c9c9; }
+  .note-block-remove svg { width: 11px; height: 11px; }
+  .note-block-image .note-block-remove { top: 10px; right: 10px; background: rgba(255,255,255,0.9); }
+
   /* ================= time view ================= */
   .panel-left { flex: 1.3; background: #F3DEE1; border: 1px solid #F3DEE1; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
   .panel-right { flex: 1; display: flex; flex-direction: column; gap: 16px; min-width: 240px; }
@@ -514,6 +569,43 @@
     .clock { font-size: 40px; }
     .timer-card { padding: 20px 16px; }
   }
+
+  /* ================= stickers ================= */
+  #stickerLayer { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+  .sticker {
+    position: absolute; pointer-events: auto; touch-action: none; cursor: grab;
+    -webkit-user-select: none; user-select: none;
+  }
+  .sticker img {
+    width: 100%; height: 100%; display: block; object-fit: contain;
+    pointer-events: none; -webkit-user-drag: none; user-select: none;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18));
+  }
+  .sticker.editing { cursor: grab; }
+  .sticker.editing:active { cursor: grabbing; }
+  .sticker.editing::after {
+    content: ""; position: absolute; inset: -6px; border: 2px dashed #B3A098;
+    border-radius: 8px; pointer-events: none;
+  }
+  .sticker-toolbar {
+    position: absolute; top: -38px; left: 50%; transform: translateX(-50%);
+    display: none; gap: 6px; background: #fff; border-radius: 20px; padding: 4px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18); white-space: nowrap;
+  }
+  .sticker.editing .sticker-toolbar { display: flex; }
+  .sticker-toolbar button {
+    width: 27px; height: 27px; border-radius: 50%; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .sticker-toolbar button svg { width: 14px; height: 14px; }
+  .sticker-confirm-btn { background: #B3A098; color: #fff; }
+  .sticker-delete-btn { background: #FBEAEA; color: #d9534f; }
+  .sticker-resize-handle {
+    position: absolute; right: -9px; bottom: -9px; width: 18px; height: 18px;
+    border-radius: 50%; background: #B3A098; border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25); cursor: nwse-resize; display: none;
+  }
+  .sticker.editing .sticker-resize-handle { display: block; }
 </style>
 </head>
 <body>
@@ -568,7 +660,7 @@
       </div>
       <div class="topbar-spacer"></div>
       <div class="icon-btn-group">
-        <button class="icon-btn" title="추가">
+        <button class="icon-btn" id="addStickerBtn" title="스티커 추가">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         </button>
         <button class="icon-btn" title="메일">
@@ -869,6 +961,10 @@
 <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
 <input type="file" id="bannerFileInput" accept="image/*" style="display:none;" />
 
+<!-- sticker images: floats over the whole screen ---- -->
+<input type="file" id="stickerFileInput" accept="image/*" style="display:none;" />
+<div id="stickerLayer"></div>
+
 <!-- image crop modal (shared by avatar + home photo) -->
 <div class="modal-overlay" id="cropModalOverlay">
   <div class="modal-box crop-modal-box">
@@ -934,11 +1030,34 @@
           <button type="button" class="note-mode-btn" id="noteModeHtml">HTML</button>
           <button type="button" class="note-paste-btn" id="notePasteBtn" title="클립보드에서 붙여넣기">붙여넣기</button>
         </div>
-        <textarea class="field-input" id="noteFieldContent" placeholder="내용" rows="4" style="resize:none;"></textarea>
-        <div>
-          <div class="note-html-preview-label" id="noteHtmlPreviewLabel">미리보기 (실제 적용된 모습 · 스타일·스크립트 포함)</div>
-          <iframe class="note-html-preview-frame" id="noteHtmlPreview" sandbox="allow-scripts"></iframe>
+
+        <div class="note-block-toolbar" id="noteBlockToolbar">
+          <button type="button" class="note-block-tool-btn" id="noteAddImageBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.6"/><path d="M21 16l-5.5-5.5L6 19"/></svg>
+            사진
+          </button>
+          <button type="button" class="note-block-tool-btn" id="noteAddFileBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v5a1 1 0 0 0 1 1h5"/><path d="M6 3h8l6 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
+            파일
+          </button>
+          <button type="button" class="note-block-tool-btn" id="noteAddLinkBtn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 17H7a5 5 0 0 1 0-10h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><path d="M8 12h8"/></svg>
+            링크
+          </button>
         </div>
+        <input type="file" id="noteBlockImageInput" accept="image/*" style="display:none;" />
+        <input type="file" id="noteBlockFileInput" style="display:none;" />
+
+        <div class="note-blocks-list" id="noteBlocksList"></div>
+
+        <div id="noteHtmlEditor" style="display:none;">
+          <textarea class="field-input" id="noteFieldContent" placeholder="<p>HTML을 입력하세요</p>" rows="4" style="resize:none;"></textarea>
+          <div>
+            <div class="note-html-preview-label" id="noteHtmlPreviewLabel">미리보기 (실제 적용된 모습 · 스타일·스크립트 포함)</div>
+            <iframe class="note-html-preview-frame" id="noteHtmlPreview" sandbox="allow-scripts"></iframe>
+          </div>
+        </div>
+
         <button class="delete-btn" id="noteDeleteBtn" style="display:none;">노트 삭제</button>
       </div>
     </div>
@@ -1945,13 +2064,40 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   const noteFieldImage = document.getElementById("noteFieldImage");
   const noteModeNormalBtn = document.getElementById("noteModeNormal");
   const noteModeHtmlBtn = document.getElementById("noteModeHtml");
+  const noteHtmlEditor = document.getElementById("noteHtmlEditor");
   const noteHtmlPreview = document.getElementById("noteHtmlPreview");
   const noteHtmlPreviewLabel = document.getElementById("noteHtmlPreviewLabel");
+  const noteBlockToolbar = document.getElementById("noteBlockToolbar");
+  const noteBlocksList = document.getElementById("noteBlocksList");
+  const noteAddImageBtn = document.getElementById("noteAddImageBtn");
+  const noteAddFileBtn = document.getElementById("noteAddFileBtn");
+  const noteAddLinkBtn = document.getElementById("noteAddLinkBtn");
+  const noteBlockImageInput = document.getElementById("noteBlockImageInput");
+  const noteBlockFileInput = document.getElementById("noteBlockFileInput");
 
   let editingNoteId = null;
   let viewingNoteId = null;
   let pendingImageData = null;
   let noteIsHtml = false;
+  const MAX_BLOCK_FILE_BYTES = 8 * 1024 * 1024; // 8MB safety cap (everything lives in memory)
+
+  // ---- content blocks: [{type:"text", value}, {type:"image", src, name}, {type:"file", name, size, dataUrl}, {type:"link", label, url}]
+  let blocks = [{ type: "text", value: "" }];
+  let lastFocusedIndex = 0;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+  function formatFileSize(bytes) {
+    if (bytes === null || bytes === undefined) return "";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / 1024 / 1024).toFixed(1) + " MB";
+  }
+  function autoGrowTextarea(ta) {
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
+  }
 
   noteImagePicker.onclick = () => noteFieldImage.click();
   noteFieldImage.onchange = () => {
@@ -1966,6 +2112,128 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     };
     reader.readAsDataURL(file);
   };
+
+  /* ---- block editor: insert image/file/link right after the block the
+     person was last focused in, so content can be dropped in mid-note ---- */
+  function focusBlock(i) {
+    requestAnimationFrame(() => {
+      const wrap = noteBlocksList.querySelector(`.note-block[data-index="${i}"]`);
+      if (!wrap) return;
+      const focusable = wrap.querySelector("textarea, input");
+      if (focusable) focusable.focus();
+    });
+  }
+
+  function insertBlock(newBlock) {
+    let pos = (lastFocusedIndex === null || lastFocusedIndex === undefined ? blocks.length - 1 : lastFocusedIndex) + 1;
+    pos = Math.max(0, Math.min(pos, blocks.length));
+    blocks.splice(pos, 0, newBlock);
+    let focusPos = pos;
+    if (newBlock.type !== "text") {
+      const next = blocks[pos + 1];
+      if (!next || next.type !== "text") {
+        blocks.splice(pos + 1, 0, { type: "text", value: "" });
+      }
+      focusPos = pos + 1;
+    }
+    lastFocusedIndex = focusPos;
+    renderBlocks();
+    focusBlock(focusPos);
+  }
+
+  function removeBlock(i) {
+    if (blocks.length <= 1) { blocks[0] = { type: "text", value: "" }; renderBlocks(); return; }
+    blocks.splice(i, 1);
+    if (lastFocusedIndex >= blocks.length) lastFocusedIndex = blocks.length - 1;
+    renderBlocks();
+  }
+
+  function removeBtnHtml() {
+    return `<button type="button" class="note-block-remove" title="삭제"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M18 6L6 18"/></svg></button>`;
+  }
+
+  function renderBlocks() {
+    noteBlocksList.innerHTML = "";
+    blocks.forEach((b, i) => {
+      const wrap = document.createElement("div");
+      wrap.dataset.index = i;
+
+      if (b.type === "text") {
+        wrap.className = "note-block note-block-text";
+        wrap.innerHTML = `<textarea class="note-block-textarea" placeholder="내용을 입력하세요..." rows="1"></textarea>${blocks.length > 1 ? removeBtnHtml() : ""}`;
+        const ta = wrap.querySelector("textarea");
+        ta.value = b.value || "";
+        requestAnimationFrame(() => autoGrowTextarea(ta));
+        ta.addEventListener("input", () => { b.value = ta.value; autoGrowTextarea(ta); });
+        ta.addEventListener("focus", () => { lastFocusedIndex = i; });
+        const rm = wrap.querySelector(".note-block-remove");
+        if (rm) rm.onclick = () => removeBlock(i);
+      } else if (b.type === "image") {
+        wrap.className = "note-block note-block-image";
+        wrap.innerHTML = `<div class="note-block-image-preview"><img src="${b.src}" alt="" /></div>${removeBtnHtml()}`;
+        wrap.querySelector(".note-block-remove").onclick = () => removeBlock(i);
+        wrap.querySelector(".note-block-image-preview").onclick = () => { lastFocusedIndex = i; };
+      } else if (b.type === "file") {
+        wrap.className = "note-block note-block-file";
+        wrap.innerHTML = `
+          <div class="note-block-media">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v5a1 1 0 0 0 1 1h5"/><path d="M6 3h8l6 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg>
+            <div class="note-block-file-info">
+              <div class="note-block-file-name">${escapeHtml(b.name || "파일")}</div>
+              <div class="note-block-file-size">${formatFileSize(b.size)}</div>
+            </div>
+          </div>
+          ${removeBtnHtml()}`;
+        wrap.querySelector(".note-block-remove").onclick = () => removeBlock(i);
+        wrap.querySelector(".note-block-media").onclick = () => { lastFocusedIndex = i; };
+      } else if (b.type === "link") {
+        wrap.className = "note-block note-block-link";
+        wrap.innerHTML = `
+          <div class="note-block-media">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 17H7a5 5 0 0 1 0-10h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><path d="M8 12h8"/></svg>
+            <div class="note-block-link-info">
+              <input class="note-block-link-input note-block-label-input" placeholder="링크 이름 (선택)" />
+              <input class="note-block-link-input note-block-url-input" placeholder="https://..." />
+            </div>
+          </div>
+          ${removeBtnHtml()}`;
+        const labelInput = wrap.querySelector(".note-block-label-input");
+        const urlInput = wrap.querySelector(".note-block-url-input");
+        labelInput.value = b.label || "";
+        urlInput.value = b.url || "";
+        labelInput.oninput = () => { b.label = labelInput.value; };
+        urlInput.oninput = () => { b.url = urlInput.value; };
+        labelInput.onfocus = () => { lastFocusedIndex = i; };
+        urlInput.onfocus = () => { lastFocusedIndex = i; };
+        wrap.querySelector(".note-block-remove").onclick = () => removeBlock(i);
+      }
+      noteBlocksList.appendChild(wrap);
+    });
+  }
+
+  noteAddImageBtn.onclick = () => noteBlockImageInput.click();
+  noteBlockImageInput.onchange = () => {
+    const file = noteBlockImageInput.files[0];
+    noteBlockImageInput.value = "";
+    if (!file) return;
+    if (file.size > MAX_BLOCK_FILE_BYTES) { alert("이미지가 너무 커요 (8MB 이하로 올려주세요)."); return; }
+    const reader = new FileReader();
+    reader.onload = () => insertBlock({ type: "image", src: reader.result, name: file.name });
+    reader.readAsDataURL(file);
+  };
+
+  noteAddFileBtn.onclick = () => noteBlockFileInput.click();
+  noteBlockFileInput.onchange = () => {
+    const file = noteBlockFileInput.files[0];
+    noteBlockFileInput.value = "";
+    if (!file) return;
+    if (file.size > MAX_BLOCK_FILE_BYTES) { alert("파일이 너무 커요 (8MB 이하로 올려주세요)."); return; }
+    const reader = new FileReader();
+    reader.onload = () => insertBlock({ type: "file", name: file.name, size: file.size, dataUrl: reader.result });
+    reader.readAsDataURL(file);
+  };
+
+  noteAddLinkBtn.onclick = () => insertBlock({ type: "link", label: "", url: "" });
 
   // shows a live-rendered preview of the HTML while typing, so it's clear the HTML is actually being applied
   function updateHtmlPreview() {
@@ -1984,7 +2252,10 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     noteIsHtml = isHtml;
     noteModeNormalBtn.classList.toggle("active", !isHtml);
     noteModeHtmlBtn.classList.toggle("active", isHtml);
-    noteFieldContent.placeholder = isHtml ? "<p>HTML을 입력하세요</p>" : "내용";
+    noteBlockToolbar.style.display = isHtml ? "none" : "flex";
+    noteBlocksList.style.display = isHtml ? "none" : "flex";
+    noteHtmlEditor.style.display = isHtml ? "block" : "none";
+    notePasteBtn.style.display = isHtml ? "" : "none";
     updateHtmlPreview();
   }
   noteModeNormalBtn.onclick = () => setNoteMode(false);
@@ -1992,7 +2263,7 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
 
   /* ---- paste button: some embedded/sandboxed viewers block the Ctrl/Cmd+V
      keyboard shortcut, so this gives an explicit way to pull text (including
-     long text or code) in from the clipboard. ---- */
+     long text or code) in from the clipboard. Only relevant in HTML mode. ---- */
   const notePasteBtn = document.getElementById("notePasteBtn");
   notePasteBtn.onclick = async () => {
     try {
@@ -2013,25 +2284,54 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   };
 
   /* ---- view mode: shows note content with a separate 편집(edit) button ---- */
+  function renderViewBlocks(n) {
+    noteViewContentEl.innerHTML = "";
+    const list = n.blocks && n.blocks.length ? n.blocks : (n.content ? [{ type: "text", value: n.content }] : []);
+    list.forEach((b) => {
+      if (b.type === "text") {
+        if (!b.value || !b.value.trim()) return;
+        const div = document.createElement("div");
+        div.className = "note-view-text-block";
+        div.textContent = b.value;
+        noteViewContentEl.appendChild(div);
+      } else if (b.type === "image" && b.src) {
+        const img = document.createElement("img");
+        img.className = "note-view-inline-image";
+        img.src = b.src;
+        img.alt = "";
+        noteViewContentEl.appendChild(img);
+      } else if (b.type === "file" && b.dataUrl) {
+        const a = document.createElement("a");
+        a.className = "note-view-file-chip";
+        a.href = b.dataUrl;
+        a.download = b.name || "file";
+        a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v5a1 1 0 0 0 1 1h5"/><path d="M6 3h8l6 6v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg><span>${escapeHtml(b.name || "파일")}</span>`;
+        noteViewContentEl.appendChild(a);
+      } else if (b.type === "link" && b.url) {
+        const a = document.createElement("a");
+        a.className = "note-view-link-chip";
+        a.href = b.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 17H7a5 5 0 0 1 0-10h2"/><path d="M15 7h2a5 5 0 0 1 0 10h-2"/><path d="M8 12h8"/></svg><span>${escapeHtml(b.label || b.url)}</span>`;
+        noteViewContentEl.appendChild(a);
+      }
+    });
+  }
+
   function openNoteViewModal(id) {
     const n = notes.find((x) => x.id === id);
     if (!n) return;
     viewingNoteId = id;
     noteViewTitleEl.textContent = n.title || "(제목 없음)";
-    if (n.content) {
-      if (n.isHtml) {
-        noteViewContentEl.style.display = "none";
-        noteViewHtmlFrame.srcdoc = n.content;
-        noteViewHtmlFrame.style.display = "block";
-      } else {
-        noteViewContentEl.textContent = n.content;
-        noteViewContentEl.style.display = "block";
-        noteViewHtmlFrame.style.display = "none";
-      }
-    } else {
-      noteViewContentEl.innerHTML = "";
+    if (n.isHtml && n.content) {
       noteViewContentEl.style.display = "none";
+      noteViewHtmlFrame.srcdoc = n.content;
+      noteViewHtmlFrame.style.display = "block";
+    } else {
       noteViewHtmlFrame.style.display = "none";
+      renderViewBlocks(n);
+      noteViewContentEl.style.display = noteViewContentEl.innerHTML ? "block" : "none";
     }
     if (n.image) {
       noteViewImageEl.style.backgroundImage = `url('${n.image}')`;
@@ -2044,16 +2344,27 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     noteOverlay.classList.add("show");
   }
 
-  /* ---- edit mode: title / content(with HTML toggle) / image / delete ---- */
+  /* ---- edit mode: title / content(blocks or HTML) / image / delete ---- */
   function openNoteEditModal(id) {
     editingNoteId = id;
     const n = id ? notes.find((x) => x.id === id) : null;
     noteModalTitle.textContent = n ? "노트 편집" : "노트 추가";
     noteFieldTitle.value = n ? n.title : "";
-    noteFieldContent.value = n && n.content ? n.content : "";
     pendingImageData = n && n.image ? n.image : null;
     noteFieldImage.value = "";
     setNoteMode(n ? !!n.isHtml : false);
+    noteFieldContent.value = n && n.isHtml && n.content ? n.content : "";
+
+    if (n && n.blocks && n.blocks.length) {
+      blocks = n.blocks.map((b) => ({ ...b }));
+    } else if (n && n.content && !n.isHtml) {
+      blocks = [{ type: "text", value: n.content }]; // migrate legacy plain-text note
+    } else {
+      blocks = [{ type: "text", value: "" }];
+    }
+    lastFocusedIndex = blocks.length - 1;
+    renderBlocks();
+
     if (pendingImageData) {
       noteImagePreviewImg.src = pendingImageData;
       noteImagePreviewImg.style.display = "block";
@@ -2081,15 +2392,28 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   noteModalSave.onclick = () => {
     const title = noteFieldTitle.value.trim();
     if (!title) return;
-    const content = noteFieldContent.value.trim();
+
+    let savedBlocks = null;
+    let savedContent = "";
+    if (noteIsHtml) {
+      savedContent = noteFieldContent.value.trim();
+    } else {
+      savedBlocks = blocks
+        .filter((b) => b.type !== "text" || b.value.trim().length > 0)
+        .map((b) => ({ ...b }));
+      if (savedBlocks.length === 0) savedBlocks = [{ type: "text", value: "" }];
+      savedContent = savedBlocks.filter((b) => b.type === "text").map((b) => b.value).join(" ").trim();
+    }
+
     if (editingNoteId) {
       const n = notes.find((x) => x.id === editingNoteId);
       n.title = title;
-      n.content = content;
       n.image = pendingImageData;
       n.isHtml = noteIsHtml;
+      n.content = savedContent;
+      n.blocks = savedBlocks;
     } else {
-      notes.push({ id: "n" + Date.now(), title, content, image: pendingImageData, isHtml: noteIsHtml });
+      notes.push({ id: "n" + Date.now(), title, image: pendingImageData, isHtml: noteIsHtml, content: savedContent, blocks: savedBlocks });
     }
     closeNoteModal();
     renderNotesGrid();
@@ -2282,6 +2606,185 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     }
     closeCropModal();
   };
+})();
+
+/* ============================================================
+   STICKERS: click the + button to drop an image anywhere on
+   screen. While placing (or right after tapping "+"), drag to
+   move, drag the corner handle to resize, tap the checkmark to
+   confirm, or the trash icon to delete. Once confirmed, a
+   sticker is locked — press and hold it to re-enter edit mode.
+   ============================================================ */
+(function stickerModule() {
+  const addBtn = document.getElementById("addStickerBtn");
+  const fileInput = document.getElementById("stickerFileInput");
+  const layer = document.getElementById("stickerLayer");
+
+  const LONG_PRESS_MS = 480;
+  const MOVE_CANCEL_PX = 8;
+  const MIN_SIZE = 40;
+  const MAX_SIZE = 520;
+
+  let stickers = [];
+  let idSeq = 1;
+  let editingId = null;
+
+  addBtn.onclick = () => fileInput.click();
+  fileInput.onchange = () => {
+    const file = fileInput.files[0];
+    fileInput.value = "";
+    if (file) readAndAdd(file);
+  };
+
+  function readAndAdd(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => addSticker(reader.result, img.naturalWidth, img.naturalHeight);
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function addSticker(src, naturalW, naturalH) {
+    const ratio = naturalW && naturalH ? naturalW / naturalH : 1;
+    let w = 160, h = 160;
+    if (ratio >= 1) { w = 160; h = Math.round(160 / ratio); }
+    else { h = 160; w = Math.round(160 * ratio); }
+    const x = Math.round(window.innerWidth / 2 - w / 2);
+    const y = Math.round(window.innerHeight / 2 - h / 2);
+    const sticker = { id: idSeq++, src, x, y, w, h, ratio: w / h };
+    stickers.push(sticker);
+    renderSticker(sticker);
+    setEditing(sticker.id);
+  }
+
+  function renderSticker(s) {
+    const el = document.createElement("div");
+    el.className = "sticker";
+    el.dataset.id = s.id;
+    el.style.left = s.x + "px";
+    el.style.top = s.y + "px";
+    el.style.width = s.w + "px";
+    el.style.height = s.h + "px";
+    el.innerHTML = `
+      <img src="${s.src}" alt="" draggable="false" />
+      <div class="sticker-toolbar">
+        <button class="sticker-confirm-btn" title="확정">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12l5 5L20 6"/></svg>
+        </button>
+        <button class="sticker-delete-btn" title="삭제">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m-8 0v12a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V7"/></svg>
+        </button>
+      </div>
+      <div class="sticker-resize-handle"></div>
+    `;
+    layer.appendChild(el);
+
+    const confirmBtn = el.querySelector(".sticker-confirm-btn");
+    const deleteBtn = el.querySelector(".sticker-delete-btn");
+    const resizeHandle = el.querySelector(".sticker-resize-handle");
+
+    confirmBtn.onclick = (e) => { e.stopPropagation(); setEditing(null); };
+    deleteBtn.onclick = (e) => { e.stopPropagation(); removeSticker(s.id); };
+
+    let mode = null; // "drag" | "resize" | null
+    let startX = 0, startY = 0, startLeft = 0, startTop = 0, startW = 0, startH = 0;
+    let longPressTimer = null, movedPastThreshold = false;
+
+    function clearLongPress() {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    }
+
+    el.addEventListener("pointerdown", (e) => {
+      if (e.target === resizeHandle || e.target === confirmBtn || e.target === deleteBtn) return;
+      startX = e.clientX; startY = e.clientY;
+      startLeft = s.x; startTop = s.y;
+      movedPastThreshold = false;
+
+      if (editingId === s.id) {
+        mode = "drag";
+        el.setPointerCapture(e.pointerId);
+      } else {
+        mode = "pending";
+        clearLongPress();
+        const pointerId = e.pointerId;
+        longPressTimer = setTimeout(() => {
+          if (mode === "pending") {
+            setEditing(s.id);
+            mode = "drag";
+            try { el.setPointerCapture(pointerId); } catch (err) {}
+          }
+        }, LONG_PRESS_MS);
+      }
+    });
+
+    resizeHandle.addEventListener("pointerdown", (e) => {
+      e.stopPropagation();
+      if (editingId !== s.id) return;
+      mode = "resize";
+      startX = e.clientX; startY = e.clientY;
+      startW = s.w; startH = s.h; startLeft = s.x; startTop = s.y;
+      resizeHandle.setPointerCapture(e.pointerId);
+    });
+
+    window.addEventListener("pointermove", (e) => {
+      if (!mode) return;
+      const dx = e.clientX - startX, dy = e.clientY - startY;
+      if (Math.abs(dx) > MOVE_CANCEL_PX || Math.abs(dy) > MOVE_CANCEL_PX) movedPastThreshold = true;
+
+      if (mode === "pending" && movedPastThreshold) {
+        clearLongPress();
+        mode = null;
+        return;
+      }
+      if (mode === "drag") {
+        s.x = startLeft + dx;
+        s.y = startTop + dy;
+        el.style.left = s.x + "px";
+        el.style.top = s.y + "px";
+      } else if (mode === "resize") {
+        let newW = Math.max(MIN_SIZE, Math.min(MAX_SIZE, startW + dx));
+        let newH = Math.round(newW / s.ratio);
+        if (newH < MIN_SIZE) { newH = MIN_SIZE; newW = Math.round(newH * s.ratio); }
+        if (newH > MAX_SIZE) { newH = MAX_SIZE; newW = Math.round(newH * s.ratio); }
+        s.w = newW; s.h = newH;
+        el.style.width = s.w + "px";
+        el.style.height = s.h + "px";
+      }
+    });
+
+    window.addEventListener("pointerup", () => {
+      clearLongPress();
+      mode = null;
+    });
+
+    el._stickerRef = s;
+    el._removeFn = () => el.remove();
+  }
+
+  function setEditing(id) {
+    editingId = id;
+    layer.querySelectorAll(".sticker").forEach((el) => {
+      el.classList.toggle("editing", Number(el.dataset.id) === id);
+    });
+  }
+
+  function removeSticker(id) {
+    stickers = stickers.filter((s) => s.id !== id);
+    const el = layer.querySelector(`.sticker[data-id="${id}"]`);
+    if (el) el.remove();
+    if (editingId === id) editingId = null;
+  }
+
+  // tapping anywhere outside the currently-editing sticker confirms it
+  document.addEventListener("pointerdown", (e) => {
+    if (editingId === null) return;
+    const activeEl = layer.querySelector(`.sticker[data-id="${editingId}"]`);
+    if (activeEl && !activeEl.contains(e.target)) {
+      setEditing(null);
+    }
+  });
 })();
 </script>
 </body>
