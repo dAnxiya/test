@@ -136,12 +136,19 @@
   .mini-cal-grid button.selected { background: #FF3B30; color: #fff; font-weight: 700; }
   .mini-cal-grid button.outmonth { color: #d4d4d8; }
 
-  .cal-list { border-top: 1px solid #ececef; padding: 10px 12px; }
-  .cal-list-title { font-size: 10.5px; color: #8e8e93; font-weight: 600; margin-bottom: 6px; }
-  .cal-list label { display: flex; align-items: center; gap: 7px; padding: 3px 0; cursor: pointer; font-size: 12px; }
-  .cal-list input[type=checkbox] { width: 12px; height: 12px; }
-  .cal-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .cal-list .name.inactive { color: #d4d4d8; }
+  .category-panel { padding: 14px 12px; display: flex; flex-direction: column; gap: 2px; height: 100%; }
+  .category-title { font-size: 12px; font-weight: 800; letter-spacing: 0.5px; color: #1c1c1e; margin-bottom: 10px; }
+  .category-row { display: flex; align-items: center; gap: 8px; padding: 7px 4px; border-radius: 8px; cursor: pointer; }
+  .category-row:hover { background: #f4f4f5; }
+  .category-row input[type=checkbox] { width: 12px; height: 12px; flex-shrink: 0; }
+  .cal-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .category-name { flex: 1; font-size: 12.5px; color: #1c1c1e; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .category-name.inactive { color: #d4d4d8; }
+  .category-count { font-size: 11px; color: #a6a6ab; font-weight: 600; min-width: 14px; text-align: right; }
+  .category-count.inactive { color: #d4d4d8; }
+  .category-add { margin-top: 8px; border: 1px dashed #d4d4d8; background: transparent; border-radius: 9px; padding: 8px 4px; display: flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer; color: #8e8e93; font-size: 12px; font-weight: 600; }
+  .category-add:hover { background: #f4f4f5; border-color: #c7c7cc; }
+  .category-add-icon { font-size: 13px; font-weight: 700; }
 
   .cal-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
   .cal-toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #ececef; }
@@ -359,25 +366,17 @@
 
     <!-- ---------- CALENDAR view ---------- -->
     <div class="view" id="view-calendar" style="display:none;">
-      <span class="page-title">CALENDAR</span>
       <div class="content">
         <div class="cal-panel">
           <div class="cal-app">
             <div class="cal-sidebar">
-              <div class="mini-cal">
-                <div class="mini-cal-head">
-                  <button id="miniPrev">‹</button>
-                  <span id="miniLabel"></span>
-                  <button id="miniNext">›</button>
-                </div>
-                <div class="mini-cal-weekdays">
-                  <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
-                </div>
-                <div class="mini-cal-grid" id="miniGrid"></div>
-              </div>
-              <div class="cal-list">
-                <div class="cal-list-title">내 캘린더</div>
-                <div id="calList"></div>
+              <div class="category-panel">
+                <div class="category-title">CATEGORY</div>
+                <div id="categoryList"></div>
+                <button class="category-add" id="categoryAddBtn">
+                  <span class="category-add-icon">+</span>
+                  <span>카테고리 추가</span>
+                </button>
               </div>
             </div>
             <div class="cal-main">
@@ -412,7 +411,6 @@
 
     <!-- ---------- TIME view ---------- -->
     <div class="view" id="view-time" style="display:none;">
-      <span class="page-title">TIME</span>
       <div class="content">
         <div class="panel-left">
           <div class="card timer-card">
@@ -598,10 +596,12 @@ function pad(n) { return String(n).padStart(2, "0"); }
   function timeToMinutes(t){ if(!t) return 0; const [h,m]=t.split(":").map(Number); return h*60+m; }
   function calColor(id){ return CALENDARS.find(c=>c.id===id).color; }
 
+  const CATEGORY_PALETTE = ["#FF9500","#34C759","#5AC8FA","#FF2D55","#AF52DE","#007AFF","#FF3B30","#00C7BE"];
+  let paletteIdx = 0;
+
   const today = new Date();
   let viewDate = new Date();
   let selectedDate = new Date();
-  let miniCursor = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1);
   let activeCalendars = new Set(CALENDARS.map(c=>c.id));
   let events = [
     { id:"e1", title:"TRPG 세션 - 겨울 시나리오", calendarId:"trpg", date: dateKey(today), start:"19:00", end:"23:00", allDay:false, location:"Discord", notes:"" },
@@ -619,41 +619,37 @@ function pad(n) { return String(n).padStart(2, "0"); }
     return map;
   }
 
-  function renderMini(){
-    document.getElementById("miniLabel").textContent = `${miniCursor.getFullYear()}년 ${MONTHS_KR[miniCursor.getMonth()]}`;
-    const grid = document.getElementById("miniGrid");
-    grid.innerHTML = "";
-    buildMonthGrid(miniCursor.getFullYear(), miniCursor.getMonth()).forEach(d=>{
-      const btn = document.createElement("button");
-      btn.textContent = d.getDate();
-      const inMonth = d.getMonth()===miniCursor.getMonth();
-      if (!inMonth) btn.classList.add("outmonth");
-      if (isSameDay(d, today)) btn.classList.add("today");
-      if (isSameDay(d, selectedDate)) btn.classList.add("selected");
-      btn.onclick = () => { selectedDate = d; viewDate = new Date(d.getFullYear(), d.getMonth(), 1); miniCursor = new Date(d.getFullYear(), d.getMonth(), 1); renderAll(); };
-      grid.appendChild(btn);
-    });
-  }
-  document.getElementById("miniPrev").onclick = () => { miniCursor = addMonths(miniCursor, -1); renderMini(); };
-  document.getElementById("miniNext").onclick = () => { miniCursor = addMonths(miniCursor, 1); renderMini(); };
-
-  function renderCalList(){
-    const el = document.getElementById("calList");
+  function renderCategoryList(){
+    const el = document.getElementById("categoryList");
     el.innerHTML = "";
     CALENDARS.forEach(c=>{
       const active = activeCalendars.has(c.id);
-      const label = document.createElement("label");
-      label.innerHTML = `
+      const count = events.filter(e=>e.calendarId===c.id).length;
+      const row = document.createElement("label");
+      row.className = "category-row";
+      row.innerHTML = `
         <input type="checkbox" ${active?"checked":""} />
         <span class="cal-dot" style="background:${c.color}"></span>
-        <span class="name ${active?"":"inactive"}">${c.name}</span>`;
-      label.querySelector("input").onchange = () => {
+        <span class="category-name ${active?"":"inactive"}">${c.name}</span>
+        <span class="category-count ${active?"":"inactive"}">${count}</span>`;
+      row.querySelector("input").onchange = () => {
         active ? activeCalendars.delete(c.id) : activeCalendars.add(c.id);
         renderAll();
       };
-      el.appendChild(label);
+      el.appendChild(row);
     });
   }
+  document.getElementById("categoryAddBtn").onclick = () => {
+    const name = prompt("새 카테고리 이름을 입력하세요");
+    if (!name || !name.trim()) return;
+    const id = "cat" + Date.now();
+    const color = CATEGORY_PALETTE[paletteIdx % CATEGORY_PALETTE.length];
+    paletteIdx++;
+    CALENDARS.push({ id, name: name.trim(), color });
+    activeCalendars.add(id);
+    refreshCalendarOptions();
+    renderAll();
+  };
 
   function renderMonth(){
     document.getElementById("monthLabel").textContent = `${viewDate.getFullYear()}년 ${MONTHS_KR[viewDate.getMonth()]}`;
@@ -700,9 +696,9 @@ function pad(n) { return String(n).padStart(2, "0"); }
     });
   }
 
-  document.getElementById("todayBtn").onclick = () => { viewDate = new Date(); selectedDate = new Date(); miniCursor = new Date(viewDate.getFullYear(), viewDate.getMonth(),1); renderAll(); };
-  document.getElementById("prevBtn").onclick = () => { viewDate = addMonths(viewDate, -1); miniCursor = new Date(viewDate); renderAll(); };
-  document.getElementById("nextBtn").onclick = () => { viewDate = addMonths(viewDate, 1); miniCursor = new Date(viewDate); renderAll(); };
+  document.getElementById("todayBtn").onclick = () => { viewDate = new Date(); selectedDate = new Date(); renderAll(); };
+  document.getElementById("prevBtn").onclick = () => { viewDate = addMonths(viewDate, -1); renderAll(); };
+  document.getElementById("nextBtn").onclick = () => { viewDate = addMonths(viewDate, 1); renderAll(); };
   document.getElementById("addBtn").onclick = () => openEditor(null, selectedDate);
 
   const overlay = document.getElementById("modalOverlay");
@@ -719,10 +715,14 @@ function pad(n) { return String(n).padStart(2, "0"); }
   const modalTitle = document.getElementById("modalTitle");
   const deleteBtn = document.getElementById("deleteBtn");
 
-  fieldCalendar.innerHTML = CALENDARS.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+  function refreshCalendarOptions(){
+    fieldCalendar.innerHTML = CALENDARS.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+  }
+  refreshCalendarOptions();
 
   function openEditor(id, defaultDate){
     editingId = id;
+    refreshCalendarOptions();
     const ev = id ? events.find(e=>e.id===id) : null;
     modalTitle.textContent = ev ? "일정 편집" : "새 일정";
     fieldTitle.value = ev ? ev.title : "";
@@ -809,8 +809,7 @@ function pad(n) { return String(n).padStart(2, "0"); }
   }
 
   function renderAll(){
-    renderMini();
-    renderCalList();
+    renderCategoryList();
     renderMonth();
   }
   renderAll();
