@@ -55,7 +55,7 @@
   .date-time { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; font-family: ui-monospace, "SF Mono", monospace; }
 
   /* ================= main shell ================= */
-  .main { flex: 1; display: flex; flex-direction: column; padding: 22px 30px; min-width: 0; min-height: 0; background: #fff; }
+  .main { flex: 1; display: flex; flex-direction: column; padding: 22px 30px; min-width: 0; min-height: 0; background: #fff; position: relative; }
 
   .topbar { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; flex-shrink: 0; }
   .search-box {
@@ -571,7 +571,7 @@
   }
 
   /* ================= stickers ================= */
-  #stickerLayer { position: fixed; inset: 0; z-index: 40; pointer-events: none; }
+  #stickerLayer { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
   .sticker {
     position: absolute; pointer-events: auto; touch-action: none; cursor: grab;
     -webkit-user-select: none; user-select: none;
@@ -674,6 +674,9 @@
         </button>
       </div>
     </div>
+
+    <!-- stickers float over this page only (scoped per nav view, not the whole screen) -->
+    <div id="stickerLayer"></div>
 
     <!-- ---------- HOME view ---------- -->
     <div class="view" id="view-home">
@@ -961,9 +964,8 @@
 <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
 <input type="file" id="bannerFileInput" accept="image/*" style="display:none;" />
 
-<!-- sticker images: floats over the whole screen ---- -->
+<!-- sticker images float over the current page (see #stickerLayer inside .main) -->
 <input type="file" id="stickerFileInput" accept="image/*" style="display:none;" />
-<div id="stickerLayer"></div>
 
 <!-- image crop modal (shared by avatar + home photo) -->
 <div class="modal-overlay" id="cropModalOverlay">
@@ -2628,6 +2630,23 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
   let stickers = [];
   let idSeq = 1;
   let editingId = null;
+  let currentViewId = (document.querySelector(".nav-item.active") || {}).dataset?.id || "home";
+
+  // stay in sync with page navigation: each sticker only shows on the page it was added to
+  document.querySelectorAll(".nav-item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (editingId !== null) setEditing(null);
+      currentViewId = btn.getAttribute("data-id");
+      updateVisibility();
+    });
+  });
+
+  function updateVisibility() {
+    layer.querySelectorAll(".sticker").forEach((el) => {
+      const s = el._stickerRef;
+      el.style.display = s && s.view === currentViewId ? "" : "none";
+    });
+  }
 
   addBtn.onclick = () => fileInput.click();
   fileInput.onchange = () => {
@@ -2651,9 +2670,10 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
     let w = 160, h = 160;
     if (ratio >= 1) { w = 160; h = Math.round(160 / ratio); }
     else { h = 160; w = Math.round(160 * ratio); }
-    const x = Math.round(window.innerWidth / 2 - w / 2);
-    const y = Math.round(window.innerHeight / 2 - h / 2);
-    const sticker = { id: idSeq++, src, x, y, w, h, ratio: w / h };
+    const rect = layer.getBoundingClientRect();
+    const x = Math.round(rect.width / 2 - w / 2);
+    const y = Math.round(rect.height / 2 - h / 2);
+    const sticker = { id: idSeq++, view: currentViewId, src, x, y, w, h, ratio: w / h };
     stickers.push(sticker);
     renderSticker(sticker);
     setEditing(sticker.id);
@@ -2680,6 +2700,8 @@ function renderQuickNotesAll() { quickNotesRenderers.forEach((fn) => fn()); }
       <div class="sticker-resize-handle"></div>
     `;
     layer.appendChild(el);
+    el._stickerRef = s;
+    el.style.display = s.view === currentViewId ? "" : "none";
 
     const confirmBtn = el.querySelector(".sticker-confirm-btn");
     const deleteBtn = el.querySelector(".sticker-delete-btn");
