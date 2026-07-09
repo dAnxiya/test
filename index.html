@@ -737,6 +737,63 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.25); cursor: nwse-resize; display: none;
   }
   .sticker.editing .sticker-resize-handle { display: block; }
+
+  /* ---- sticker text content (rendered inside a .sticker box, same drag/resize as images) ---- */
+  .sticker-text-box {
+    width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+    text-align: center; word-break: break-word; white-space: pre-wrap; font-weight: 800; line-height: 1.25;
+    filter: drop-shadow(0 3px 8px rgba(0,0,0,0.14)); padding: 2px; pointer-events: none; overflow: hidden;
+  }
+
+  /* ---- sticker type choice modal ---- */
+  .sticker-type-grid { display: flex; gap: 10px; justify-content: center; }
+  .sticker-type-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;
+    border: 1.5px solid var(--pink); border-radius: 12px; background: #fff; padding: 16px 6px;
+    cursor: pointer; color: var(--brown-dark); font-size: 12px; font-weight: 700;
+  }
+  .sticker-type-btn:hover { background: var(--pink-hover); border-color: var(--brown-light); }
+  .sticker-type-btn svg { width: 22px; height: 22px; color: var(--brown); }
+
+  /* ---- text sticker creation modal ---- */
+  .sticker-text-preview {
+    border: 1px solid var(--pink); border-radius: 10px; padding: 18px 10px; min-height: 60px;
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-weight: 800; font-size: 20px; color: var(--brown-dark); word-break: break-word; white-space: pre-wrap;
+  }
+  .swatch-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+  .swatch-dot {
+    width: 24px; height: 24px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; padding: 0;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.08);
+  }
+  .swatch-dot.active { border-color: var(--brown-dark); }
+  .swatch-dot.custom { background: conic-gradient(red, yellow, lime, cyan, blue, magenta, red); }
+
+  /* ---- drawing modal ---- */
+  .draw-modal-box { width: 400px; }
+  .draw-canvas-wrap {
+    width: 100%; aspect-ratio: 1 / 1; border-radius: 12px; border: 1px solid var(--pink);
+    overflow: hidden; position: relative;
+    background-image:
+      linear-gradient(45deg, #f4efec 25%, transparent 25%), linear-gradient(-45deg, #f4efec 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #f4efec 75%), linear-gradient(-45deg, transparent 75%, #f4efec 75%);
+    background-size: 16px 16px; background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  }
+  .draw-canvas-wrap canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+  .draw-toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .draw-tool-group { display: flex; gap: 3px; background: var(--pink-pale); border-radius: 10px; padding: 3px; }
+  .draw-tool-btn {
+    width: 32px; height: 32px; border-radius: 8px; border: none; background: transparent; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: var(--brown);
+  }
+  .draw-tool-btn svg { width: 16px; height: 16px; }
+  .draw-tool-btn.active { background: var(--brown); color: #fff; }
+  .draw-clear-btn {
+    border: none; background: var(--pink-soft); color: #d9534f; font-size: 12px; font-weight: 700;
+    padding: 7px 12px; border-radius: 8px; cursor: pointer; margin-left: auto;
+  }
+  .draw-size-row { display: flex; align-items: center; gap: 10px; }
+  .draw-size-row input[type="range"] { flex: 1; }
 </style>
 </head>
 <body>
@@ -1248,6 +1305,108 @@
   </div>
 </div>
 
+
+<!-- sticker: choose image / text / draw -->
+<div class="modal-overlay" id="stickerTypeModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="stickerTypeModalCancel">취소</button>
+      <span class="modal-title">스티커 추가</span>
+      <span style="width:28px;"></span>
+    </div>
+    <div class="modal-body">
+      <div class="sticker-type-grid">
+        <button class="sticker-type-btn" id="stickerTypeImageBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          이미지
+        </button>
+        <button class="sticker-type-btn" id="stickerTypeTextBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5h14M12 5v14"/></svg>
+          텍스트
+        </button>
+        <button class="sticker-type-btn" id="stickerTypeDrawBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          직접 그리기
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- sticker: text creation -->
+<div class="modal-overlay" id="stickerTextModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="stickerTextModalCancel">취소</button>
+      <span class="modal-title">텍스트 스티커</span>
+      <button class="save-btn" id="stickerTextModalSave" disabled>완료</button>
+    </div>
+    <div class="modal-body">
+      <textarea class="field-input" id="stickerTextInput" placeholder="문구를 입력해요" maxlength="40" rows="2" style="resize:none;"></textarea>
+      <div class="sticker-text-preview" id="stickerTextPreview">미리보기</div>
+      <div class="swatch-row" id="stickerTextColorRow"></div>
+    </div>
+  </div>
+</div>
+
+<!-- sticker: draw creation -->
+<div class="modal-overlay" id="stickerDrawModalOverlay">
+  <div class="modal-box draw-modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="stickerDrawModalCancel">취소</button>
+      <span class="modal-title">직접 그리기</span>
+      <button class="save-btn" id="stickerDrawModalSave">완료</button>
+    </div>
+    <div class="modal-body">
+      <div class="draw-canvas-wrap"><canvas id="stickerDrawCanvas" width="600" height="600"></canvas></div>
+      <div class="draw-toolbar">
+        <div class="draw-tool-group">
+          <button class="draw-tool-btn active" id="drawToolPen" title="펜">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+          </button>
+          <button class="draw-tool-btn" id="drawToolPencil" title="연필">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          </button>
+          <button class="draw-tool-btn" id="drawToolEraser" title="지우개">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H8l-6-6a2 2 0 0 1 0-2.8l9-9a2 2 0 0 1 2.8 0l6.2 6.2a2 2 0 0 1 0 2.8L13 18"/></svg>
+          </button>
+        </div>
+        <button class="draw-clear-btn" id="drawClearBtn">전체 지우기</button>
+      </div>
+      <div class="draw-size-row">
+        <span class="field-label" style="width:auto;">굵기</span>
+        <input type="range" id="drawSizeRange" min="2" max="40" value="8" />
+      </div>
+      <div class="swatch-row" id="drawColorRow"></div>
+    </div>
+  </div>
+</div>
+
+<!-- shared custom color picker (color-wheel), opened from any swatch row's rainbow circle -->
+<div class="modal-overlay" id="customColorModalOverlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <button class="cancel-btn" id="customColorModalCancel">취소</button>
+      <span class="modal-title">색상 선택</span>
+      <button class="save-btn" id="customColorModalSave">완료</button>
+    </div>
+    <div class="modal-body">
+      <div class="color-wheel-wrap">
+        <div class="color-wheel" id="customColorWheel">
+          <div class="color-wheel-pointer" id="customColorPointer"></div>
+        </div>
+        <div class="color-wheel-controls">
+          <div class="color-preview" id="customColorPreview"></div>
+          <input type="range" id="customBrightness" min="10" max="100" value="90" />
+          <div class="color-hex-input">
+            <span>#</span>
+            <input type="text" id="customHexInput" maxlength="6" placeholder="B3A098" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- hidden file pickers for avatar / home photo ---- -->
 <input type="file" id="avatarFileInput" accept="image/*" style="display:none;" />
@@ -3632,6 +3791,80 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
    confirm, or the trash icon to delete. Once confirmed, a
    sticker is locked — press and hold it to re-enter edit mode.
    ============================================================ */
+(function customColorPickerModule() {
+  const overlay = document.getElementById("customColorModalOverlay");
+  const wheel = document.getElementById("customColorWheel");
+  const pointer = document.getElementById("customColorPointer");
+  const preview = document.getElementById("customColorPreview");
+  const brightness = document.getElementById("customBrightness");
+  const hexInput = document.getElementById("customHexInput");
+  const saveBtn = document.getElementById("customColorModalSave");
+  const cancelBtn = document.getElementById("customColorModalCancel");
+
+  let hue = 4, sat = 100, current = "#B3A098";
+  let onConfirm = null;
+
+  function updatePointer() {
+    const R = wheel.clientWidth / 2;
+    const rad = (hue * Math.PI) / 180;
+    const dist = (sat / 100) * R;
+    pointer.style.left = (R + Math.sin(rad) * dist) + "px";
+    pointer.style.top = (R - Math.cos(rad) * dist) + "px";
+  }
+  function apply() {
+    current = hsvToHex(hue, sat, Number(brightness.value));
+    preview.style.background = current;
+    if (document.activeElement !== hexInput) hexInput.value = current.replace("#", "").toUpperCase();
+  }
+  function pickFromEvent(e) {
+    const rect = wheel.getBoundingClientRect();
+    const R = rect.width / 2;
+    const dx = e.clientX - rect.left - R, dy = e.clientY - rect.top - R;
+    const dist = Math.min(Math.sqrt(dx * dx + dy * dy), R);
+    let h = (Math.atan2(dx, -dy) * 180) / Math.PI;
+    if (h < 0) h += 360;
+    hue = h; sat = (dist / R) * 100;
+    updatePointer(); apply();
+  }
+  let dragging = false;
+  wheel.addEventListener("pointerdown", (e) => { dragging = true; wheel.setPointerCapture(e.pointerId); pickFromEvent(e); });
+  wheel.addEventListener("pointermove", (e) => { if (dragging) pickFromEvent(e); });
+  wheel.addEventListener("pointerup", () => { dragging = false; });
+  wheel.addEventListener("pointercancel", () => { dragging = false; });
+  brightness.addEventListener("input", apply);
+  hexInput.addEventListener("input", () => {
+    let v = hexInput.value.trim().replace(/^#/, "");
+    if (/^[0-9a-fA-F]{3}$/.test(v)) v = v.split("").map((c) => c + c).join("");
+    if (!/^[0-9a-fA-F]{6}$/.test(v)) return;
+    const hex = "#" + v;
+    const [h, s, val] = hexToHsv(hex);
+    hue = h; sat = Math.max(s, 4);
+    brightness.value = Math.max(Math.round(val), 10);
+    current = hex;
+    preview.style.background = current;
+    requestAnimationFrame(updatePointer);
+  });
+  hexInput.addEventListener("blur", () => { hexInput.value = current.replace("#", "").toUpperCase(); });
+  hexInput.addEventListener("keydown", (e) => { if (e.key === "Enter") hexInput.blur(); });
+
+  cancelBtn.onclick = () => overlay.classList.remove("show");
+  saveBtn.onclick = () => {
+    overlay.classList.remove("show");
+    if (onConfirm) onConfirm(current);
+  };
+
+  // reusable across the app: pass a starting hex + callback(hex) to fire on confirm
+  window.openCustomColorPicker = function (initialHex, callback) {
+    onConfirm = callback;
+    const [h, s, v] = hexToHsv(initialHex || "#B3A098");
+    hue = h; sat = Math.max(s, 15); brightness.value = Math.max(Math.round(v), 30);
+    current = initialHex || "#B3A098";
+    requestAnimationFrame(updatePointer);
+    apply();
+    overlay.classList.add("show");
+  };
+})();
+
 (function stickerModule() {
   const addBtn = document.getElementById("addStickerBtn");
   const fileInput = document.getElementById("stickerFileInput");
@@ -3641,11 +3874,234 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
   const MOVE_CANCEL_PX = 8;
   const MIN_SIZE = 40;
   const MAX_SIZE = 520;
+  const PALETTE = ["#6E5A4C", "#B3A098", "#E58C8A", "#E3A76F", "#D9C46A", "#8FBC8F", "#7FA8D9", "#A98FD9", "#E38FC0", "#FFFFFF"];
 
   let stickers = [];
   let idSeq = 1;
   let editingId = null;
   let currentViewId = (document.querySelector(".nav-item.active") || {}).dataset?.id || "home";
+
+  function buildSwatchRow(container, activeColor, onPick) {
+    container.innerHTML = "";
+    PALETTE.forEach((c) => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "swatch-dot" + (c === activeColor ? " active" : "");
+      b.style.background = c;
+      b.onclick = () => onPick(c);
+      container.appendChild(b);
+    });
+    const customBtn = document.createElement("button");
+    customBtn.type = "button";
+    customBtn.title = "커스텀 색상";
+    customBtn.className = "swatch-dot custom" + (!PALETTE.includes(activeColor) ? " active" : "");
+    customBtn.onclick = () => {
+      if (window.openCustomColorPicker) window.openCustomColorPicker(activeColor, (hex) => onPick(hex));
+    };
+    container.appendChild(customBtn);
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  /* ---- type choice modal: 이미지 / 텍스트 / 직접 그리기 ---- */
+  const typeOverlay = document.getElementById("stickerTypeModalOverlay");
+  function openTypeModal() { typeOverlay.classList.add("show"); }
+  function closeTypeModal() { typeOverlay.classList.remove("show"); }
+  document.getElementById("stickerTypeModalCancel").onclick = closeTypeModal;
+  document.getElementById("stickerTypeImageBtn").onclick = () => { closeTypeModal(); fileInput.click(); };
+  document.getElementById("stickerTypeTextBtn").onclick = () => { closeTypeModal(); openTextModal(); };
+  document.getElementById("stickerTypeDrawBtn").onclick = () => { closeTypeModal(); openDrawModal(); };
+
+  /* ---- text sticker creation modal ---- */
+  const textOverlay = document.getElementById("stickerTextModalOverlay");
+  const textInput = document.getElementById("stickerTextInput");
+  const textPreview = document.getElementById("stickerTextPreview");
+  const textColorRow = document.getElementById("stickerTextColorRow");
+  const textSaveBtn = document.getElementById("stickerTextModalSave");
+  let textColor = PALETTE[0];
+
+  function pickTextColor(c) {
+    textColor = c;
+    textPreview.style.color = c;
+    buildSwatchRow(textColorRow, textColor, pickTextColor);
+  }
+
+  function openTextModal() {
+    textInput.value = "";
+    textColor = PALETTE[0];
+    textPreview.textContent = "미리보기";
+    textPreview.style.color = textColor;
+    textSaveBtn.disabled = true;
+    buildSwatchRow(textColorRow, textColor, pickTextColor);
+    textOverlay.classList.add("show");
+    setTimeout(() => textInput.focus(), 50);
+  }
+  document.getElementById("stickerTextModalCancel").onclick = () => textOverlay.classList.remove("show");
+  textInput.oninput = () => {
+    const v = textInput.value;
+    textPreview.textContent = v.trim() ? v : "미리보기";
+    textSaveBtn.disabled = v.trim().length === 0;
+  };
+  textSaveBtn.onclick = () => {
+    const v = textInput.value.trim();
+    if (!v) return;
+    textOverlay.classList.remove("show");
+    addSticker({ type: "text", text: v, color: textColor, fontSize: 26 });
+  };
+
+  /* ---- draw sticker creation modal ---- */
+  const drawOverlay = document.getElementById("stickerDrawModalOverlay");
+  const drawCanvas = document.getElementById("stickerDrawCanvas");
+  const drawCtx = drawCanvas.getContext("2d");
+  const drawSizeRange = document.getElementById("drawSizeRange");
+  const drawColorRow = document.getElementById("drawColorRow");
+  const drawToolBtns = {
+    pen: document.getElementById("drawToolPen"),
+    pencil: document.getElementById("drawToolPencil"),
+    eraser: document.getElementById("drawToolEraser"),
+  };
+  let drawTool = "pen";
+  let drawColor = PALETTE[0];
+  let drawing = false;
+  let lastPt = null;
+
+  function setDrawTool(tool) {
+    drawTool = tool;
+    Object.keys(drawToolBtns).forEach((k) => drawToolBtns[k].classList.toggle("active", k === tool));
+    drawCanvas.style.cursor = tool === "eraser" ? "cell" : "crosshair";
+  }
+  drawToolBtns.pen.onclick = () => setDrawTool("pen");
+  drawToolBtns.pencil.onclick = () => setDrawTool("pencil");
+  drawToolBtns.eraser.onclick = () => setDrawTool("eraser");
+
+  function pickDrawColor(c) {
+    drawColor = c;
+    buildSwatchRow(drawColorRow, drawColor, pickDrawColor);
+  }
+
+  document.getElementById("drawClearBtn").onclick = () => {
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+  };
+
+  function canvasPointFromEvent(e) {
+    const rect = drawCanvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (drawCanvas.width / rect.width),
+      y: (e.clientY - rect.top) * (drawCanvas.height / rect.height),
+    };
+  }
+
+  function strokeSettings() {
+    const size = Number(drawSizeRange.value);
+    if (drawTool === "eraser") return { size: size * 1.6, color: "#000", opacity: 1, composite: "destination-out" };
+    if (drawTool === "pencil") return { size: Math.max(2, size * 0.85), color: drawColor, opacity: 0.55, composite: "source-over" };
+    return { size, color: drawColor, opacity: 1, composite: "source-over" };
+  }
+
+  function applyStrokeStyle() {
+    const s = strokeSettings();
+    drawCtx.globalCompositeOperation = s.composite;
+    drawCtx.globalAlpha = s.opacity;
+    drawCtx.strokeStyle = s.color;
+    drawCtx.fillStyle = s.color;
+    drawCtx.lineWidth = s.size;
+    drawCtx.lineCap = "round";
+    drawCtx.lineJoin = "round";
+    return s;
+  }
+
+  // pencil: scatter small jittered, semi-transparent dabs to fake a grainy graphite texture
+  // instead of one flat translucent stroke.
+  function pencilDab(pt, s) {
+    drawCtx.globalCompositeOperation = "source-over";
+    drawCtx.fillStyle = s.color;
+    const dabs = 5;
+    for (let j = 0; j < dabs; j++) {
+      const jitterR = (s.size / 2) * Math.random();
+      const angle = Math.random() * Math.PI * 2;
+      const jx = pt.x + Math.cos(angle) * jitterR;
+      const jy = pt.y + Math.sin(angle) * jitterR;
+      const r = Math.max(0.4, (s.size / 2) * (0.2 + Math.random() * 0.5));
+      drawCtx.globalAlpha = s.opacity * (0.25 + Math.random() * 0.5);
+      drawCtx.beginPath();
+      drawCtx.arc(jx, jy, r, 0, Math.PI * 2);
+      drawCtx.fill();
+    }
+    drawCtx.globalAlpha = 1;
+  }
+  function pencilSegment(a, b, s) {
+    const dist = Math.hypot(b.x - a.x, b.y - a.y);
+    const steps = Math.max(1, Math.ceil(dist / 1.3));
+    for (let i = 1; i <= steps; i++) {
+      const t = i / steps;
+      pencilDab({ x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }, s);
+    }
+  }
+
+  function drawDot(pt) {
+    const s = strokeSettings();
+    if (drawTool === "pencil") { pencilDab(pt, s); return; }
+    applyStrokeStyle();
+    drawCtx.beginPath();
+    drawCtx.arc(pt.x, pt.y, s.size / 2, 0, Math.PI * 2);
+    drawCtx.fill();
+    drawCtx.globalAlpha = 1;
+    drawCtx.globalCompositeOperation = "source-over";
+  }
+  function drawLineTo(a, b) {
+    const s = strokeSettings();
+    if (drawTool === "pencil") { pencilSegment(a, b, s); return; }
+    applyStrokeStyle();
+    drawCtx.beginPath();
+    drawCtx.moveTo(a.x, a.y);
+    drawCtx.lineTo(b.x, b.y);
+    drawCtx.stroke();
+    drawCtx.globalAlpha = 1;
+    drawCtx.globalCompositeOperation = "source-over";
+  }
+
+  drawCanvas.addEventListener("pointerdown", (e) => {
+    drawing = true;
+    drawCanvas.setPointerCapture(e.pointerId);
+    lastPt = canvasPointFromEvent(e);
+    drawDot(lastPt);
+  });
+  drawCanvas.addEventListener("pointermove", (e) => {
+    if (!drawing) return;
+    const pt = canvasPointFromEvent(e);
+    drawLineTo(lastPt, pt);
+    lastPt = pt;
+  });
+  function endDraw() { drawing = false; lastPt = null; }
+  drawCanvas.addEventListener("pointerup", endDraw);
+  drawCanvas.addEventListener("pointercancel", endDraw);
+  drawCanvas.addEventListener("pointerleave", endDraw);
+
+  function isCanvasBlank(canvas) {
+    const data = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height).data;
+    for (let i = 3; i < data.length; i += 4) { if (data[i] !== 0) return false; }
+    return true;
+  }
+
+  function openDrawModal() {
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    setDrawTool("pen");
+    drawColor = PALETTE[0];
+    drawSizeRange.value = 8;
+    buildSwatchRow(drawColorRow, drawColor, pickDrawColor);
+    drawOverlay.classList.add("show");
+  }
+  document.getElementById("stickerDrawModalCancel").onclick = () => drawOverlay.classList.remove("show");
+  document.getElementById("stickerDrawModalSave").onclick = () => {
+    const empty = isCanvasBlank(drawCanvas);
+    drawOverlay.classList.remove("show");
+    if (empty) return;
+    addSticker({ type: "image", src: drawCanvas.toDataURL("image/png"), naturalW: drawCanvas.width, naturalH: drawCanvas.height });
+  };
 
   // stay in sync with page navigation: each sticker only shows on the page it was added to
   document.querySelectorAll(".nav-item").forEach((btn) => {
@@ -3669,7 +4125,7 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
     });
   }
 
-  addBtn.onclick = () => fileInput.click();
+  addBtn.onclick = () => openTypeModal();
   fileInput.onchange = () => {
     const file = fileInput.files[0];
     fileInput.value = "";
@@ -3680,21 +4136,30 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
     const reader = new FileReader();
     reader.onload = () => {
       const img = new Image();
-      img.onload = () => addSticker(reader.result, img.naturalWidth, img.naturalHeight);
+      img.onload = () => addSticker({ type: "image", src: reader.result, naturalW: img.naturalWidth, naturalH: img.naturalHeight });
       img.src = reader.result;
     };
     reader.readAsDataURL(file);
   }
 
-  function addSticker(src, naturalW, naturalH) {
-    const ratio = naturalW && naturalH ? naturalW / naturalH : 1;
-    let w = 160, h = 160;
-    if (ratio >= 1) { w = 160; h = Math.round(160 / ratio); }
-    else { h = 160; w = Math.round(160 * ratio); }
+  function addSticker(opts) {
+    const type = opts.type || "image";
+    let w, h;
+    if (type === "image") {
+      const ratio = opts.naturalW && opts.naturalH ? opts.naturalW / opts.naturalH : 1;
+      if (ratio >= 1) { w = 160; h = Math.round(160 / ratio); }
+      else { h = 160; w = Math.round(160 * ratio); }
+    } else {
+      w = 150; h = 150;
+    }
     const rect = layer.getBoundingClientRect();
     const x = Math.round(rect.width / 2 - w / 2);
     const y = Math.round(rect.height / 2 - h / 2);
-    const sticker = { id: idSeq++, view: currentViewId, src, x, y, w, h, ratio: w / h };
+    const sticker = {
+      id: idSeq++, view: currentViewId, type, x, y, w, h, ratio: w / h,
+      src: opts.src || null, text: opts.text || "", color: opts.color || "#6E5A4C",
+      baseW: w, baseFontSize: opts.fontSize || 26,
+    };
     stickers.push(sticker);
     renderSticker(sticker);
     setEditing(sticker.id);
@@ -3708,8 +4173,11 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
     el.style.top = s.y + "px";
     el.style.width = s.w + "px";
     el.style.height = s.h + "px";
+    const contentHtml = s.type === "text"
+      ? `<div class="sticker-text-box" style="color:${s.color}; font-size:${s.baseFontSize}px;">${escapeHtml(s.text)}</div>`
+      : `<img src="${s.src}" alt="" draggable="false" />`;
     el.innerHTML = `
-      <img src="${s.src}" alt="" draggable="false" />
+      ${contentHtml}
       <div class="sticker-toolbar">
         <button class="sticker-confirm-btn" title="확정">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M4 12l5 5L20 6"/></svg>
@@ -3794,6 +4262,10 @@ function renderEventsAll() { eventsRenderers.forEach((fn) => fn()); }
         s.w = newW; s.h = newH;
         el.style.width = s.w + "px";
         el.style.height = s.h + "px";
+        if (s.type === "text") {
+          const box = el.querySelector(".sticker-text-box");
+          if (box) box.style.fontSize = Math.round(s.baseFontSize * (s.w / s.baseW)) + "px";
+        }
       }
     });
 
